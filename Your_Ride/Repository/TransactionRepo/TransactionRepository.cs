@@ -29,7 +29,7 @@ namespace Your_Ride.Repository.TransactionRepo
         {
             Transaction transaction = await context.Transactions.FirstOrDefaultAsync(x => x.Id == id);
 
-            if (transaction != null)
+            if (transaction == null)
             {
                 return -1;
 
@@ -40,7 +40,7 @@ namespace Your_Ride.Repository.TransactionRepo
             }
             else
             {
-                transaction.IsDeleted = false;
+                transaction.IsDeleted = true;
                await SaveDB();
                 return 1;
             }

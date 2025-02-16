@@ -8,13 +8,16 @@ namespace Your_Ride.ViewModels.TransactionViewModel
         public int Id { get; set; }
 
         [Required]
-        public ApplicationUser User { get; set; }
+        public string UserId { get; set; }
+        public ApplicationUser? User { get; set; }
 
         [Required]
-        public Wallet Wallet { get; set; }
+        public int WalletID { get; set; }
+        public Wallet? Wallet { get; set; }
 
         [Required]
-        public ApplicationUser Admin { get; set; }
+        public string AdminId { get; set; }
+        public ApplicationUser? Admin { get; set; }
 
         [Required]
         [Range(0.01, double.MaxValue, ErrorMessage = "Amount must be greater than zero.")]
@@ -24,5 +27,16 @@ namespace Your_Ride.ViewModels.TransactionViewModel
         public DateTime TransactionDate { get; set; }
 
         public  DateTime? EditedTransactionDate { get; set; }
+
+        [Range(0.01, double.MaxValue, ErrorMessage = "Amount must be greater than zero.")]
+        public double? OptionAmount { get; set; }
+
+        public TransactionType? OptionType { get; set; } // Only one option: Increase OR Decrease
     }
+    public enum TransactionType
+    {
+        Increase, // "+"
+        Decrease  // "-"
+    }
+
 }

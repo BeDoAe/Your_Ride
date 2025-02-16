@@ -87,6 +87,7 @@ namespace Your_Ride.Controllers
             allDataTransactionCreateVM.Admin = adminUser;
             allDataTransactionCreateVM.User = user;
             allDataTransactionCreateVM.Wallet = wallet;
+            wallet.Amount += createtransactionVM.Amount;
             allDataTransactionCreateVM.WalletId = wallet.Id;
             allDataTransactionCreateVM.Amount = createtransactionVM.Amount;
             allDataTransactionCreateVM.TransactionDate = createtransactionVM.TransactionDate;
@@ -107,6 +108,9 @@ namespace Your_Ride.Controllers
             var transaction = await transactionService.GetTransactionByID(id);
             if (transaction == null) return NotFound();
 
+            transaction.UserId = transaction.User.Id;
+            transaction.AdminId = transaction.Admin.Id;
+            transaction.WalletID = transaction.Wallet.Id;
             return View("EditTransaction", transaction);
         }
 

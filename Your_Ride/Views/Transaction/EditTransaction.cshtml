@@ -8,15 +8,46 @@
 
 <form asp-action="EditTransaction" method="post">
     <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="AdminId" />
+    <input type="hidden" asp-for="UserId" />
+    <input type="hidden" asp-for="WalletID" />
+
 
     <div class="mb-3">
         <label class="form-label">Amount ($)</label>
         <input asp-for="Amount" class="form-control" required />
     </div>
 
+@*     <div class="mb-3">
+        <label class="form-label">Transaction Date</label>
+        <input readonly asp-for="TransactionDate" type="datetime" class="form-control" required />
+
+        <p><strong>Transaction Date:</strong> @Model.TransactionDate.ToString("yyyy-MM-dd HH:mm")</p>
+
+    </div> *@
+
     <div class="mb-3">
         <label class="form-label">Transaction Date</label>
-        <input readonly asp-for="TransactionDate" type="date" class="form-control" required />
+        <input readonly class="form-control" type="text" value="@Model.TransactionDate.ToString("dddd, MMMM dd, yyyy - hh:mm tt")" />
+    </div>
+
+    <!-- Option Amount -->
+    <div class="mb-3">
+        <label class="form-label">Adjust Amount</label>
+        <input asp-for="OptionAmount" class="form-control" />
+    </div>
+
+    <!-- Choose Increase or Decrease -->
+    <div class="mb-3">
+        <label class="form-label">Adjustment Type</label>
+        <div class="form-check">
+            <input type="radio" asp-for="OptionType" value="Increase" class="form-check-input" id="increaseOption" />
+            <label class="form-check-label" for="increaseOption">Increase (+)</label>
+        </div>
+        <div class="form-check">
+            <input type="radio" asp-for="OptionType" value="Decrease" class="form-check-input" id="decreaseOption" />
+            <label class="form-check-label" for="decreaseOption">Decrease (-)</label>
+        </div>
     </div>
 
     <button type="submit" class="btn btn-primary">💾 Save Changes</button>

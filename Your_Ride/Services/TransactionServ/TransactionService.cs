@@ -6,6 +6,7 @@ using Your_Ride.Repository.TransactionRepo;
 using Your_Ride.Repository.WalletRepo;
 using Your_Ride.Services.Generic;
 using Your_Ride.ViewModels.TransactionViewModel;
+using Your_Ride.ViewModels.WalletViewModel;
 
 namespace Your_Ride.Services.TransactionServ
 {
@@ -48,9 +49,51 @@ namespace Your_Ride.Services.TransactionServ
 
             Transaction transactionFromDB = await transactionRepository.GetByIdAsync(transactionVM.Id);
             if (transactionFromDB == null) return null;
+            Wallet wallet = await walletRepository.GetByIdAsync(transactionVM.WalletID);
+            if(wallet.Amount<0)
+            {
+                return transactionVM;
+            }
 
-            transactionFromDB.Amount = transactionVM.Amount;
-            transactionFromDB.TransactionDate=DateTime.Now;
+
+            // Ensure a valid adjustment
+            if (transactionVM.OptionAmount > 0 && transactionVM.OptionType.HasValue)
+            {
+                if (transactionVM.OptionType == TransactionType.Decrease && transactionVM.OptionAmount <= transactionVM.Amount)
+                {
+                    wallet.Amount -= transactionVM.OptionAmount.Value;
+                    transactionFromDB.Amount -= transactionVM.OptionAmount.Value;
+
+                    /////////////////
+                    transactionFromDB.EditedTransactionDate = DateTime.Now;
+
+                    await transactionRepository.UpdateAsync(transactionFromDB);
+
+                    return automapper.Map<TransactionvM>(transactionFromDB);
+                }
+                else if (transactionVM.OptionType == TransactionType.Increase)
+                {
+                    wallet.Amount -= transactionFromDB.Amount;
+                    wallet.Amount += transactionVM.OptionAmount.Value;
+                    transactionFromDB.Amount = transactionVM.OptionAmount.Value;
+
+                    transactionFromDB.EditedTransactionDate = DateTime.Now;
+
+                    await transactionRepository.UpdateAsync(transactionFromDB);
+
+                    return automapper.Map<TransactionvM>(transactionFromDB);
+                }
+                else
+                {
+                    return transactionVM;
+                }
+            }
+
+            wallet.Amount -= transactionFromDB.Amount;
+            wallet.Amount += transactionVM.Amount;
+
+             transactionFromDB.Amount = transactionVM.Amount;
+            //transactionFromDB.TransactionDate=DateTime.Now;
 
             DateTime currentDateTime = DateTime.Now;
             transactionFromDB.EditedTransactionDate = currentDateTime;
@@ -108,8 +151,13 @@ namespace Your_Ride.Services.TransactionServ
             // 🔄 Sorting
             query = sortColumn switch
             {
+                "Id" => ascending ? query.OrderBy(t => t.Id) : query.OrderByDescending(t => t.Id),
                 "Amount" => ascending ? query.OrderBy(t => t.Amount) : query.OrderByDescending(t => t.Amount),
                 "Date" => ascending ? query.OrderBy(t => t.TransactionDate) : query.OrderByDescending(t => t.TransactionDate),
+                "User" => ascending ? query.OrderBy(t => t.User.FirstName).ThenBy(t => t.User.LastName)
+                                    : query.OrderByDescending(t => t.User.FirstName).ThenByDescending(t => t.User.LastName),
+                "Admin" => ascending ? query.OrderBy(t => t.Admin.FirstName).ThenBy(t => t.Admin.LastName)
+                                     : query.OrderByDescending(t => t.Admin.FirstName).ThenByDescending(t => t.Admin.LastName),
                 _ => query.OrderByDescending(t => t.TransactionDate) // Default sorting by date descending
             };
 
