@@ -1,0 +1,27 @@
+﻿@model Your_Ride.ViewModels.Account.loginUserVM
+
+<h2>Login</h2>
+
+<form asp-action="Login" asp-controller="Account" method="post">
+    <div class="mb-3">
+        <label asp-for="UserName" class="form-label">User Name</label>
+        <input asp-for="UserName" class="form-control" required />
+        <span asp-validation-for="UserName" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Password" class="form-label">Password</label>
+        <input asp-for="Password" type="password" class="form-control" required />
+        <span asp-validation-for="Password" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3 form-check">
+        <input asp-for="RememberMe" type="checkbox" class="form-check-input" />
+        <label asp-for="RememberMe" class="form-check-label">Remember Me</label>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Login</button>
+</form>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

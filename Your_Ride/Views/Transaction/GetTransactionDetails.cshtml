@@ -1,0 +1,27 @@
+﻿@model Your_Ride.ViewModels.TransactionViewModel.TransactionvM
+
+@{
+    ViewData["Title"] = "Transaction Details";
+}
+
+<h2 class="mb-4">💳 Transaction Details</h2>
+
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title">Transaction #@Model.Id</h5>
+        <p><strong>Amount:</strong> $@Model.Amount</p>
+        <p><strong>Transaction Date:</strong> @Model.TransactionDate.ToString("yyyy-MM-dd")</p>
+        <p><strong>Transaction Last Edited-Date:</strong> @Model.EditedTransactionDate?.ToString("yyyy-MM-dd")</p>
+        <hr>
+
+        <h4>User Details</h4>
+        <p><strong>Name:</strong> @Model.User.FirstName @Model.User.LastName</p>
+        <p><strong>Email:</strong> @Model.User.Email</p>
+
+        <h4>Wallet Details</h4>
+        <p><strong>Wallet ID:</strong> @Model.Wallet.Id</p>
+        <p><strong>Wallet Balance:</strong> $@Model.Wallet.Amount</p>
+
+        <a asp-action="GetAllTransactions" class="btn btn-secondary">⬅ Back</a>
+    </div>
+</div>

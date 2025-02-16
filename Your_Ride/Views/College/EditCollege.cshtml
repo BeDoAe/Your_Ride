@@ -1,0 +1,64 @@
+﻿@model Your_Ride.ViewModels.College.EditCollegeVM
+
+@{
+    ViewData["Title"] = "Edit College";
+}
+
+<h2>Edit College</h2>
+
+<form asp-action="Edit" method="post">
+    <input type="hidden" asp-for="CollegeVM.Id" />
+
+    <div class="form-group">
+        <label asp-for="CollegeVM.Name"></label>
+        <input asp-for="CollegeVM.Name" class="form-control" />
+        <span asp-validation-for="CollegeVM.Name" class="text-danger"></span>
+    </div>
+
+    <!-- University Dropdown -->
+    <div class="form-group">
+        <label asp-for="CollegeVM.UniversityID">University</label>
+        <select asp-for="CollegeVM.UniversityID" class="form-control">
+            @foreach (var university in Model.Universities)
+            {
+                <option value="@university.Id">@university.Name</option>
+            }
+        </select>
+    </div>
+
+    <!-- Batches Section -->
+    <div class="form-group">
+        <label>Batches</label>
+        <ul id="batches-list">
+            @for (int i = 0; i < Model.CollegeVM.Batches.Count; i++)
+            {
+                <li>
+                    <input type="text" name="CollegeVM.Batches[@i]" value="@Model.CollegeVM.Batches[i]" class="form-control d-inline-block w-75" />
+                    <button type="button" class="btn btn-danger btn-sm" onclick="removeBatch(this)">Remove</button>
+                </li>
+            }
+        </ul>
+        <button type="button" class="btn btn-success" onclick="addBatch()">Add Batch</button>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Update</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        function addBatch() {
+            var index = document.querySelectorAll("#batches-list input").length;
+            var list = document.getElementById("batches-list");
+            var li = document.createElement("li");
+            li.innerHTML = `<input type="text" name="CollegeVM.Batches[${index}]" class="form-control d-inline-block w-75" />
+                            <button type="button" class="btn btn-danger btn-sm" onclick="removeBatch(this)">Remove</button>`;
+            list.appendChild(li);
+        }
+
+        function removeBatch(button) {
+            button.parentElement.remove();
+        }
+    </script>
+}

@@ -1,0 +1,119 @@
+﻿@model Your_Ride.ViewModels.Account.AccountCollegeUniversityVM
+
+@{
+    ViewData["Title"] = "Register";
+}
+
+<h2>Register</h2>
+
+<form asp-action="Register" method="post">
+    <div class="form-group">
+        <label>First Name</label>
+        <input asp-for="RegisterVM.FirstName" class="form-control" />
+        <span asp-validation-for="RegisterVM.FirstName" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label>Last Name</label>
+        <input asp-for="RegisterVM.LastName" class="form-control" />
+        <span asp-validation-for="RegisterVM.LastName" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label>User Name</label>
+        <input asp-for="RegisterVM.UserName" class="form-control" />
+        <span asp-validation-for="RegisterVM.UserName" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label>Email</label>
+        <input asp-for="RegisterVM.Email" class="form-control" />
+        <span asp-validation-for="RegisterVM.Email" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label>Password</label>
+        <input asp-for="RegisterVM.Password" class="form-control" />
+        <span asp-validation-for="RegisterVM.Password" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label>Confirm Password</label>
+        <input asp-for="RegisterVM.ConfirmPassword" class="form-control" />
+        <span asp-validation-for="RegisterVM.ConfirmPassword" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label>Mobile Number</label>
+        <input asp-for="RegisterVM.MobileNumber" class="form-control" />
+        <span asp-validation-for="RegisterVM.MobileNumber" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label>National ID</label>
+        <input asp-for="RegisterVM.NationalID" class="form-control" />
+        <span asp-validation-for="RegisterVM.NationalID" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label>University</label>
+        <select asp-for="RegisterVM.UniversityID" class="form-control" id="universityDropdown">
+            <option value="">-- Select University --</option>
+            @foreach (var university in Model.UniversitiesVM)
+            {
+                <option value="@university.Id">@university.Name</option>
+            }
+        </select>
+        <span asp-validation-for="RegisterVM.UniversityID" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label>College</label>
+        <select asp-for="RegisterVM.CollegeID" class="form-control" id="collegeDropdown">
+            <option value="">-- Select College --</option>
+        </select>
+        <span asp-validation-for="RegisterVM.CollegeID" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label>Batch</label>
+        <select asp-for="RegisterVM.Batch" class="form-control" id="batchDropdown">
+            <option value="">-- Select Batch --</option>
+        </select>
+        <span asp-validation-for="RegisterVM.Batch" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Register</button>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        $(document).ready(function () {
+            $("#universityDropdown").change(function () {
+                var universityId = $(this).val();
+                if (universityId) {
+                    $.getJSON('/Account/GetColleges?universityId=' + universityId, function (data) {
+                        $("#collegeDropdown").empty().append('<option value="">-- Select College --</option>');
+                        $.each(data, function (i, college) {
+                            $("#collegeDropdown").append('<option value="' + college.id + '">' + college.name + '</option>');
+                        });
+                    });
+                } else {
+                    $("#collegeDropdown").empty().append('<option value="">-- Select College --</option>');
+                }
+            });
+
+            $("#collegeDropdown").change(function () {
+                var collegeId = $(this).val();
+                if (collegeId) {
+                    $.getJSON('/Account/GetBatches?collegeId=' + collegeId, function (data) {
+                        $("#batchDropdown").empty().append('<option value="">-- Select Batch --</option>');
+                        $.each(data, function (i, batch) {
+                            $("#batchDropdown").append('<option value="' + batch + '">' + batch + '</option>');
+                        });
+                    });
+                } else {
+                    $("#batchDropdown").empty().append('<option value="">-- Select Batch --</option>');
+                }
+            });
+        });
+    </script>
+}

@@ -1,0 +1,10 @@
+﻿@model Your_Ride.ViewModels.Account.DeleteRoleVM
+
+<h2>Confirm Delete Role</h2>
+<p>Are you sure you want to delete the role <strong>@Model.RoleName</strong>?</p>
+
+<form asp-action="DeleteRole" asp-controller="Account" method="post">
+    <input type="hidden" name="RoleName" value="@Model.RoleName" />
+    <button type="submit" class="btn btn-danger">Delete</button>
+    <a asp-action="UserRoles" class="btn btn-secondary">Cancel</a>
+</form>

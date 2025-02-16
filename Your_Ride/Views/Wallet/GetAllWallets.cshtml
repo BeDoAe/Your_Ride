@@ -1,0 +1,30 @@
+﻿@model List<Your_Ride.ViewModels.WalletViewModel.WalletVM>
+
+@{
+    ViewData["Title"] = "All Wallets";
+}
+
+<h2>All Wallets</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>User Name</th>
+            <th>Wallet Amount</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var wallet in Model)
+        {
+            <tr>
+                <td>@wallet.User.UserName</td>
+                <td>@wallet.Amount</td>
+                <td>
+                    <a asp-action="GetWalletByID" asp-route-WalletID="@wallet.Id" class="btn btn-info">View</a>
+                    <a asp-action="UpdateWallet" asp-route-WalletID="@wallet.Id" class="btn btn-warning">Edit</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

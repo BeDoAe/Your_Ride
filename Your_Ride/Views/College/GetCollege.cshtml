@@ -1,0 +1,20 @@
+﻿@model Your_Ride.ViewModels.College.CollegeVM
+<h1>@Model.Name</h1>
+<h2>
+    @if (Model?.Batches != null && Model.Batches.Any())
+    {
+        <ul>
+            @foreach (var batch in Model.Batches)
+            {
+                <li>@batch</li>
+            }
+        </ul>
+    }
+    else
+    {
+        <span>No batches available</span>
+    }
+</h2>
+<h3>@Model?.University.Name</h3>
+<a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Edit</a>
+<a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger">Delete</a>

@@ -1,0 +1,88 @@
+﻿@model Your_Ride.ViewModels.Account.UserRolesVM
+
+<h2 class="text-center">User Roles Management</h2>
+
+<div class="row">
+    <!-- Users Table -->
+    <div class="col-md-7">
+        <h4>Users & Their Roles</h4>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>User Name</th>
+                    <th>Email</th>
+                    <th>Roles</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var user in Model.Users)
+                {
+                    <tr>
+                        <td>@user.UserName</td>
+                        <td>@user.Email</td>
+                        <td>@string.Join(", ", user.Roles)</td>
+                        <td>
+                            <form asp-action="AssignRole" asp-controller="Account" method="post" class="d-inline">
+                                <input type="hidden" name="userId" value="@user.UserId" />
+                                <select name="role" class="form-select d-inline w-auto">
+                                    @foreach (var role in Model.Roles)
+                                    {
+                                        <option value="@role">@role</option>
+                                    }
+                                </select>
+                                <button type="submit" class="btn btn-success btn-sm">Assign</button>
+                            </form>
+
+                            <form asp-action="RemoveRole" asp-controller="Account" method="post" class="d-inline">
+                                <input type="hidden" name="userId" value="@user.UserId" />
+                                <select name="role" class="form-select d-inline w-auto">
+                                    @foreach (var role in user.Roles)
+                                    {
+                                        <option value="@role">@role</option>
+                                    }
+                                </select>
+                                <button type="submit" class="btn btn-danger btn-sm">Remove</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Roles Table -->
+    <div class="col-md-5">
+        <h4>Roles Management</h4>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Role Name</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var role in Model.Roles)
+                {
+                    <tr>
+                        <td>@role</td>
+                        <td>
+                            <a asp-action="EditRole" asp-route-roleName="@role" class="btn btn-warning btn-sm">Edit</a>
+                            <form asp-action="DeleteRole" asp-controller="Account" method="post" class="d-inline">
+                                <input type="hidden" name="roleName" value="@role" />
+                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <!-- Add Role Button -->
+        <a asp-action="AddRole" asp-controller="Account" class="btn btn-primary">Add New Role</a>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

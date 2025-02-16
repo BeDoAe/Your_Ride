@@ -1,0 +1,36 @@
+﻿@model List<Your_Ride.ViewModels.College.CollegeVM>
+
+@{
+    ViewData["Title"] = "All Colleges";
+}
+
+<h2>All Colleges</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>College Name</th>
+            <th>University</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var college in Model)
+        {
+            <tr>
+                <td>@college.Name</td>
+@*                 <td>@college.UniversityID</td>
+ *@                <td>@college.University?.Name</td>
+
+
+                <td>
+                    <a asp-action="GetCollegeByID" asp-route-id="@college.Id" class="btn btn-info">View</a>
+                    <a asp-action="Edit" asp-route-id="@college.Id" class="btn btn-warning">Edit</a>
+                    <a asp-action="Delete" asp-route-id="@college.Id" class="btn btn-danger">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a asp-action="Create" class="btn btn-success">Create New College</a>
