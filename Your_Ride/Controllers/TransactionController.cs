@@ -1,4 +1,5 @@
-﻿using System.Security.Claims;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -119,7 +120,11 @@ namespace Your_Ride.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditTransaction(TransactionvM transactionVM)
         {
-            if (!ModelState.IsValid) return View(transactionVM);
+            // Run validation first
+            if (!ModelState.IsValid)
+            {
+                return View(transactionVM);
+            }
 
             var updatedTransaction = await transactionService.UpdateTransaction(transactionVM);
             if (updatedTransaction == null)

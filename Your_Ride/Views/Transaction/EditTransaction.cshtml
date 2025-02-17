@@ -12,20 +12,13 @@
     <input type="hidden" asp-for="UserId" />
     <input type="hidden" asp-for="WalletID" />
 
-
+    <!-- Amount Field (Read-only) -->
     <div class="mb-3">
         <label class="form-label">Amount ($)</label>
-        <input asp-for="Amount" class="form-control" required />
+        <input asp-for="Amount" class="form-control" readonly />
     </div>
 
-@*     <div class="mb-3">
-        <label class="form-label">Transaction Date</label>
-        <input readonly asp-for="TransactionDate" type="datetime" class="form-control" required />
-
-        <p><strong>Transaction Date:</strong> @Model.TransactionDate.ToString("yyyy-MM-dd HH:mm")</p>
-
-    </div> *@
-
+    <!-- Transaction Date -->
     <div class="mb-3">
         <label class="form-label">Transaction Date</label>
         <input readonly class="form-control" type="text" value="@Model.TransactionDate.ToString("dddd, MMMM dd, yyyy - hh:mm tt")" />
@@ -34,10 +27,11 @@
     <!-- Option Amount -->
     <div class="mb-3">
         <label class="form-label">Adjust Amount</label>
-        <input asp-for="OptionAmount" class="form-control" />
+        <input asp-for="OptionAmount" class="form-control" id="OptionAmount" />
+        <span asp-validation-for="OptionAmount" class="text-danger"></span>
     </div>
 
-    <!-- Choose Increase or Decrease -->
+    <!-- Adjustment Type (Increase/Decrease) -->
     <div class="mb-3">
         <label class="form-label">Adjustment Type</label>
         <div class="form-check">
@@ -48,8 +42,47 @@
             <input type="radio" asp-for="OptionType" value="Decrease" class="form-check-input" id="decreaseOption" />
             <label class="form-check-label" for="decreaseOption">Decrease (-)</label>
         </div>
+        <span asp-validation-for="OptionType" class="text-danger"></span>
+    </div>
+
+    <!-- Dynamic Transaction Value (For User View Only) -->
+    <div class="mb-3">
+        <label class="form-label">Transaction Value (Preview)</label>
+        <input type="text" id="transactionValuePreview" class="form-control" readonly />
     </div>
 
     <button type="submit" class="btn btn-primary">💾 Save Changes</button>
     <a asp-action="GetAllTransactions" class="btn btn-secondary">⬅ Cancel</a>
 </form>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const amount = parseFloat(document.getElementById("Amount").value);
+        const optionAmountInput = document.getElementById("OptionAmount");
+        const transactionValuePreview = document.getElementById("transactionValuePreview");
+        const increaseOption = document.getElementById("increaseOption");
+        const decreaseOption = document.getElementById("decreaseOption");
+
+        // Function to update the dynamic transaction value preview
+        function updateTransactionValue() {
+            const optionAmount = parseFloat(optionAmountInput.value) || 0;
+            let transactionValue = amount;
+
+            if (increaseOption.checked) {
+                transactionValue += optionAmount; // Increase Amount
+            } else if (decreaseOption.checked) {
+                transactionValue -= optionAmount; // Decrease Amount
+            }
+
+            transactionValuePreview.value = transactionValue.toFixed(2);
+        }
+
+        // Event listeners for OptionAmount and OptionType changes
+        optionAmountInput.addEventListener("input", updateTransactionValue);
+        increaseOption.addEventListener("change", updateTransactionValue);
+        decreaseOption.addEventListener("change", updateTransactionValue);
+
+        // Initial transaction value calculation
+        updateTransactionValue();
+    });
+</script>

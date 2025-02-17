@@ -3,7 +3,7 @@ using Your_Ride.Models;
 
 namespace Your_Ride.ViewModels.TransactionViewModel
 {
-    public class TransactionvM
+    public class TransactionvM : IValidatableObject
     {
         public int Id { get; set; }
 
@@ -32,6 +32,25 @@ namespace Your_Ride.ViewModels.TransactionViewModel
         public double? OptionAmount { get; set; }
 
         public TransactionType? OptionType { get; set; } // Only one option: Increase OR Decrease
+
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if ( OptionAmount == null)
+            {
+                yield return new ValidationResult("You must provide an Amount value when selecting an option type.", new[] { "OptionAmount" });
+            }else if (OptionType.HasValue == false )
+            {
+                yield return new ValidationResult("You must Choose an Option when inserting Amount value.", new[] { "OptionAmount" });
+
+            }
+
+            // Ensure OptionAmount cannot be greater than Amount when Decreasing
+            if (OptionType == TransactionType.Decrease && OptionAmount.HasValue && OptionAmount.Value > Amount)
+            {
+                yield return new ValidationResult("Must not exceed Transaction amount if Decrease", new[] { "OptionAmount" });
+            }
+        }
+
     }
     public enum TransactionType
     {

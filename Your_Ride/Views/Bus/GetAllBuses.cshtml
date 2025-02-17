@@ -1,0 +1,37 @@
+﻿@model List<Your_Ride.ViewModels.BusViewModel.BusVM>
+
+<h2 class="text-center my-4">All Buses</h2>
+
+<table class="table table-striped table-hover">
+    <thead class="table-dark">
+        <tr>
+            <th>#</th>
+            <th>Plate Number</th>
+            <th>Seats</th>
+      @*       <th>Driver Name</th>
+            <th>Driver Phone</th> *@
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var bus in Model)
+        {
+                <tr>
+                    <td>@bus.Id</td>
+                    <td>@bus.PlateNumber</td>
+                    <td>@bus.NumberOfSeats</td>
+                   @*  <td>@bus.DriverName</td>
+                    <td>@bus.DriverPhone</td> *@
+                    <td>
+                        <a asp-action="GetBusByID" asp-route-BusID="@bus.Id" class="btn btn-info btn-sm">View</a>
+                        <a asp-action="EditBus" asp-route-BusID="@bus.Id" class="btn btn-warning btn-sm">Edit</a>
+                        <a asp-action="DeleteBus" asp-route-BusID="@bus.Id" class="btn btn-danger btn-sm">Delete</a>
+                    </td>
+                </tr>
+        }
+    </tbody>
+</table>
+
+<div class="text-center mt-4">
+    <a asp-action="CreateBus" class="btn btn-success">Add New Bus</a>
+</div>

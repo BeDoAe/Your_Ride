@@ -1,0 +1,36 @@
+﻿@model Your_Ride.ViewModels.BusViewModel.BusVM
+
+<h2 class="text-center my-4">Edit Bus</h2>
+
+<form asp-action="EditBus" method="post" class="w-50 mx-auto">
+    <input type="hidden" asp-for="Id" />
+
+    <div class="mb-3">
+        <label class="form-label">Plate Number</label>
+        <input asp-for="PlateNumber" placeholder="Number of Plates are not Required" class="form-control" />
+        <span asp-validation-for="PlateNumber" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Number of Seats</label>
+        <input asp-for="NumberOfSeats" placeholder="Number of Seats are Required" class="form-control" type="number" />
+        <span asp-validation-for="NumberOfSeats" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Driver Name</label>
+        <input asp-for="DriverName" placeholder="Driver's Name is not Required" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Driver Phone</label>
+        <input asp-for="DriverPhone" placeholder="Driver's Phone is not Required" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-warning">Update</button>
+    <a asp-action="GetAllBuses" class="btn btn-secondary">Cancel</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

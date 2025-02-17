@@ -1,0 +1,15 @@
+﻿@model Your_Ride.ViewModels.BusViewModel.BusVM
+
+<h2 class="text-center my-4">Bus Details</h2>
+
+<div class="card mx-auto" style="width: 50%;">
+    <div class="card-body">
+        <h5 class="card-title">Bus ID: @Model.Id</h5>
+        <p class="card-text"><strong>Plate Number:</strong> @Model.PlateNumber</p>
+        <p class="card-text"><strong>Number of Seats:</strong> @Model.NumberOfSeats</p>
+        <p class="card-text"><strong>Driver Name:</strong> @Model.DriverName</p>
+        <p class="card-text"><strong>Driver Phone:</strong> @Model.DriverPhone</p>
+        <a asp-action="EditBus" asp-route-BusID="@Model.Id" class="btn btn-warning">Edit</a>
+        <a asp-action="GetAllBuses" class="btn btn-secondary">Back to List</a>
+    </div>
+</div>

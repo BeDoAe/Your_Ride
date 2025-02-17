@@ -56,7 +56,6 @@ namespace Your_Ride.Services.TransactionServ
             }
 
 
-            // Ensure a valid adjustment
             if (transactionVM.OptionAmount > 0 && transactionVM.OptionType.HasValue)
             {
                 if (transactionVM.OptionType == TransactionType.Decrease && transactionVM.OptionAmount <= transactionVM.Amount)
@@ -73,9 +72,9 @@ namespace Your_Ride.Services.TransactionServ
                 }
                 else if (transactionVM.OptionType == TransactionType.Increase)
                 {
-                    wallet.Amount -= transactionFromDB.Amount;
+                    //wallet.Amount -= transactionFromDB.Amount;
                     wallet.Amount += transactionVM.OptionAmount.Value;
-                    transactionFromDB.Amount = transactionVM.OptionAmount.Value;
+                    transactionFromDB.Amount += transactionVM.OptionAmount.Value;
 
                     transactionFromDB.EditedTransactionDate = DateTime.Now;
 
@@ -85,7 +84,7 @@ namespace Your_Ride.Services.TransactionServ
                 }
                 else
                 {
-                    return transactionVM;
+                    return null;
                 }
             }
 
