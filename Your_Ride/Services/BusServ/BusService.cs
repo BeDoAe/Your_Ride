@@ -18,7 +18,7 @@ namespace Your_Ride.Services.BusServ
 
         public async Task<List<BusVM>> GetAllBuses()
         {
-            List<Bus> buses = await busRepository.GetAllAsync();
+            List<Bus> buses = await busRepository.GetAllBuses();
 
             List<BusVM> busVMs = automapper.Map<List<BusVM>>(buses);
 
@@ -26,7 +26,7 @@ namespace Your_Ride.Services.BusServ
         }
         public async Task<BusVM> GetBusByID(int  BusID )
         {
-            Bus bus = await busRepository.GetByIdAsync(BusID);
+            Bus bus = await busRepository.GetBusByID(BusID);
 
             BusVM busVM = automapper.Map<BusVM>(bus);
 
@@ -34,11 +34,23 @@ namespace Your_Ride.Services.BusServ
         }
         public async Task<BusVM> CreateBus(BusVM busVM)
         {
-            Bus busFromDB = await busRepository.GetByIdAsync(busVM.Id);
+            Bus busFromDB = await busRepository.GetBusByID(busVM.Id);
             if (busFromDB == null)
             {
+                //Generate Bus Tag
+                string busIdentifier = await GenerateNextBusIdentifier();
+
                 Bus bus = automapper.Map<Bus>(busVM);
+                bus.BusIdentifier = busIdentifier;
+
+                // Generate seats
+                for (int i = 1; i <= bus.NumberOfSeats; i++)
+                {
+                    bus.Seats.Add(new Seat { SeatLabel = $"{busIdentifier}{i}" });
+                }
+
                 await busRepository.AddAsync(bus);
+
                 return busVM;
             }
             return null;
@@ -46,13 +58,17 @@ namespace Your_Ride.Services.BusServ
 
         public async Task<BusVM> EditBus(BusVM busVM)
         {
-            Bus busFromDB = await busRepository.GetByIdAsync(busVM.Id);
+            Bus busFromDB = await busRepository.GetBusByID(busVM.Id);
             if (busFromDB == null)
             {
                 return null;
             }
             automapper.Map(busVM, busFromDB);
-
+            // Generate seats
+            for (int i = 1; i <= busFromDB.NumberOfSeats; i++)
+            {
+                busFromDB.Seats.Add(new Seat { SeatLabel = $"{busFromDB.BusIdentifier}{i}" });
+            }
             await busRepository.UpdateAsync(busFromDB);
             return automapper.Map<BusVM>(busFromDB);
         }
@@ -60,6 +76,41 @@ namespace Your_Ride.Services.BusServ
         {
             int result = await busRepository.DeleteBus(id);
             return result;
+        }
+
+
+        public async Task<string> GenerateNextBusIdentifier()
+        {
+            // Fetch all existing bus identifiers from the database
+            var existingIdentifiers = await busRepository.GetAllBusIdentifier();
+
+            if (!existingIdentifiers.Any())
+                return "A"; // First bus starts with 'A'
+
+            // Get the last assigned identifier in alphabetical order
+            string lastIdentifier = existingIdentifiers.OrderBy(id => id).Last();
+
+            // Generate the next identifier
+            return GetNextIdentifier(lastIdentifier);
+        }
+
+        private string GetNextIdentifier(string lastIdentifier)
+        {
+            char[] chars = lastIdentifier.ToCharArray();
+
+            // Increment from the last character
+            for (int i = chars.Length - 1; i >= 0; i--)
+            {
+                if (chars[i] < 'Z')
+                {
+                    chars[i]++;
+                    return new string(chars);
+                }
+                chars[i] = 'A';
+            }
+
+            // If all characters were 'Z', add another character in front
+            return 'A'+ new string(chars) ;
         }
     }
 }

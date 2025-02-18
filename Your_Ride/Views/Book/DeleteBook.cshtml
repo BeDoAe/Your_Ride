@@ -1,0 +1,20 @@
+﻿@model Your_Ride.ViewModels.BookViewModel.BookVM
+
+@{
+    ViewData["Title"] = "Delete Booking";
+}
+
+<h2 class="text-center my-4 text-danger">Are you sure you want to delete this booking?</h2>
+
+<div class="card shadow-sm p-4">
+    <h4>Booking ID: @Model.Id</h4>
+    <p><strong>User:</strong> @Model.User?.UserName</p>
+    <p><strong>Appointment:</strong> @(Model.Appointment != null ? $"On {Model.Appointment.Date}" : "No Appointment")</p>
+    <p><strong>Max Amount:</strong> $@Model.MaxAmount</p>
+
+    <form asp-action="ConfirmDelete" method="post">
+        <input type="hidden" asp-for="Id" />
+        <button type="submit" class="btn btn-danger">Delete</button>
+        <a asp-action="GetAllBooks" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>

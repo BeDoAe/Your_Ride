@@ -17,6 +17,8 @@ namespace Your_Ride.Models
         public DateTime? DueDateDepartureSubmission { get; set; }
   
 
+        public double Fee {  get; set; }
+
 
 
 

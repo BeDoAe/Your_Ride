@@ -18,6 +18,12 @@
     </div>
 
     <div class="mb-3">
+        <label class="form-label">Bus Tag</label>
+        <input asp-for="BusIdentifier" readonly  class="form-control" type="text" />
+        <span asp-validation-for="BusIdentifier" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
         <label class="form-label">Driver Name</label>
         <input asp-for="DriverName" placeholder="Driver's Name is not Required" class="form-control" />
     </div>

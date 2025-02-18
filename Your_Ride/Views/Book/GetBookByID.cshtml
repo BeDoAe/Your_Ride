@@ -1,0 +1,19 @@
+﻿@model Your_Ride.ViewModels.BookViewModel.BookVM
+
+@{
+    ViewData["Title"] = "Booking Details";
+}
+
+<h2 class="text-center my-4">Booking Details</h2>
+
+<div class="card shadow-sm p-4">
+    <h4>Booking ID: @Model.Id</h4>
+    <p><strong>User:</strong> @Model.User?.UserName</p>
+    <p><strong>Email:</strong> @Model.User?.Email</p>
+    <p><strong>Appointment:</strong> @(Model.Appointment != null ? $"On {Model.Appointment.Date}" : "No Appointment")</p>
+    <p><strong>Max Amount:</strong> $@Model.MaxAmount</p>
+
+    <a asp-action="EditBook" asp-route-id="@Model.Id" class="btn btn-warning">Edit</a>
+    <a asp-action="DeleteBook" asp-route-id="@Model.Id" class="btn btn-danger">Delete</a>
+    <a asp-action="GetAllBooks" class="btn btn-secondary">Back to List</a>
+</div>

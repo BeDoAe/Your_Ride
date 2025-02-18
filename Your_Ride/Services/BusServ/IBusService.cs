@@ -11,6 +11,10 @@ namespace Your_Ride.Services.BusServ
         public Task<BusVM> CreateBus(BusVM busVM);
         public Task<BusVM> EditBus(BusVM busVM);
         public Task<int> DeleteBus(int id);
-           
-            }
+
+        public  Task<string> GenerateNextBusIdentifier();
+
+
+
+    }
 }

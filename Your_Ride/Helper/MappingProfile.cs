@@ -6,6 +6,7 @@ using Your_Ride.ViewModels.University;
 using Your_Ride.ViewModels.WalletViewModel;
 using Your_Ride.ViewModels.TransactionViewModel;
 using Your_Ride.ViewModels.BusViewModel;
+using Your_Ride.ViewModels.BookViewModel;
 
 namespace Your_Ride.Helper
 {
@@ -32,6 +33,9 @@ namespace Your_Ride.Helper
             CreateMap<Transaction,AllDataTransactionCreateVM>().ReverseMap();
 
             CreateMap<Bus, BusVM>().ReverseMap();
+
+            CreateMap<Book, BookVM>().ReverseMap();
+
 
             // Use the corrected value converter
             //CreateMap<AddProductVM, Product>()

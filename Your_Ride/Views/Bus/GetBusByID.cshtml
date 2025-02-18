@@ -7,6 +7,14 @@
         <h5 class="card-title">Bus ID: @Model.Id</h5>
         <p class="card-text"><strong>Plate Number:</strong> @Model.PlateNumber</p>
         <p class="card-text"><strong>Number of Seats:</strong> @Model.NumberOfSeats</p>
+        <h3>Seats</h3>
+        <ul>
+            @foreach (var seat in Model.Seats)
+            {
+                <li>@seat.SeatLabel</li>
+            }
+        </ul>
+        <p class="card-text"><strong>Bus Tag:</strong> @Model.BusIdentifier</p>
         <p class="card-text"><strong>Driver Name:</strong> @Model.DriverName</p>
         <p class="card-text"><strong>Driver Phone:</strong> @Model.DriverPhone</p>
         <a asp-action="EditBus" asp-route-BusID="@Model.Id" class="btn btn-warning">Edit</a>

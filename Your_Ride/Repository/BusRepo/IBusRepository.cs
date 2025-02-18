@@ -7,6 +7,16 @@ namespace Your_Ride.Repository.BusRepo
     {
         public Task<int> DeleteBus(int id);
 
+        public  Task<List<Bus>> GetAllBuses();
+
+        public Task<Bus> GetBusByID(int id);
+
+        public Task<List<string>> GetAllBusIdentifier();
+
+        public Task<Bus> GetBusByIdentifier(char c);
+
+
+
     }
 
 }

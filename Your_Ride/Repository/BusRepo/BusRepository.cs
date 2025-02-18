@@ -11,7 +11,20 @@ namespace Your_Ride.Repository.BusRepo
         { 
             this.context = context;
         }
-
+        public async Task<List<Bus>> GetAllBuses()
+        {
+            List<Bus> buses = await context.Buses.Include(x=>x.Seats).ToListAsync();
+            return buses;
+        }
+        public async Task<Bus> GetBusByID(int id)
+        {
+            Bus bus = await context.Buses.Include(x => x.Seats).FirstOrDefaultAsync(x=>x.Id==id);
+            if (bus == null)
+            {
+                return null;
+            }
+            return bus;
+        }
         public async Task<int> DeleteBus(int id)
         {
             Bus bus = await context.Buses.FirstOrDefaultAsync(x => x.Id == id);
@@ -32,6 +45,19 @@ namespace Your_Ride.Repository.BusRepo
                 return 1;
             }
         }
+        public async Task<List<string>> GetAllBusIdentifier ()
+        {
+            List<string> busIdentifiers = await context.Buses.Include(x=>x.Seats).Select(x=>x.BusIdentifier).ToListAsync();
 
+            return busIdentifiers;
+        }
+
+        public async Task<Bus> GetBusByIdentifier(char c)
+        {
+           string busIdentifier = c.ToString();
+            Bus bus = await context.Buses.Include(x => x.Seats).FirstOrDefaultAsync(x => x.BusIdentifier == busIdentifier);
+
+            return bus;
+        }
     }
 }
