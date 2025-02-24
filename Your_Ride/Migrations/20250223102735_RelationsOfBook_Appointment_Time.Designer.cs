@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Your_Ride.Models;
 
@@ -11,9 +12,11 @@ using Your_Ride.Models;
 namespace Your_Ride.Migrations
 {
     [DbContext(typeof(Context))]
-    partial class ContextModelSnapshot : ModelSnapshot
+    [Migration("20250223102735_RelationsOfBook_Appointment_Time")]
+    partial class RelationsOfBook_Appointment_Time
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -267,17 +270,12 @@ namespace Your_Ride.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<int>("SeatId")
-                        .HasColumnType("int");
-
                     b.Property<string>("UserID")
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("AppointmentId");
-
-                    b.HasIndex("SeatId");
 
                     b.HasIndex("UserID");
 
@@ -377,9 +375,6 @@ namespace Your_Ride.Migrations
 
                     b.Property<int>("BusId")
                         .HasColumnType("int");
-
-                    b.Property<bool>("IsAvailable")
-                        .HasColumnType("bit");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -566,15 +561,8 @@ namespace Your_Ride.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("BusGuideId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<DateOnly>("Date")
                         .HasColumnType("date");
-
-                    b.Property<bool>("HasCompleted")
-                        .HasColumnType("bit");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -583,8 +571,6 @@ namespace Your_Ride.Migrations
                         .HasColumnType("float");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("BusGuideId");
 
                     b.ToTable("Appointments");
                 });
@@ -657,20 +643,12 @@ namespace Your_Ride.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Your_Ride.Models.Seat", "Seat")
-                        .WithMany()
-                        .HasForeignKey("SeatId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("Your_Ride.Models.ApplicationUser", "User")
                         .WithMany("Bookings")
                         .HasForeignKey("UserID")
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Appointment");
-
-                    b.Navigation("Seat");
 
                     b.Navigation("User");
                 });
@@ -769,17 +747,6 @@ namespace Your_Ride.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Your_Ride.Models.Your_Ride.Models.Appointment", b =>
-                {
-                    b.HasOne("Your_Ride.Models.ApplicationUser", "BusGuide")
-                        .WithMany()
-                        .HasForeignKey("BusGuideId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("BusGuide");
                 });
 
             modelBuilder.Entity("Your_Ride.Models.ApplicationUser", b =>

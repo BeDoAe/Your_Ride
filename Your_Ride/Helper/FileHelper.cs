@@ -67,6 +67,17 @@
 
                 return "/Files/" + uniqueFileName;
             }
+        public static void Delete(string filePath)
+        {
+            var fullPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", filePath.TrimStart('/'));
 
+            if (File.Exists(fullPath))
+            {
+                File.Delete(fullPath);
+            }
         }
+
+
+
     }
+}

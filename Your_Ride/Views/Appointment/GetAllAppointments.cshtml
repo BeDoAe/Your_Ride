@@ -1,0 +1,52 @@
+﻿@model IEnumerable<Your_Ride.ViewModels.AppointmentviewModel.AppointmentVM>
+
+<h2>All Appointments</h2>
+
+<!-- Search & Sort Form -->
+<form method="get" asp-action="GetAllAppointments">
+    <div class="form-group">
+        <input type="text" name="searchQuery" value="@ViewBag.SearchQuery" class="form-control" placeholder="Search by Date or Bus Guide Name" />
+    </div>
+    <button type="submit" class="btn btn-primary">Search</button>
+
+    <a asp-action="GetAllAppointments" asp-route-sortOrder="@ViewBag.SortOrder" class="btn btn-secondary">
+        Sort @* by Date (@(ViewBag.SortOrder == "asc" ? "⬆️ ASC" : "⬇️ DESC") *@)
+    </a>
+</form>
+
+<!-- Appointment Table -->
+<table class="table">
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Max Amount</th>
+            <th>Bus Guide</th>
+            <th>Completed</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var appointment in Model)
+        {
+            <tr>
+                <td>@appointment.Date.ToString("yyyy-MM-dd")</td>
+                <td>@appointment.MaxAmount</td>
+                <td>@(appointment.BusGuide != null ? appointment.BusGuide.UserName : "Not Assigned")</td>
+                <td>@(appointment.HasCompleted ? "Yes" : "No")</td>
+                <td>
+                    <a asp-action="GetAppointmentByID" asp-route-id="@appointment.Id" class="btn btn-info">View</a>
+                    <a asp-action="EditAppointment" asp-route-id="@appointment.Id" class="btn btn-warning">Edit</a>
+
+                    <form asp-action="CompleteAppointment" method="post" style="display:inline;">
+                        <input type="hidden" name="id" value="@appointment.Id" />
+                        <button type="submit" class="btn btn-warning">Complete</button>
+                    </form>
+
+                    <a asp-action="DeleteAppointment" asp-route-id="@appointment.Id" class="btn btn-danger">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a asp-action="CreateAppointment" class="btn btn-success">Create New Appointment</a>

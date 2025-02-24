@@ -1,9 +1,9 @@
-﻿using Microsoft.VisualBasic;
-using Your_Ride.Models.Your_Ride.Models;
+﻿using Your_Ride.Models.Your_Ride.Models;
+using Your_Ride.Models;
 
-namespace Your_Ride.Models
+namespace Your_Ride.ViewModels.TimeViewModel
 {
-    public class Time : BaseModel
+    public class IFormFileTimeVM
     {
         public int Id { get; set; }
         public TimeOnly TimeOnly { get; set; }
@@ -12,14 +12,14 @@ namespace Your_Ride.Models
         //public List<string> Locations { get; set; }
 
         //public List<string>? LocationsPics { get; set; }
-        public Dictionary<string, string?> LocationsWithPics { get; set; } = new();
+        public Dictionary<string, IFormFile?> LocationsWithPics { get; set; } = new();
 
 
         public DateTime? DueDateArrivalSubmission { get; set; }
         public DateTime? DueDateDepartureSubmission { get; set; }
-  
 
-        public double Fee {  get; set; }
+
+        public double Fee { get; set; }
 
 
 
@@ -27,8 +27,8 @@ namespace Your_Ride.Models
         [Flags]
         public enum TripCategory
         {
-            Arrival=0,
-            Departure=1
+            Arrival = 0,
+            Departure = 1
         }
 
         public TripCategory Category { get; set; }

@@ -7,6 +7,9 @@ using Your_Ride.ViewModels.WalletViewModel;
 using Your_Ride.ViewModels.TransactionViewModel;
 using Your_Ride.ViewModels.BusViewModel;
 using Your_Ride.ViewModels.BookViewModel;
+using Your_Ride.Models.Your_Ride.Models;
+using Your_Ride.ViewModels.AppointmentviewModel;
+using Your_Ride.ViewModels.TimeViewModel;
 
 namespace Your_Ride.Helper
 {
@@ -35,6 +38,12 @@ namespace Your_Ride.Helper
             CreateMap<Bus, BusVM>().ReverseMap();
 
             CreateMap<Book, BookVM>().ReverseMap();
+
+            CreateMap<Appointment, AppointmentVM>().ReverseMap();
+
+            CreateMap<Time, TimeVM>().ReverseMap();
+            CreateMap<Time , IFormFileTimeVM>().ReverseMap();
+            CreateMap<IFormFileTimeVM, TimeVM>().ReverseMap();
 
 
             // Use the corrected value converter

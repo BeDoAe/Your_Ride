@@ -1,0 +1,35 @@
+﻿@model Your_Ride.ViewModels.AppointmentviewModel.AppointmentVM
+@using Your_Ride.Models
+@{
+    var users = ViewBag.Users as List<ApplicationUser>;
+}
+
+<h2>Edit Appointment</h2>
+
+<form asp-action="EditAppointment" method="post">
+    <input type="hidden" asp-for="Id" />
+
+    <div class="form-group">
+        <label for="Date">Date</label>
+        <input asp-for="Date" class="form-control" type="date" required />
+    </div>
+
+    <div class="form-group">
+        <label for="MaxAmount">Max Amount</label>
+        <input asp-for="MaxAmount" class="form-control" type="number" step="0.01" required />
+    </div>
+
+    <div class="form-group">
+        <label for="BusGuideId">Select Bus Guide</label>
+        <select asp-for="BusGuideId" class="form-control">
+            <option value="">-- Select Bus Guide --</option>
+            @foreach (var user in users)
+            {
+                <option value="@user.Id" selected="@(Model.BusGuideId == user.Id ? "selected" : null)">@user.UserName</option>
+            }
+        </select>
+    </div>
+
+    <button type="submit" class="btn btn-warning">Update</button>
+    <a asp-action="GetAllAppointments" class="btn btn-secondary">Cancel</a>
+</form>

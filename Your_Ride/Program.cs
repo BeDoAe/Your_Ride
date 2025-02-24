@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Your_Ride.Helper;
 using Your_Ride.Models;
+using Your_Ride.Repository.AppointmentRepo;
 using Your_Ride.Repository.BookRepo;
 using Your_Ride.Repository.BusRepo;
 using Your_Ride.Repository.CollegeRepo;
@@ -9,6 +10,7 @@ using Your_Ride.Repository.Generic;
 using Your_Ride.Repository.TransactionRepo;
 using Your_Ride.Repository.UniversityRepo;
 using Your_Ride.Repository.WalletRepo;
+using Your_Ride.Services.AppointmentServ;
 using Your_Ride.Services.BookServ;
 using Your_Ride.Services.BusServ;
 using Your_Ride.Services.CollegeServ;
@@ -68,9 +70,11 @@ builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
 builder.Services.AddScoped<IBusRepository, BusRepository>();
 builder.Services.AddScoped<IBusService, BusService>();
 
-builder.Services.AddScoped<IBookRepository, BookRepository>();
-builder.Services.AddScoped<IBookService, BookService>();
+//builder.Services.AddScoped<IBookRepository, BookRepository>();
+//builder.Services.AddScoped<IBookService, BookService>();
 
+builder.Services.AddScoped<IAppointmentRepository, AppointmentRepository>();
+builder.Services.AddScoped<IAppointmentService, AppointmentService>();
 
 //////////////////////////////////////////////////////////////////
 var app = builder.Build();

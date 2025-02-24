@@ -48,5 +48,12 @@ namespace Your_Ride.Repository.BookRepo
                 return 1;
             }
         }
+        public async Task<Book> UpdateBook(Book book)
+        {
+            context.Books.Update(book);
+          await context.SaveChangesAsync();
+            return book;
+
+        }
     }
 }

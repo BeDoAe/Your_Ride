@@ -9,6 +9,8 @@ namespace Your_Ride.Repository.BookRepo
         public Task<Book> GetBookByID(int id);
         public Task<List<Book>> GetAllBooksOfUser(string id);
         public Task<int> DeleteBook(int id);
+        public  Task<Book> UpdateBook(Book book);
+
 
 
     }

@@ -11,11 +11,13 @@ namespace Your_Ride.ViewModels.TimeViewModel
             public TimeOnly TimeOnly { get; set; }
 
 
-            public List<string> Locations { get; set; }
+        //public List<string> Locations { get; set; }
 
-            public List<string>? LocationsPics { get; set; }
+        //public List<string>? LocationsPics { get; set; }
+        public Dictionary<string, string?> LocationsWithPics { get; set; } = new();
 
-            public DateTime? DueDateArrivalSubmission { get; set; }
+
+        public DateTime? DueDateArrivalSubmission { get; set; }
             public DateTime? DueDateDepartureSubmission { get; set; }
 
         [Required]

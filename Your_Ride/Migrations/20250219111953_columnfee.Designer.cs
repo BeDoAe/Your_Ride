@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Your_Ride.Models;
 
@@ -11,9 +12,11 @@ using Your_Ride.Models;
 namespace Your_Ride.Migrations
 {
     [DbContext(typeof(Context))]
-    partial class ContextModelSnapshot : ModelSnapshot
+    [Migration("20250219111953_columnfee")]
+    partial class columnfee
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -261,23 +264,17 @@ namespace Your_Ride.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("AppointmentId")
-                        .HasColumnType("int");
-
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<int>("SeatId")
-                        .HasColumnType("int");
+                    b.Property<double>("MaxAmount")
+                        .HasColumnType("float");
 
                     b.Property<string>("UserID")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("AppointmentId");
-
-                    b.HasIndex("SeatId");
 
                     b.HasIndex("UserID");
 
@@ -377,9 +374,6 @@ namespace Your_Ride.Migrations
 
                     b.Property<int>("BusId")
                         .HasColumnType("int");
-
-                    b.Property<bool>("IsAvailable")
-                        .HasColumnType("bit");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -566,25 +560,19 @@ namespace Your_Ride.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("BusGuideId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("BookId")
+                        .HasColumnType("int");
 
                     b.Property<DateOnly>("Date")
                         .HasColumnType("date");
 
-                    b.Property<bool>("HasCompleted")
-                        .HasColumnType("bit");
-
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<double>("MaxAmount")
-                        .HasColumnType("float");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("BusGuideId");
+                    b.HasIndex("BookId")
+                        .IsUnique();
 
                     b.ToTable("Appointments");
                 });
@@ -651,26 +639,11 @@ namespace Your_Ride.Migrations
 
             modelBuilder.Entity("Your_Ride.Models.Book", b =>
                 {
-                    b.HasOne("Your_Ride.Models.Your_Ride.Models.Appointment", "Appointment")
-                        .WithMany()
-                        .HasForeignKey("AppointmentId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Your_Ride.Models.Seat", "Seat")
-                        .WithMany()
-                        .HasForeignKey("SeatId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("Your_Ride.Models.ApplicationUser", "User")
                         .WithMany("Bookings")
                         .HasForeignKey("UserID")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("Appointment");
-
-                    b.Navigation("Seat");
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("User");
                 });
@@ -773,13 +746,13 @@ namespace Your_Ride.Migrations
 
             modelBuilder.Entity("Your_Ride.Models.Your_Ride.Models.Appointment", b =>
                 {
-                    b.HasOne("Your_Ride.Models.ApplicationUser", "BusGuide")
-                        .WithMany()
-                        .HasForeignKey("BusGuideId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                    b.HasOne("Your_Ride.Models.Book", "Book")
+                        .WithOne("Appointment")
+                        .HasForeignKey("Your_Ride.Models.Your_Ride.Models.Appointment", "BookId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("BusGuide");
+                    b.Navigation("Book");
                 });
 
             modelBuilder.Entity("Your_Ride.Models.ApplicationUser", b =>
@@ -790,6 +763,11 @@ namespace Your_Ride.Migrations
 
                     b.Navigation("Wallet")
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Your_Ride.Models.Book", b =>
+                {
+                    b.Navigation("Appointment");
                 });
 
             modelBuilder.Entity("Your_Ride.Models.Bus", b =>

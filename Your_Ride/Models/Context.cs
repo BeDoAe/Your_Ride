@@ -33,10 +33,40 @@ namespace Your_Ride.Models
         { }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            // One-to-Many: Appointment has multiple Time slots
+            modelBuilder.Entity<Appointment>()
+                .HasMany(a => a.Times)
+                .WithOne(t => t.Appointment)
+                .HasForeignKey(t => t.AppointmentId)
+                .OnDelete(DeleteBehavior.Cascade); // Delete times if appointment is deleted
+
+            // One-to-Many: A User can have multiple Bookings
             modelBuilder.Entity<Book>()
-         .HasOne(b => b.Appointment)
-         .WithOne(a => a.Book)
-         .HasForeignKey<Appointment>(a => a.BookId);
+                .HasOne(b => b.User)
+                .WithMany(u => u.Bookings)
+                .HasForeignKey(b => b.UserID)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // One-to-One: Each Booking is linked to one Appointment
+            modelBuilder.Entity<Book>()
+                .HasOne(b => b.Appointment)
+                .WithMany() // Appointments exist independently
+                .HasForeignKey(b => b.AppointmentId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // One-to-One: Each Booking reserves one Seat
+            modelBuilder.Entity<Book>()
+                .HasOne(b => b.Seat)
+                .WithMany()
+                .HasForeignKey(b => b.SeatId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // One-to-Many: Bus Guide is a User
+            modelBuilder.Entity<Appointment>()
+                .HasOne(a => a.BusGuide)
+                .WithMany()
+                .HasForeignKey(a => a.BusGuideId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             // Configure One-to-One relationship between ApplicationUser and Wallet
             modelBuilder.Entity<ApplicationUser>()
@@ -45,11 +75,6 @@ namespace Your_Ride.Models
                 .HasForeignKey<Wallet>(w => w.UserId)  // Wallet depends on ApplicationUser
                 .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<Appointment>()
-        .HasMany(a => a.Times) // One Appointment has many Times
-        .WithOne(t => t.Appointment) // Each Time belongs to one Appointment
-        .HasForeignKey(t => t.AppointmentId) // Foreign Key in Time table
-        .OnDelete(DeleteBehavior.Cascade); // Optional: Cascade delete
 
             modelBuilder.Entity<Transaction>()
        .HasOne(t => t.Wallet)  // Each Transaction has one Wallet
