@@ -23,6 +23,8 @@ namespace Your_Ride.Models
         public DbSet<Bus> Buses { get; set; }
 
         public DbSet<Seat> Seats { get; set; }
+       
+        public DbSet<LocationImage> LocationImages { get; set; }
 
         public DbSet<Notification> Notifications { get; set; }
 

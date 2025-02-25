@@ -13,6 +13,10 @@ namespace Your_Ride.Services.TimeServ
         public Task<TimeVM> CreateTime(IFormFileTimeVM formFileTimeVM);
         public Task<TimeVM> EditTime(IFormFileTimeVM formFileTimeVM);
         public Task<int> DeleteTime(int id);
+        public Task<int> DeleteLocationImage(int id);
+        public Task<LocationImage> GetLocationImage(int id);
+
+
 
     }
 }

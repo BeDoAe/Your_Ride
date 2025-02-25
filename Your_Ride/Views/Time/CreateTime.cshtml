@@ -1,42 +1,155 @@
-﻿@model Your_Ride.ViewModels.TimeViewModel.IFormFileTimeVM
+﻿@* @model Your_Ride.ViewModels.TimeViewModel.IFormFileTimeVM
 
 <h2>Create / Edit Time</h2>
 
 <form asp-action="CreateTime" method="post" enctype="multipart/form-data">
-    <div>
-        <label>Time:</label>
-        <input asp-for="TimeOnly" type="time" required />
+    @Html.AntiForgeryToken()
+
+    <div class="mb-3">
+        <label class="form-label">Time:</label>
+        <input asp-for="TimeOnly" class="form-control" type="time" required />
     </div>
 
-    <div>
-        <label>Fee:</label>
-        <input asp-for="Fee" type="number" step="0.01" required />
+    <div class="mb-3">
+        <label class="form-label">Fee:</label>
+        <input asp-for="Fee" class="form-control" type="number" step="0.01" required placeholder="Enter fee amount" />
     </div>
 
-    <div>
-        <label>Bus:</label>
-        <select asp-for="BusID" asp-items="@(new SelectList(ViewBag.Buses, "Id", "BusIdentifier"))">
-            <option value="">Select a Bus</option>
+    <div class="mb-3">
+        <label class="form-label">Category:</label>
+        <select asp-for="Category" class="form-select" id="categorySelect" onchange="toggleDateFields()">
+            <option value="0">Arrival</option>
+            <option value="1">Departure</option>
         </select>
     </div>
 
-    <div>
-        <label>Appointment:</label>
-        <select asp-for="AppointmentId" asp-items="@(new SelectList(ViewBag.Appointments, "Id", "Date"))">
-            <option value="">Select an Appointment</option>
+    <div id="arrivalDateField" class="mb-3">
+        <label class="form-label">Arrival Due Date (Optional):</label>
+        <input asp-for="DueDateArrivalSubmission" class="form-control" type="date" placeholder="Not required" />
+    </div>
+
+    <div id="departureDateField" class="mb-3" style="display:none;">
+        <label class="form-label">Departure Due Date (Optional):</label>
+        <input asp-for="DueDateDepartureSubmission" class="form-control" type="date" placeholder="Not required" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Select Bus:</label>
+        <select asp-for="BusID" class="form-select" required asp-items="@(new SelectList(ViewBag.Buses, "Id", "BusIdentifier"))">
+            <option value="">-- Select a Bus --</option>
         </select>
     </div>
 
-    <h3>Locations</h3>
+    <div class="mb-3">
+        <label class="form-label">Select Appointment:</label>
+        <select asp-for="AppointmentId" class="form-select" required asp-items="@(new SelectList(ViewBag.Appointments, "Id", "Date"))">
+            <option value="">-- Select an Appointment --</option>
+        </select>
+    </div>
+
+    <h3>Locations & Images</h3>
     <div id="locationList">
-        <div>
-            <input type="text" name="FormFileLocationsWithPics[0].Location" placeholder="Location Name" required />
-            <input type="file" name="FormFileLocationsWithPics[0].ImageFile" />
+        <div class="location-entry mb-3">
+            <input type="text" name="FormFileLocationsWithPics[0].Location" class="form-control mb-2" placeholder="Location Name (Required)" required />
+            <input type="number" name="FormFileLocationsWithPics[0].LocationOrder" class="form-control mb-2" placeholder="Location Order (Required)" required />
+            <input type="text" name="FormFileLocationsWithPics[0].PathURL" class="form-control mb-2" placeholder="Path URL Adress (Optional)"  />
+            <input type="file" name="FormFileLocationsWithPics[0].ImagePath" class="form-control" accept="image/*" onchange="previewImage(this, 0)" />
+            <img id="preview0" src="" class="img-preview mt-2" style="max-width: 100px; display:none;" />
         </div>
     </div>
-    <button type="button" onclick="addLocation()">Add More Locations</button>
+    <button type="button" class="btn btn-primary mt-2" onclick="addLocation()">Add More Locations</button>
 
-    <button type="submit">Save</button>
+    <button type="submit" class="btn btn-success mt-3">Save</button>
+</form>
+
+<script>
+    function toggleDateFields() {
+        var category = document.getElementById("categorySelect").value;
+        document.getElementById("arrivalDateField").style.display = (category == "0") ? "block" : "none";
+        document.getElementById("departureDateField").style.display = (category == "1") ? "block" : "none";
+    }
+
+    let count = 1;
+    function addLocation() {
+        let list = document.getElementById("locationList");
+        let div = document.createElement("div");
+        div.classList.add("location-entry", "mb-3");
+        div.innerHTML = `
+            <input type="text" name="FormFileLocationsWithPics[${count}].Location" class="form-control mb-2" placeholder="Location Name" required />
+            <input type="text" name="FormFileLocationsWithPics[${count}]..LocationOrder" class="form-control mb-2" placeholder="Location Order (Required)" required />
+            <input type="text" name="FormFileLocationsWithPics[${count}].PathURL" class="form-control mb-2" placeholder="Path URL Adress (Optional)" />
+            <input type="file" name="FormFileLocationsWithPics[${count}].ImagePath" class="form-control" accept="image/*" onchange="previewImage(this, ${count})" />
+            <img id="preview${count}" src="" class="img-preview mt-2" style="max-width: 100px; display:none;" />
+        `;
+        list.appendChild(div);
+        count++;
+    }
+
+    function previewImage(input, index) {
+        var preview = document.getElementById("preview" + index);
+        var file = input.files[0];
+        if (file) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                preview.style.display = "block";
+            }
+            reader.readAsDataURL(file);
+        }
+    }
+</script> *@
+@model Your_Ride.ViewModels.TimeViewModel.IFormFileTimeVM
+
+<h2>Create / Edit Time</h2>
+
+<form asp-action="CreateTime" method="post" enctype="multipart/form-data">
+    @Html.AntiForgeryToken()
+
+    <div class="mb-3">
+        <label class="form-label">Time:</label>
+        <input asp-for="TimeOnly" class="form-control" type="time" required />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Fee:</label>
+        <input asp-for="Fee" class="form-control" type="number" step="0.01" required placeholder="Enter fee amount" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Category:</label>
+        <select asp-for="Category" class="form-select">
+            <option value="0">Arrival</option>
+            <option value="1">Departure</option>
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Select Bus:</label>
+        <select asp-for="BusID" class="form-select" required asp-items="@(new SelectList(ViewBag.Buses, "Id", "BusIdentifier"))">
+            <option value="">-- Select a Bus --</option>
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Select Appointment:</label>
+        <select asp-for="AppointmentId" class="form-select" required asp-items="@(new SelectList(ViewBag.Appointments, "Id", "Date"))">
+            <option value="">-- Select an Appointment --</option>
+        </select>
+    </div>
+
+    <h3>Locations & Images</h3>
+    <div id="locationList">
+        <div class="location-entry mb-3">
+            <input type="text" name="FormFileLocationsWithPics[0].Location" class="form-control mb-2" placeholder="Location Name" required />
+            <input type="number" name="FormFileLocationsWithPics[0].LocationOrder" class="form-control mb-2" placeholder="Location Order" required />
+            <input type="text" name="FormFileLocationsWithPics[0].PathURL" class="form-control mb-2" placeholder="Path URL (Optional)" />
+            <input type="file" name="FormFileLocationsWithPics[0].ImagePath" class="form-control" accept="image/*" onchange="previewImage(this, 0)" />
+            <img id="preview0" src="" class="img-preview mt-2" style="max-width: 100px; display:none;" />
+        </div>
+    </div>
+
+    <button type="button" class="btn btn-primary mt-2" onclick="addLocation()">Add More Locations</button>
+    <button type="submit" class="btn btn-success mt-3">Save</button>
 </form>
 
 <script>
@@ -44,9 +157,37 @@
     function addLocation() {
         let list = document.getElementById("locationList");
         let div = document.createElement("div");
-        div.innerHTML = `<input type="text" name="FormFileLocationsWithPics[${count}].Location" placeholder="Location Name" required />
-                         <input type="file" name="FormFileLocationsWithPics[${count}].ImageFile" />`;
+        div.classList.add("location-entry", "mb-3");
+        div.innerHTML = `
+            <input type="text" name="FormFileLocationsWithPics[${count}].Location" class="form-control mb-2" placeholder="Location Name" required />
+            <input type="number" name="FormFileLocationsWithPics[${count}].LocationOrder" class="form-control mb-2" placeholder="Location Order" required />
+            <input type="text" name="FormFileLocationsWithPics[${count}].PathURL" class="form-control mb-2" placeholder="Path URL (Optional)" />
+            <input type="file" name="FormFileLocationsWithPics[${count}].ImagePath" class="form-control" accept="image/*" onchange="previewImage(this, ${count})" />
+            <img id="preview${count}" src="" class="img-preview mt-2" style="max-width: 100px; display:none;" />
+        `;
         list.appendChild(div);
         count++;
     }
+
+    function previewImage(input, index) {
+        var preview = document.getElementById("preview" + index);
+        var file = input.files[0];
+        if (file) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                preview.style.display = "block";
+            }
+            reader.readAsDataURL(file);
+        }
+    }
 </script>
+
+<style>
+    .img-preview {
+        border: 1px solid #ccc;
+        padding: 5px;
+        margin-top: 5px;
+        border-radius: 5px;
+    }
+</style>

@@ -1,4 +1,6 @@
 ﻿
+using System.ComponentModel.DataAnnotations;
+
 namespace Your_Ride.Models
 {
     public class FormFileLocationPics
@@ -9,6 +11,7 @@ namespace Your_Ride.Models
 
         public string? PathURL { get; set; }
 
+        [Required(ErrorMessage = "Must Specify the Location Order")]
         public int LocationOrder { get; set; }
 
         // Foreign Key to Time

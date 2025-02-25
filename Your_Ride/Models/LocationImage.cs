@@ -1,6 +1,8 @@
-﻿namespace Your_Ride.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Your_Ride.Models
 {
-    public class LocationImage
+    public class LocationImage: BaseModel
     {
         public int Id { get; set; }
         public string Location { get; set; }
@@ -8,6 +10,7 @@
 
         public string? PathURL { get; set; }
 
+        [Required(ErrorMessage ="Must Specify the Location Order")]
         public int LocationOrder { get; set; }
 
         // Foreign Key to Time

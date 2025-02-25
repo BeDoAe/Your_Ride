@@ -189,5 +189,25 @@ namespace Your_Ride.Controllers
 
             return RedirectToAction("GetAllTimes");
         }
+        [HttpGet]
+        public async Task<IActionResult> DeleteLocationImage(int id)
+        {
+            LocationImage locationImage = await timeService.GetLocationImage(id);
+            if (locationImage == null)
+            {
+                return NotFound("Time");
+            }
+            return View("DeleteLocationImage", locationImage);
+        }
+        [HttpPost]
+        [AutoValidateAntiforgeryToken]
+        public async Task<IActionResult> DeleteLocationImage(LocationImage locationImage)
+        {
+            int result = await timeService.DeleteLocationImage(locationImage.Id);
+            if (result == -1) return NotFound("Location or Image not found.");
+            if (result == 0) return BadRequest("Location or Image is already deleted.");
+
+            return RedirectToAction("GetAllTimes");
+        }
     }
 }

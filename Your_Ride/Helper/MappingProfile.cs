@@ -41,9 +41,20 @@ namespace Your_Ride.Helper
 
             CreateMap<Appointment, AppointmentVM>().ReverseMap();
 
-            CreateMap<Time, TimeVM>().ReverseMap();
-            CreateMap<Time , IFormFileTimeVM>().ReverseMap();
-            CreateMap<IFormFileTimeVM, TimeVM>().ReverseMap();
+            //CreateMap<Time, TimeVM>().ReverseMap();
+            CreateMap<Time, TimeVM>()
+                .ForMember(dest => dest.LocationImages, opt => opt.MapFrom(src => src.LocationsWithPics ?? new List<LocationImage>()))
+                .ReverseMap();
+
+            // Mapping Time to IFormFileTimeVM
+            CreateMap<Time, IFormFileTimeVM>()
+                //.ForMember(dest => dest.FormFileLocationsWithPics, opt => opt.MapFrom(src => src.LocationsWithPics ?? new List<FormFileLocationPics>()))
+                .ReverseMap();
+
+            // Mapping between TimeVM and IFormFileTimeVM
+            CreateMap<IFormFileTimeVM, TimeVM>()
+                .ForMember(dest => dest.LocationImages, opt => opt.MapFrom(src => src.FormFileLocationsWithPics))
+                .ReverseMap();
 
 
             // Use the corrected value converter

@@ -11,6 +11,9 @@ namespace Your_Ride.Repository.TimeRepo
         public Task<List<Time>> GetAllTimesByAppointmentID(int id);
         public Task<Time> CreateTime(Time time);
         public Task<int> DeleteTime(int id);
+        public Task<int> DeleteLocationImage(int id);
+        public Task<LocationImage> GetLocationImage(int id);
+
 
     }
 }

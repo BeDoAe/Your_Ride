@@ -15,7 +15,8 @@ namespace Your_Ride.ViewModels.TimeViewModel
         //public List<string>? LocationsPics { get; set; }
         //public Dictionary<string, IFormFile?> LocationsWithPics { get; set; } = new();
 
-        public List<FormFileLocationPics> FormFileLocationsWithPics { get; set; }
+        public List<LocationImage>? locationImages { get; set; }=new List<LocationImage>();
+        public List<FormFileLocationPics> FormFileLocationsWithPics { get; set; }=new List<FormFileLocationPics> { };
 
         public DateTime? DueDateArrivalSubmission { get; set; }
         public DateTime? DueDateDepartureSubmission { get; set; }
