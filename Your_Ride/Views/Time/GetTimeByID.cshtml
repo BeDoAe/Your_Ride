@@ -1,0 +1,63 @@
+﻿@model Your_Ride.ViewModels.TimeViewModel.TimeVM
+
+<h2>Appointment Time Details</h2>
+
+<div class="row">
+    <!-- Time Info -->
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white">Time Details</div>
+            <div class="card-body">
+                <p><strong>Time:</strong> @Model.TimeOnly.ToString("hh:mm tt")</p>
+                <p><strong>Date:</strong> @Model.Appointment.Date.ToString("MM/dd/yyyy")</p>
+                <p><strong>Locations:</strong>
+                    <ul>
+                        @foreach (var loc in Model.LocationImages)
+                        {
+                            <li>
+                                @loc.Location
+                                @if (!string.IsNullOrEmpty(loc.ImagePath))
+                                {
+                                    <br />
+                                    <img src="@loc.ImagePath" alt="@loc.Location" width="100" />
+                                    <p> Order : <strong>@loc.LocationOrder</strong></p>
+                                    <p> URL : <strong>@loc.PathURL</strong></p>
+
+                                }
+                            </li>
+                        }
+                    </ul>
+                </p>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Bus Info -->
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header bg-success text-white">Bus Details</div>
+            <div class="card-body">
+                <p><strong>Driver:</strong> @Model.Bus.DriverName</p>
+                <p><strong>Plate Number:</strong> @Model.Bus.PlateNumber</p>
+                <p><strong>Seats:</strong> @Model.Bus.NumberOfSeats</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Appointment Info -->
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header bg-warning text-white">Appointment Info</div>
+            <div class="card-body">
+                <p><strong>Appointment Date:</strong> @Model.Appointment.Date.ToString("MM/dd/yyyy")</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mt-3">
+    <a asp-action="EditTime" asp-route-id="@Model.Id" class="btn btn-warning">Edit</a>
+    <a asp-action="DeleteTime" asp-route-id="@Model.Id" class="btn btn-danger">Delete</a>
+    <a asp-action="GetAllTimes" class="btn btn-secondary">Back to List</a>
+</div>

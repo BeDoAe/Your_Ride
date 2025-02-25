@@ -7,6 +7,7 @@ using Your_Ride.Repository.BookRepo;
 using Your_Ride.Repository.BusRepo;
 using Your_Ride.Repository.CollegeRepo;
 using Your_Ride.Repository.Generic;
+using Your_Ride.Repository.TimeRepo;
 using Your_Ride.Repository.TransactionRepo;
 using Your_Ride.Repository.UniversityRepo;
 using Your_Ride.Repository.WalletRepo;
@@ -14,6 +15,7 @@ using Your_Ride.Services.AppointmentServ;
 using Your_Ride.Services.BookServ;
 using Your_Ride.Services.BusServ;
 using Your_Ride.Services.CollegeServ;
+using Your_Ride.Services.TimeServ;
 using Your_Ride.Services.TransactionServ;
 using Your_Ride.Services.UniversityServ;
 using Your_Ride.Services.WalletServ;
@@ -75,6 +77,9 @@ builder.Services.AddScoped<IBusService, BusService>();
 
 builder.Services.AddScoped<IAppointmentRepository, AppointmentRepository>();
 builder.Services.AddScoped<IAppointmentService, AppointmentService>();
+
+builder.Services.AddScoped<ITimeRepository, TimeRepository>();
+builder.Services.AddScoped<ITimeService, TimeService>();
 
 //////////////////////////////////////////////////////////////////
 var app = builder.Build();

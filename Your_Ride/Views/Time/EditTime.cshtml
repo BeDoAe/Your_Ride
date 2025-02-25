@@ -1,0 +1,89 @@
+﻿@model Your_Ride.ViewModels.TimeViewModel.IFormFileTimeVM
+
+<h2>Edit Time</h2>
+
+<form asp-action="EditTime" method="post" enctype="multipart/form-data">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Id" />
+
+    <div class="mb-3">
+        <label asp-for="TimeOnly" class="form-label">Time</label>
+        <input asp-for="TimeOnly" class="form-control" type="time" required />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="DueDateArrivalSubmission" class="form-label">Arrival Due Date</label>
+        <input asp-for="DueDateArrivalSubmission" class="form-control" type="date" />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="DueDateDepartureSubmission" class="form-label">Departure Due Date</label>
+        <input asp-for="DueDateDepartureSubmission" class="form-control" type="date" />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Fee" class="form-label">Fee</label>
+        <input asp-for="Fee" class="form-control" type="number" step="0.01" placeholder="Enter fee amount" required />
+        <span asp-validation-for="Fee" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Category" class="form-label">Trip Category</label>
+        <select asp-for="Category" class="form-control">
+            <option value="0">Arrival</option>
+            <option value="1">Departure</option>
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="BusID" class="form-label">Select Bus</label>
+        <select asp-for="BusID" class="form-control" required>
+            <option value="">-- Select Bus --</option>
+            @foreach (var bus in ViewBag.Buses)
+            {
+                <option value="@bus.Id" selected="@(Model.BusID == bus.Id ? "selected" : null)">@bus.Name</option>
+            }
+        </select>
+        <span asp-validation-for="BusID" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="AppointmentId" class="form-label">Select Appointment</label>
+        <select asp-for="AppointmentId" class="form-control" required>
+            <option value="">-- Select Appointment --</option>
+            @foreach (var appointment in ViewBag.Appointments)
+            {
+                <option value="@appointment.Id" selected="@(Model.AppointmentId == appointment.Id ? "selected" : null)">@appointment.Name</option>
+            }
+        </select>
+        <span asp-validation-for="AppointmentId" class="text-danger"></span>
+    </div>
+
+    <!-- Locations & Images -->
+    <div class="mb-3">
+        <label class="form-label">Locations & Images</label>
+        <ul>
+            @foreach (var loc in Model.FormFileLocationsWithPics)
+            {
+                <li>
+                    <strong>@loc.Location</strong>
+                @*     @if (!string.IsNullOrEmpty(loc.ImagePath))
+                    { *@
+                        <br />
+                        <img src="@loc.ImagePath" alt="@loc.Location" width="100" />
+                        <p> Order : <strong>@loc.LocationOrder</strong></p>
+                        <p> URL : <strong>@loc.PathURL</strong></p>
+                        <button type="submit" asp-action="RemoveImage" asp-route-imageId="@loc.Id" class="btn btn-sm btn-danger">
+                            Remove Image
+                        </button>
+@*                     }
+ *@                </li>
+            }
+        </ul>
+@*         <label class="form-label">Upload New Image</label>
+        <input type="file" asp-for="NewImage" class="form-control" /> *@
+    </div>
+
+    <button type="submit" class="btn btn-warning">Save Changes</button>
+    <a asp-action="GetAllTimes" class="btn btn-secondary">Cancel</a>
+</form>

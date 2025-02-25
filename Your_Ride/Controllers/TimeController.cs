@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Your_Ride.Helper;
 using Your_Ride.Models;
 using Your_Ride.Repository.BusRepo;
 using Your_Ride.Services.AppointmentServ;
@@ -25,17 +26,59 @@ namespace Your_Ride.Controllers
             this.busService = busService;
             this.appointmentService = appointmentService;
         }
+        //[HttpGet]
+        //public async Task<IActionResult> GetAllTimes()
+        //{
+        //    List<TimeVM> timeVMs = await timeService.GetAllTimes();
+
+        //    List<BusVM> busVMs = await busService.GetAllBuses();
+        //    List<AppointmentVM> appointmentVMs = await appointmentService.GetAllAppointments();
+        //    ViewBag.Buses = busVMs;
+        //    ViewBag.Appointments = appointmentVMs;
+        //    return View("GetAllTimes", timeVMs);
+        //}
+
+        // /Time/GetAllTimes
         [HttpGet]
-        public async Task<IActionResult> GetAllTimes()
+        public async Task<IActionResult> GetAllTimes(string search, string sortOrder, int page = 1, int pageSize = 10)
         {
             List<TimeVM> timeVMs = await timeService.GetAllTimes();
 
-            List<BusVM> busVMs = await busService.GetAllBuses();
-            List<AppointmentVM> appointmentVMs = await appointmentService.GetAllAppointments();
-            ViewBag.Buses = busVMs;
-            ViewBag.Appointments = appointmentVMs;
-            return View("GetAllTimes", timeVMs);
+            // **Filtering (Search)**
+            if (!string.IsNullOrEmpty(search))
+            {
+                timeVMs = timeVMs.Where(t =>
+                    t.Bus.DriverName.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                    t.Bus.PlateNumber.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                    t.Bus.NumberOfSeats.ToString().Contains(search) ||
+                    t.TimeOnly.ToString("hh:mm tt").Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                    t.Appointment.Date.ToString("MM/dd/yyyy").Contains(search)
+                ).ToList();
+            }
+
+            // **Sorting**
+            ViewBag.CurrentSort = sortOrder;
+            ViewBag.TimeSortParam = sortOrder == "time_asc" ? "time_desc" : "time_asc";
+            ViewBag.DriverSortParam = sortOrder == "driver_asc" ? "driver_desc" : "driver_asc";
+
+            timeVMs = sortOrder switch
+            {
+                "time_asc" => timeVMs.OrderBy(t => t.TimeOnly).ToList(),
+                "time_desc" => timeVMs.OrderByDescending(t => t.TimeOnly).ToList(),
+                "driver_asc" => timeVMs.OrderBy(t => t.Bus.DriverName).ToList(),
+                "driver_desc" => timeVMs.OrderByDescending(t => t.Bus.DriverName).ToList(),
+                _ => timeVMs
+            };
+
+            // **Pagination**
+            int totalItems = timeVMs.Count;
+            List<TimeVM> paginatedTimes = timeVMs.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+
+            PaginatedList<TimeVM> paginatedList = new PaginatedList<TimeVM>(paginatedTimes, totalItems, page, pageSize);
+
+            return View("GetAllTimes", paginatedList);
         }
+
         [HttpGet]
         public async Task<IActionResult> GetTimeByID(int id)
         {
@@ -59,7 +102,7 @@ namespace Your_Ride.Controllers
 
             return View("GetAllTimesByAppointmentID", timeVMs);
         }
-
+        // /Time/CreateTime
         [HttpGet]
         public async Task<IActionResult> CreateTime()
         {

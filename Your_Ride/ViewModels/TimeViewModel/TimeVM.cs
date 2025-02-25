@@ -14,7 +14,8 @@ namespace Your_Ride.ViewModels.TimeViewModel
         //public List<string> Locations { get; set; }
 
         //public List<string>? LocationsPics { get; set; }
-        public Dictionary<string, string?> LocationsWithPics { get; set; } = new();
+        //public Dictionary<string, string?> LocationsWithPics { get; set; } = new();
+        public List<LocationImage> LocationImages { get; set; }
 
 
         public DateTime? DueDateArrivalSubmission { get; set; }
@@ -36,15 +37,17 @@ namespace Your_Ride.ViewModels.TimeViewModel
 
             public TripCategory Category { get; set; }
 
-            public int BusID { get; set; }
-            public Bus Bus { get; set; }
+
+        [Required(ErrorMessage = "Must Have Bus ")]
+        public int BusID { get; set; }
+        public Bus? Bus { get; set; }
+
+        [Required(ErrorMessage = "Must Have An Appointment ")]
+        // Foreign key for Appointment
+        public int AppointmentId { get; set; }
+        public Appointment? Appointment { get; set; }
 
 
-            // Foreign key for Appointment
-            public int AppointmentId { get; set; }
-            public Appointment Appointment { get; set; }
-
-
-        }
+    }
     }
 

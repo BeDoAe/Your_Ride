@@ -68,6 +68,13 @@ namespace Your_Ride.Models
                 .HasForeignKey(a => a.BusGuideId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            //one - many :  Time to Locations
+            modelBuilder.Entity<LocationImage>()
+              .HasOne(li => li.Time)
+              .WithMany(t => t.LocationsWithPics)
+              .HasForeignKey(li => li.TimeId)
+               .OnDelete(DeleteBehavior.Cascade);
+
             // Configure One-to-One relationship between ApplicationUser and Wallet
             modelBuilder.Entity<ApplicationUser>()
                 .HasOne(a => a.Wallet)

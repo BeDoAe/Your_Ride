@@ -1,0 +1,63 @@
+﻿@model Your_Ride.ViewModels.TimeViewModel.TimeVM
+
+<h2>Delete Time</h2>
+<p>Are you sure you want to delete this time entry?</p>
+
+<table class="table">
+    <tr>
+        <th>Time</th>
+        <td>@Model.TimeOnly</td>
+    </tr>
+    <tr>
+        <th>Arrival Due Date</th>
+        <td>@Model.DueDateArrivalSubmission?.ToString("yyyy-MM-dd")</td>
+    </tr>
+    <tr>
+        <th>Departure Due Date</th>
+        <td>@Model.DueDateDepartureSubmission?.ToString("yyyy-MM-dd")</td>
+    </tr>
+    <tr>
+        <th>Fee</th>
+        <td>@Model.Fee</td>
+    </tr>
+    <tr>
+        <th>Category</th>
+        <td>@Model.Category</td>
+    </tr>
+    <tr>
+        <th>Bus Guide</th>
+        <td>@Model.Appointment?.BusGuide.FirstName  @Model.Appointment.BusGuide.LastName</td>
+    </tr>
+    <tr>
+        <th>Appointment Date</th>
+        <td>@Model.Appointment?.Date</td>
+    </tr>
+    <tr>
+        <th>Locations & Images</th>
+        <td>
+            <ul>
+                @foreach (var loc in Model.LocationImages)
+                {
+                    <li>
+                        <strong>@loc.Location</strong>
+                        @if (!string.IsNullOrEmpty(loc.ImagePath))
+                        {
+                            <br />
+                            <img src="@loc.ImagePath" alt="@loc.Location" width="100" />
+                            <p> Order : <strong>@loc.LocationOrder</strong></p>
+                            <p> URL : <strong>@loc.PathURL</strong></p>
+                        }
+                    </li>
+                }
+            </ul>
+        </td>
+    </tr>
+</table>
+
+<form asp-action="DeleteTime" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Id" />
+
+    <button type="submit" class="btn btn-danger">Delete</button>
+    <a asp-action="GetAllTimes" class="btn btn-secondary">Cancel</a>
+</form>

@@ -65,14 +65,16 @@ namespace Your_Ride.Services.TimeServ
 
             //var locationsWithPics = new Dictionary<string, string?>();
 
-            foreach(var LC in formFileTimeVM.LocationsWithPics)
+            foreach (var T in Newtime.LocationsWithPics)
             {
-                Newtime.LocationsWithPics.Add(LC.Key, await FileHelper.SaveFileAsync(LC.Value));
+                foreach (var LC in formFileTimeVM.FormFileLocationsWithPics)
+                {
+                    T.ImagePath = await FileHelper.SaveFileAsync(LC.ImagePath);
+                }
             }
 
             Time time = await timeRepository.CreateTime(Newtime);
             return automapper.Map<TimeVM>(time);
-
         }
         public async Task<TimeVM> EditTime(IFormFileTimeVM formFileTimeVM)
         {
@@ -84,42 +86,53 @@ namespace Your_Ride.Services.TimeServ
 
             automapper.Map(formFileTimeVM, timeFromDB);
 
+            #region Old Mapping
             // Ensure dictionary is initialized
-            if (timeFromDB.LocationsWithPics == null)
-                timeFromDB.LocationsWithPics = new Dictionary<string, string?>();
+            //if (timeFromDB.LocationsWithPics == null)
+            //    timeFromDB.LocationsWithPics = new Dictionary<string, string?>();
 
-            Dictionary<string, string?> updatedLocations = new();
+            //Dictionary<string, string?> updatedLocations = new();
 
-            foreach (var LC in formFileTimeVM.LocationsWithPics)
+            //foreach (var LC in formFileTimeVM.LocationsWithPics)
+            //{
+            //    if (timeFromDB.LocationsWithPics.ContainsKey(LC.Key))
+            //    {
+            //        // Check if new file is uploaded
+            //        if (LC.Value != null)
+            //        {
+            //            // Delete old file if exists
+            //            if (!string.IsNullOrEmpty(timeFromDB.LocationsWithPics[LC.Key]))
+            //            {
+            //                FileHelper.Delete(timeFromDB.LocationsWithPics[LC.Key]);
+            //            }
+
+            //            updatedLocations[LC.Key] = await FileHelper.SaveFileAsync(LC.Value);
+            //        }
+            //        else
+            //        {
+            //            // Retain old file if no new file uploaded
+            //            updatedLocations[LC.Key] = timeFromDB.LocationsWithPics[LC.Key];
+            //        }
+            //    }
+            //    else
+            //    {
+            //        // Add new location with file
+            //        updatedLocations[LC.Key] = await FileHelper.SaveFileAsync(LC.Value);
+            //    }
+            //}
+
+            //// Update dictionary
+            //timeFromDB.LocationsWithPics = updatedLocations; 
+            #endregion
+
+            foreach (var T in timeFromDB.LocationsWithPics)
             {
-                if (timeFromDB.LocationsWithPics.ContainsKey(LC.Key))
+                foreach (var LC in formFileTimeVM.FormFileLocationsWithPics)
                 {
-                    // Check if new file is uploaded
-                    if (LC.Value != null)
-                    {
-                        // Delete old file if exists
-                        if (!string.IsNullOrEmpty(timeFromDB.LocationsWithPics[LC.Key]))
-                        {
-                            FileHelper.Delete(timeFromDB.LocationsWithPics[LC.Key]);
-                        }
-
-                        updatedLocations[LC.Key] = await FileHelper.SaveFileAsync(LC.Value);
-                    }
-                    else
-                    {
-                        // Retain old file if no new file uploaded
-                        updatedLocations[LC.Key] = timeFromDB.LocationsWithPics[LC.Key];
-                    }
-                }
-                else
-                {
-                    // Add new location with file
-                    updatedLocations[LC.Key] = await FileHelper.SaveFileAsync(LC.Value);
+                    
+                    T.ImagePath = await FileHelper.SaveFileAsync(LC.ImagePath);
                 }
             }
-
-            // Update dictionary
-            timeFromDB.LocationsWithPics = updatedLocations;
 
             Time updatedTime = await timeRepository.UpdateAsync(timeFromDB);
             return automapper.Map<TimeVM>(updatedTime);

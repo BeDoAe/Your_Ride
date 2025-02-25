@@ -1,0 +1,64 @@
+﻿@model Your_Ride.Helper.PaginatedList<Your_Ride.ViewModels.TimeViewModel.TimeVM>
+
+<h2>All Time Appointments</h2>
+
+<!-- Search Bar -->
+<form asp-action="GetAllTimes" method="get">
+    <input type="text" name="search" placeholder="Search by Driver, Plate, Seat, Time, Date" class="form-control" />
+    <button type="submit" class="btn btn-primary mt-2">Search</button>
+</form>
+
+<!-- Sorting Links -->
+<p>
+    <a asp-action="GetAllTimes" asp-route-sortOrder="@ViewBag.TimeSortParam">Sort by Time</a> |
+    <a asp-action="GetAllTimes" asp-route-sortOrder="@ViewBag.DriverSortParam">Sort by Driver</a>
+</p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Time</th>
+            <th>Bus Guide</th>
+            <th>Bus Tag</th>
+            <th>Driver</th>
+            <th>Plate</th>
+            <th>Seat Number</th>
+            <th>Appointment Date</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var time in Model.Items)
+        {
+            <tr>
+                <td>@time.TimeOnly.ToString("hh:mm tt")</td>
+                <td>@time.Appointment.BusGuide.FirstName  @time.Appointment.BusGuide.LastName</td>
+                <td>@time.Bus.BusIdentifier</td>
+                <td>@time.Bus.DriverName</td>
+                <td>@time.Bus.PlateNumber</td>
+                <td>@time.Bus.NumberOfSeats</td>
+                <td>@time.Appointment.Date.ToShortDateString()</td>
+                <td>
+                    <a asp-action="GetTimeByID" asp-route-id="@time.Id" class="btn btn-info">View</a>
+                    <a asp-action="EditTime" asp-route-id="@time.Id" class="btn btn-warning">Edit</a>
+                    <a asp-action="DeleteTime" asp-route-id="@time.Id" class="btn btn-danger">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<!-- Pagination -->
+<div class="pagination">
+    @if (Model.HasPrevious)
+    {
+        <a asp-action="GetAllTimes" asp-route-page="@(Model.PageNumber - 1)" class="btn btn-primary">Previous</a>
+    }
+    <span>Page @Model.PageNumber of @Model.TotalPages</span>
+    @if (Model.HasNext)
+    {
+        <a asp-action="GetAllTimes" asp-route-page="@(Model.PageNumber + 1)" class="btn btn-primary">Next</a>
+    }
+</div>
+
+<a asp-action="CreateTime" class="btn btn-success mt-3">Create New Time</a>

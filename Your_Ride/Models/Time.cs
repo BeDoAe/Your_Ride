@@ -12,8 +12,9 @@ namespace Your_Ride.Models
         //public List<string> Locations { get; set; }
 
         //public List<string>? LocationsPics { get; set; }
-        public Dictionary<string, string?> LocationsWithPics { get; set; } = new();
+        //public Dictionary<string, string?> LocationsWithPics { get; set; } = new();
 
+        public List<LocationImage> LocationsWithPics { get; set; } = new();
 
         public DateTime? DueDateArrivalSubmission { get; set; }
         public DateTime? DueDateDepartureSubmission { get; set; }

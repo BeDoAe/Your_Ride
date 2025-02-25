@@ -1,0 +1,52 @@
+﻿@model Your_Ride.ViewModels.TimeViewModel.IFormFileTimeVM
+
+<h2>Create / Edit Time</h2>
+
+<form asp-action="CreateTime" method="post" enctype="multipart/form-data">
+    <div>
+        <label>Time:</label>
+        <input asp-for="TimeOnly" type="time" required />
+    </div>
+
+    <div>
+        <label>Fee:</label>
+        <input asp-for="Fee" type="number" step="0.01" required />
+    </div>
+
+    <div>
+        <label>Bus:</label>
+        <select asp-for="BusID" asp-items="@(new SelectList(ViewBag.Buses, "Id", "BusIdentifier"))">
+            <option value="">Select a Bus</option>
+        </select>
+    </div>
+
+    <div>
+        <label>Appointment:</label>
+        <select asp-for="AppointmentId" asp-items="@(new SelectList(ViewBag.Appointments, "Id", "Date"))">
+            <option value="">Select an Appointment</option>
+        </select>
+    </div>
+
+    <h3>Locations</h3>
+    <div id="locationList">
+        <div>
+            <input type="text" name="FormFileLocationsWithPics[0].Location" placeholder="Location Name" required />
+            <input type="file" name="FormFileLocationsWithPics[0].ImageFile" />
+        </div>
+    </div>
+    <button type="button" onclick="addLocation()">Add More Locations</button>
+
+    <button type="submit">Save</button>
+</form>
+
+<script>
+    let count = 1;
+    function addLocation() {
+        let list = document.getElementById("locationList");
+        let div = document.createElement("div");
+        div.innerHTML = `<input type="text" name="FormFileLocationsWithPics[${count}].Location" placeholder="Location Name" required />
+                         <input type="file" name="FormFileLocationsWithPics[${count}].ImageFile" />`;
+        list.appendChild(div);
+        count++;
+    }
+</script>
