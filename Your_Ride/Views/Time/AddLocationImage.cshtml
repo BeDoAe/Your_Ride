@@ -1,0 +1,64 @@
+﻿@model List<Your_Ride.Models.LocationImage>
+
+@{
+    ViewData["Title"] = "Add Location Image";
+}
+
+<h2>Location Images</h2>
+
+@if (Model == null || !Model.Any())
+{
+    <p class="alert alert-warning">No location found yet!</p>
+}
+else
+{
+    <div class="row">
+        @foreach (var location in Model)
+        {
+            <div class="col-md-4">
+                <div class="card mb-3">
+                    <img src="@location.ImagePath" class="card-img-top" alt="Location Image" style="height: 200px; object-fit: cover;">
+                    <div class="card-body">
+                        <h5 class="card-title">@location.Location</h5>
+                        <p class="card-text">Order: @location.LocationOrder</p>
+                        <p class="card-text">
+                            <a href="@location.PathURL" target="_blank">View Location</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+<h3 class="mt-4">Add New Location Image</h3>
+
+<form asp-action="ConfirmAddLocationImage" method="post" enctype="multipart/form-data">
+    <input type="hidden" name="id" value="@ViewBag.TimeID" />
+
+    <input type="hidden" name="TimeId" value="@ViewBag.TimeID" />
+
+
+    <div class="form-group">
+        <label for="Location">Location Name</label>
+        <input type="text" name="Location" class="form-control" placeholder="Enter location name" required />
+    </div>
+
+    <div class="form-group">
+        <label for="LocationOrder">Order</label>
+        <input type="number" name="LocationOrder" class="form-control" placeholder="Enter order number" />
+    </div>
+
+    <div class="form-group">
+        <label for="PathURL">Location URL (Optional)</label>
+        <input type="text" name="PathURL" class="form-control" placeholder="Enter GPS URL (optional)" />
+    </div>
+
+    <div class="form-group">
+        <label for="ImageFile">Upload Image</label>
+        <input type="file" name="ImageFile" class="form-control" required />
+    </div>
+
+    <button type="submit" class="btn btn-success mt-2">Add Location Image</button>
+    <a asp-action="EditTime" asp-route-id="@ViewBag.TimeId" class="btn btn-secondary mt-2">Back to Edit Time</a>
+</form>

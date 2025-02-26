@@ -10,7 +10,7 @@
 <form asp-action="CreateAppointment" method="post">
     <div class="form-group">
         <label for="Date">Date</label>
-        <input asp-for="Date" class="form-control" type="date" required />
+        <input asp-for="Date" class="form-control" type="date" id="appointmentDate" @*  value="2025-07-22" min="2018-01-01"   max="2018-12-31" *@ required />
     </div>
 
     <div class="form-group">
@@ -35,3 +35,11 @@
     <button type="submit" class="btn btn-success">Create</button>
     <a asp-action="GetAllAppointments" class="btn btn-secondary">Cancel</a>
 </form>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
+        var dateInput = document.getElementById("appointmentDate");
+        dateInput.min = today; // Set minimum date to today
+        dateInput.value = today; // Set default value to today
+    });
+</script>

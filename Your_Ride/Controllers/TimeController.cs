@@ -106,6 +106,8 @@ namespace Your_Ride.Controllers
         // /Time/CreateTime
         [HttpGet]
         public async Task<IActionResult> CreateTime()
+        
+        
         {
             List<BusVM> busVMs = await busService.GetAllBuses();
             List<AppointmentVM> appointmentVMs = await appointmentService.GetAllAppointments();
@@ -178,7 +180,9 @@ namespace Your_Ride.Controllers
             }
             IFormFileTimeVM fileTimeVM = await timeService.EditTime(formFileTimeVM);
             if (fileTimeVM == null) return NotFound("Error Editing");
-            return RedirectToAction("GetTimeByID", new { id = formFileTimeVM.Id });
+            //return RedirectToAction("GetTimeByID", new { id = formFileTimeVM.Id });
+            return RedirectToAction("GetAllTimes");
+
 
         }
 
@@ -222,9 +226,21 @@ namespace Your_Ride.Controllers
 
             return RedirectToAction("GetAllTimes");
         }
+        [HttpGet]
+        public async Task<IActionResult> AddLocationImage(int id)
+        {
+            TimeVM timeVM = await timeService.GetTimeByID(id);
+            if (timeVM == null) return NotFound("No Time Found !!");
+
+            List<LocationImage> locationImages = await timeService.GetLocationImagessByTimeID(id);
+            ViewBag.TimeID=id;
+
+            return View("AddLocationImage", locationImages);
+
+        }
         [HttpPost]
         [AutoValidateAntiforgeryToken]
-        public async Task<IActionResult> AddLocationImage(int id , LocationImage locationImage)
+        public async Task<IActionResult> ConfirmAddLocationImage(int id , LocationImage locationImage)
         {
             LocationImage result = await timeService.AddLocationImage(id, locationImage);
                 if (result == null)

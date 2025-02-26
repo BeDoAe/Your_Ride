@@ -25,6 +25,7 @@ namespace Your_Ride.Services.TimeServ
 
 
         public Task<LocationImage> AddLocationImage(int id, LocationImage Locationimage);
+        public Task<List<LocationImage>> GetLocationImagessByTimeID(int id);
 
 
     }

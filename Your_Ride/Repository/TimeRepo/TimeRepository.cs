@@ -38,6 +38,11 @@ namespace Your_Ride.Repository.TimeRepo
             List<Time> times = await context.Times.Include(x => x.LocationsWithPics).Include(x => x.BusGuide).Include(x => x.Bus).Include(x => x.Appointment).Where(x => x.BusGuideId == id).ToListAsync();
             return times;
         }
+        public async Task<List<LocationImage>> GetLocationImagessByTimeID(int id)
+        {
+            List<LocationImage> locationImages = await context.LocationImages.Where(x => x.TimeId == id).ToListAsync();
+            return locationImages;
+        }
 
         public async Task<Time> CreateTime(Time time)
         {
@@ -53,10 +58,10 @@ namespace Your_Ride.Repository.TimeRepo
                 .ThenInclude(x => x.LocationsWithPics)
                 .FirstOrDefaultAsync(x => x.Date == time.Appointment.Date);
 
-            // If an appointment exists, check if the time already exists
+            // If an appointment exists, check if the time already exists with same category !
             if (existingAppointment != null)
             {
-                bool timeExists = existingAppointment.Times.Any(t => t.TimeOnly == time.TimeOnly);
+                bool timeExists = existingAppointment.Times.Any(t => t.TimeOnly == time.TimeOnly && t.Category==time.Category);
 
                 // Fix: Corrected condition
                 if (timeExists)  // No need to check `!= null`, it's always true/false
@@ -68,6 +73,21 @@ namespace Your_Ride.Repository.TimeRepo
             await context.Times.AddAsync(time);
             await SaveDB();
             return time;
+        }
+        public async Task<Time> UpdateTime(Time time)
+        {
+            Time timeFromDB = await context.Times.FirstOrDefaultAsync(x => x.Id == time.Id);
+            if (timeFromDB == null) return null;
+            else
+            {
+                await context.SaveChangesAsync();
+
+                //context.Times.Update(time);
+                //await context.SaveChangesAsync();
+                    return time;
+            }
+
+
         }
 
         public async Task<int> DeleteTime(int id)
@@ -121,8 +141,11 @@ namespace Your_Ride.Repository.TimeRepo
 
             if (existed == false)
             {
+                //locationImage.Time = timeFromDB;
+                //locationImage.TimeId = id;
                 await context.LocationImages.AddAsync(locationImage);
-                await SaveDB();
+                await context.SaveChangesAsync();
+                //await SaveDB();
                 return locationImage;
             }
             else

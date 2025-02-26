@@ -168,7 +168,6 @@ namespace Your_Ride.Services.TimeServ
         //    Time updatedTime = await timeRepository.UpdateAsync(timeFromDB);
         //    return automapper.Map<TimeVM>(updatedTime);
         //}
-        #endregion
 
         //public async Task<IFormFileTimeVM> EditTime(IFormFileTimeVM formFileTimeVM)
         //{
@@ -235,6 +234,7 @@ namespace Your_Ride.Services.TimeServ
         //    // Map the updated Time entity to ViewModel
         //    return automapper.Map<IFormFileTimeVM>(updatedTime);
         //}
+        #endregion
 
 
         public async Task<IFormFileTimeVM> EditTime(IFormFileTimeVM formFileTimeVM)
@@ -245,30 +245,30 @@ namespace Your_Ride.Services.TimeServ
             // Validate Bus Guide Role
             ApplicationUser AdminBusGuide = await userManager.Users.FirstOrDefaultAsync(x => x.Id == formFileTimeVM.BusGuideId);
             if (AdminBusGuide == null || !(await userManager.IsInRoleAsync(AdminBusGuide, "Admin"))) return null;
+            if(formFileTimeVM.Category == IFormFileTimeVM.TripCategory.Arrival)
+            {
+                timeFromDB.DueDateArrivalSubmission = null;
 
-            //automapper.Map(formFileTimeVM, timeFromDB);
+            }else if (formFileTimeVM.Category == IFormFileTimeVM.TripCategory.Departure)
+            {
+                timeFromDB.DueDateArrivalSubmission = null;
+            }
+            // Update Fields
             timeFromDB.Fee = formFileTimeVM.Fee;
             timeFromDB.Category = (Time.TripCategory)formFileTimeVM.Category;
-            timeFromDB.DueDateArrivalSubmission=formFileTimeVM.DueDateDepartureSubmission;
-            timeFromDB.DueDateDepartureSubmission = formFileTimeVM.DueDateDepartureSubmission;
             timeFromDB.TimeOnly = formFileTimeVM.TimeOnly;
             timeFromDB.BusGuideId = formFileTimeVM.BusGuideId;
-            timeFromDB.BusGuide=formFileTimeVM.BusGuide;
             timeFromDB.AppointmentId = formFileTimeVM.AppointmentId;
-            timeFromDB.Appointment=formFileTimeVM.Appointment;
-            timeFromDB.Bus=formFileTimeVM.Bus;
             timeFromDB.BusID = formFileTimeVM.BusID;
-            
 
 
-            // Update Locations
+
+            // Update Locations with Images
             foreach (var existingLocation in timeFromDB.LocationsWithPics.ToList())
             {
                 var updatedLocation = formFileTimeVM.FormFileLocationsWithPics.FirstOrDefault(l => l.Id == existingLocation.Id);
                 if (updatedLocation != null)
                 {
-                
-                    existingLocation.TimeId = updatedLocation.TimeId;
                     existingLocation.Location = updatedLocation.Location;
                     existingLocation.LocationOrder = updatedLocation.LocationOrder;
                     existingLocation.PathURL = updatedLocation.PathURL;
@@ -288,9 +288,9 @@ namespace Your_Ride.Services.TimeServ
                 }
             }
 
-            // Save changes
-            await timeRepository.UpdateAsync(timeFromDB);
-            return automapper.Map<IFormFileTimeVM>(timeFromDB);
+            // Save to Database
+            Time timeAfterSaving = await timeRepository.UpdateTime(timeFromDB);
+            return automapper.Map<IFormFileTimeVM>(timeAfterSaving);
         }
 
 
@@ -313,6 +313,7 @@ namespace Your_Ride.Services.TimeServ
         }
         public async Task<LocationImage> AddLocationImage(int id , LocationImage Locationimage)
         {
+
             LocationImage locationImageFromDB = await timeRepository.AddLocationImage(id, Locationimage);   
             return locationImageFromDB;
  
@@ -322,6 +323,11 @@ namespace Your_Ride.Services.TimeServ
             LocationImage locationImage = await timeRepository.GetLocationImage(id);
             return locationImage;
 
+        }
+        public async Task<List<LocationImage>> GetLocationImagessByTimeID(int id)
+        {
+            List<LocationImage> locationImages = await timeRepository.GetLocationImagessByTimeID(id);   
+            return locationImages;
         }
 
 

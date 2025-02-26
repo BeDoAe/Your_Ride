@@ -125,12 +125,13 @@
     </div>
         <div id="arrivalDateField" class="mb-3">
         <label class="form-label">Arrival Due Date (Optional):</label>
-        <input asp-for="DueDateArrivalSubmission" class="form-control" type="date" placeholder="Not required" />
+        <input asp-for="DueDateArrivalSubmission" class="form-control" type="datetime-local" placeholder="Not required" />
     </div>
 
     <div id="departureDateField" class="mb-3" style="display:none;">
         <label class="form-label">Departure Due Date (Optional):</label>
-        <input asp-for="DueDateDepartureSubmission" class="form-control" type="date" placeholder="Not required" />
+        <input asp-for="DueDateDepartureSubmission" class="form-control" type="datetime-local" placeholder="Not required" />
+
     </div>
     <div class="mb-3">
         <label class="form-label">Select Bus Guide:</label>
@@ -158,7 +159,7 @@
             <input type="text" name="FormFileLocationsWithPics[0].Location" class="form-control mb-2" placeholder="Location Name" required />
             <input type="number" name="FormFileLocationsWithPics[0].LocationOrder" class="form-control mb-2" placeholder="Location Order" required />
             <input type="text" name="FormFileLocationsWithPics[0].PathURL" class="form-control mb-2" placeholder="Path URL (Optional)" />
-            <input type="file" name="FormFileLocationsWithPics[0].ImagePath" class="form-control" accept="image/*" onchange="previewImage(this, 0)" />
+            <input type="file" name="FormFileLocationsWithPics[0].ImageFile" class="form-control" accept="image/*" onchange="previewImage(this, 0)" />
             <img id="preview0" src="" class="img-preview mt-2" style="max-width: 100px; display:none;" />
         </div>
     </div>
@@ -182,7 +183,7 @@
             <input type="text" name="FormFileLocationsWithPics[${count}].Location" class="form-control mb-2" placeholder="Location Name" required />
             <input type="number" name="FormFileLocationsWithPics[${count}].LocationOrder" class="form-control mb-2" placeholder="Location Order" required />
             <input type="text" name="FormFileLocationsWithPics[${count}].PathURL" class="form-control mb-2" placeholder="Path URL (Optional)" />
-            <input type="file" name="FormFileLocationsWithPics[${count}].ImagePath" class="form-control" accept="image/*" onchange="previewImage(this, ${count})" />
+            <input type="file" name="FormFileLocationsWithPics[${count}].ImageFile" class="form-control" accept="image/*" onchange="previewImage(this, ${count})" />
             <img id="preview${count}" src="" class="img-preview mt-2" style="max-width: 100px; display:none;" />
         `;
         list.appendChild(div);
@@ -199,6 +200,69 @@
                 preview.style.display = "block";
             }
             reader.readAsDataURL(file);
+        }
+    }
+     document.addEventListener("DOMContentLoaded", function () {
+        document.getElementById("categorySelect").addEventListener("change", toggleDateFields);
+        document.getElementById("AppointmentId").addEventListener("change", validateDueDate);
+        document.getElementById("DueDateDepartureSubmission").addEventListener("change", validateDueDate);
+        document.getElementById("DueDateArrivalSubmission").addEventListener("change", validateDueDate);
+        document.getElementById("TimeOnly").addEventListener("change", validateDueTime);
+    });
+
+    function toggleDateFields() {
+        var category = document.getElementById("categorySelect").value;
+        document.getElementById("arrivalDateField").style.display = (category == "0") ? "block" : "none";
+        document.getElementById("departureDateField").style.display = (category == "1") ? "block" : "none";
+        validateDueDate();
+    }
+
+    function validateDueDate() {
+        var appointmentSelect = document.getElementById("AppointmentId");
+        var appointmentDate = appointmentSelect.options[appointmentSelect.selectedIndex].text;
+        var departureDateInput = document.getElementById("DueDateDepartureSubmission");
+        var arrivalDateInput = document.getElementById("DueDateArrivalSubmission");
+
+        if (!appointmentDate) return;
+
+        var selectedDate = new Date(appointmentDate);
+        if (departureDateInput && departureDateInput.value) {
+            var departureDate = new Date(departureDateInput.value);
+            if (departureDate < selectedDate) {
+                alert("Departure Due Date cannot be earlier than the Appointment Date.");
+                departureDateInput.value = ""; // Reset the input
+            }
+        }
+        if (arrivalDateInput && arrivalDateInput.value) {
+            var arrivalDate = new Date(arrivalDateInput.value);
+            if (arrivalDate < selectedDate) {
+                alert("Arrival Due Date cannot be earlier than the Appointment Date.");
+                arrivalDateInput.value = ""; // Reset the input
+            }
+        }
+    }
+
+    function validateDueTime() {
+        var appointmentTimeInput = document.getElementById("TimeOnly");
+        var departureTimeInput = document.getElementById("DueDateDepartureSubmission");
+        var arrivalTimeInput = document.getElementById("DueDateArrivalSubmission");
+
+        if (!appointmentTimeInput.value) return;
+
+        var appointmentTime = appointmentTimeInput.value;
+        if (departureTimeInput && departureTimeInput.value) {
+            var departureTime = departureTimeInput.value.split("T")[1]; // Extract time from datetime-local
+            if (departureTime < appointmentTime) {
+                alert("Departure Time cannot be earlier than the Appointment Time.");
+                departureTimeInput.value = ""; // Reset input
+            }
+        }
+        if (arrivalTimeInput && arrivalTimeInput.value) {
+            var arrivalTime = arrivalTimeInput.value.split("T")[1];
+            if (arrivalTime < appointmentTime) {
+                alert("Arrival Time cannot be earlier than the Appointment Time.");
+                arrivalTimeInput.value = ""; // Reset input
+            }
         }
     }
 </script>

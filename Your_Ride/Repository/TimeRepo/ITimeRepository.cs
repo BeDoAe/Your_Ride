@@ -17,8 +17,10 @@ namespace Your_Ride.Repository.TimeRepo
         public Task<List<Time>> GetAppointmentsByBusGuideID(string id);
 
         public Task<LocationImage> AddLocationImage(int id, LocationImage locationImage);
+        public Task<Time> UpdateTime(Time time);
 
 
+        public Task<List<LocationImage>> GetLocationImagessByTimeID(int id);
 
     }
 }
