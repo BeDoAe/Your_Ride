@@ -1,9 +1,9 @@
 ﻿@model Your_Ride.ViewModels.AppointmentviewModel.AppointmentVM
 @using Your_Ride.Models
-
+@* 
 @{
     var users = ViewBag.Users as List<ApplicationUser>;
-}
+} *@
 
 <h2>Create Appointment</h2>
 
@@ -18,7 +18,7 @@
         <input asp-for="MaxAmount" class="form-control" type="number" step="0.01" required />
     </div>
 
-    <div class="form-group">
+@*     <div class="form-group">
         <label for="BusGuideId">Select Bus Guide</label>
         <select asp-for="BusGuideId" class="form-control">
             <option value="">-- Select Bus Guide --</option>
@@ -30,7 +30,7 @@
                 }
             }
         </select>
-    </div>
+    </div> *@
 
     <button type="submit" class="btn btn-success">Create</button>
     <a asp-action="GetAllAppointments" class="btn btn-secondary">Cancel</a>

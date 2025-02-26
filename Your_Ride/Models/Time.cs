@@ -14,7 +14,7 @@ namespace Your_Ride.Models
         //public List<string>? LocationsPics { get; set; }
         //public Dictionary<string, string?> LocationsWithPics { get; set; } = new();
 
-        public List<LocationImage> LocationsWithPics { get; set; } = new();
+        public List<LocationImage> LocationsWithPics { get; set; } = new List<LocationImage>();
 
         public DateTime? DueDateArrivalSubmission { get; set; }
         public DateTime? DueDateDepartureSubmission { get; set; }
@@ -37,6 +37,10 @@ namespace Your_Ride.Models
         public int BusID { get; set; }
         public Bus? Bus { get; set; }
 
+
+        // Bus Guide assigned to the appointment
+        public string BusGuideId { get; set; }
+        public ApplicationUser? BusGuide { get; set; }
 
         // Foreign key for Appointment
         public int AppointmentId { get; set; }

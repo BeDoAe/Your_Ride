@@ -37,7 +37,7 @@
                 }
 
                 // Validate file type (e.g., images only)
-                var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
+                var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" ,".webp"};
                 var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
                 if (!allowedExtensions.Contains(extension))
                 {

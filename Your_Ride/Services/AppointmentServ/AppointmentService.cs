@@ -44,16 +44,16 @@ namespace Your_Ride.Services.AppointmentServ
 
 
         }
-        public async Task<List<AppointmentVM>> GetAppointmentsByBuisGuideID(string id)
-        {
-            List<Appointment> appointments = await appointmentRepository.GetAppointmentsByBusGuideID(id);
+        //public async Task<List<AppointmentVM>> GetAppointmentsByBuisGuideID(string id)
+        //{
+        //    List<Appointment> appointments = await appointmentRepository.GetAppointmentsByBusGuideID(id);
 
-            List<AppointmentVM> appointmentVMs = automapper.Map<List<AppointmentVM>>(appointments);
+        //    List<AppointmentVM> appointmentVMs = automapper.Map<List<AppointmentVM>>(appointments);
 
-            return appointmentVMs;
+        //    return appointmentVMs;
 
 
-        }
+        //}
 
 
 

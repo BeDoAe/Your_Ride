@@ -9,13 +9,22 @@ namespace Your_Ride.Services.TimeServ
         public Task<List<TimeVM>> GetAllTimes();
         public Task<List<TimeVM>> GetAllTimesByBusID(int id);
         public Task<List<TimeVM>> GetAllTimesByAppointmentID(int id);
+
+        public Task<List<TimeVM>> GetAppointmentsByBuisGuideID(string id);
+
         public Task<TimeVM> GetTimeByID(int id);
         public Task<TimeVM> CreateTime(IFormFileTimeVM formFileTimeVM);
-        public Task<TimeVM> EditTime(IFormFileTimeVM formFileTimeVM);
+        //public Task<TimeVM> EditTime(IFormFileTimeVM formFileTimeVM);
+        public Task<IFormFileTimeVM> EditTime(IFormFileTimeVM formFileTimeVM);
+
         public Task<int> DeleteTime(int id);
         public Task<int> DeleteLocationImage(int id);
         public Task<LocationImage> GetLocationImage(int id);
 
+        public IFormFileTimeVM MappingToFormFile(TimeVM timeVM);
+
+
+        public Task<LocationImage> AddLocationImage(int id, LocationImage Locationimage);
 
 
     }

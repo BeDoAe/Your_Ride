@@ -13,7 +13,7 @@ namespace Your_Ride.Repository.AppointmentRepo
 
         public Task<int> DeleteAppointment(int id);
         public Task<Appointment> UpdateAppointment(Appointment appointment);
-        public Task<List<Appointment>> GetAppointmentsByBusGuideID(string id);
+        //public Task<List<Appointment>> GetAppointmentsByBusGuideID(string id);
         public Task<List<Appointment>> GetAllAppointments(string searchQuery, string sortOrder);
 
     }

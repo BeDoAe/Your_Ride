@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Your_Ride.Helper;
 using Your_Ride.Models;
 using Your_Ride.Models.Your_Ride.Models;
@@ -16,13 +18,15 @@ namespace Your_Ride.Services.TimeServ
         private readonly ITimeRepository timeRepository;
         private readonly IBusRepository busRepository;
         private readonly IAppointmentRepository appointmentRepository;
+        private readonly UserManager<ApplicationUser> userManager;
 
-        public TimeService(IMapper automapper , ITimeRepository timeRepository , IBusRepository busRepository , IAppointmentRepository appointmentRepository)
+        public TimeService(IMapper automapper , ITimeRepository timeRepository , IBusRepository busRepository , IAppointmentRepository appointmentRepository , UserManager<ApplicationUser> userManager)
         {
             this.automapper = automapper;
             this.timeRepository = timeRepository;
             this.busRepository = busRepository;
             this.appointmentRepository = appointmentRepository;
+            this.userManager = userManager;
         }
 
         public async Task<List<TimeVM>> GetAllTimes()
@@ -45,7 +49,16 @@ namespace Your_Ride.Services.TimeServ
             List<TimeVM> timeVMs = automapper.Map<List<TimeVM>>(times);
             return timeVMs;
         }
+        public async Task<List<TimeVM>> GetAppointmentsByBuisGuideID(string id)
+        {
+            List<Time> times = await timeRepository.GetAppointmentsByBusGuideID(id);
 
+            List<TimeVM> timeVMs = automapper.Map<List<TimeVM>>(times);
+
+            return timeVMs;
+
+
+        }
         public async Task<TimeVM> GetTimeByID(int id)
         {
             Time time = await timeRepository.GetTimeByID(id);
@@ -58,11 +71,16 @@ namespace Your_Ride.Services.TimeServ
         {
             Bus bus = await busRepository.GetByIdAsync(formFileTimeVM.BusID);
             Appointment appointment = await appointmentRepository.GetAppointmentByID(formFileTimeVM.AppointmentId);
-            if (bus == null || appointment == null) return null;
+              ApplicationUser AdminBusGuide = await userManager.Users.FirstOrDefaultAsync(x=>x.Id==formFileTimeVM.BusGuideId);
+            bool isAdmin = await userManager.IsInRoleAsync(AdminBusGuide, "Admin");
+            //if (isAdmin != true) return null;
+
+            if (bus == null || appointment == null || isAdmin != true) return null;
 
             Time Newtime = automapper.Map<Time>(formFileTimeVM);
             Newtime.Appointment = appointment;
             Newtime.Bus = bus;
+            Newtime.BusGuide = AdminBusGuide;
             //product.Img = await FileHelper.SaveFileAsync(addProductVM.Img);
 
             //var locationsWithPics = new Dictionary<string, string?>();
@@ -77,7 +95,7 @@ namespace Your_Ride.Services.TimeServ
                     locationImage.LocationOrder = LC.LocationOrder;
                     locationImage.Location=LC.Location;
                     locationImage.TimeId = LC.TimeId;
-                    locationImage.ImagePath = await FileHelper.SaveFileAsync(LC.ImagePath);
+                    locationImage.ImagePath = await FileHelper.SaveFileAsync(LC.ImageFile);
 
                 Newtime.LocationsWithPics.Add(locationImage);
 
@@ -152,70 +170,134 @@ namespace Your_Ride.Services.TimeServ
         //}
         #endregion
 
-        public async Task<TimeVM> EditTime(IFormFileTimeVM formFileTimeVM)
-        {
-            // Retrieve the existing Time object from the database using its ID.
-            Time timeFromDB = await timeRepository.GetTimeByID(formFileTimeVM.Id);
+        //public async Task<IFormFileTimeVM> EditTime(IFormFileTimeVM formFileTimeVM)
+        //{
+        //    // Retrieve existing Time object from DB
+        //    Time timeFromDB = await timeRepository.GetTimeByID(formFileTimeVM.Id);
 
-            // Loop through the existing locations linked to this Time entry
+        //    if (timeFromDB == null)
+        //        return null;
+
+        //    ApplicationUser AdminBusGuide = await userManager.Users.FirstOrDefaultAsync(x => x.Id == formFileTimeVM.BusGuideId);
+        //    bool isAdmin = await userManager.IsInRoleAsync(AdminBusGuide, "Admin");
+        //    if (!isAdmin) return null;
+
+        //    // Update each existing location or mark as deleted
+        //    foreach (var existingLocation in timeFromDB.LocationsWithPics.ToList())
+        //    {
+        //        var updatedLocation = formFileTimeVM.FormFileLocationsWithPics
+        //            .FirstOrDefault(l => l.Id == existingLocation.Id);
+
+        //        if (updatedLocation != null)
+        //        {
+        //            existingLocation.TimeId = updatedLocation.TimeId;
+        //            existingLocation.Location = updatedLocation.Location;
+        //            existingLocation.LocationOrder = updatedLocation.LocationOrder;
+        //            existingLocation.PathURL = updatedLocation.PathURL;
+
+        //            // Handle new image upload
+        //            if (updatedLocation.ImagePath != null)
+        //            {
+        //                // Delete old file
+        //                if (!string.IsNullOrEmpty(existingLocation.ImagePath))
+        //                {
+        //                    FileHelper.Delete(existingLocation.ImagePath);
+        //                }
+
+        //                // Save new file
+        //                existingLocation.ImagePath = await FileHelper.SaveFileAsync(updatedLocation.ImageFile);
+        //            }
+        //        }
+        //        else
+        //        {
+        //            existingLocation.IsDeleted = true;
+        //        }
+        //    }
+
+        //    // Add new locations if they have Id = 0
+        //    foreach (var newLocation in formFileTimeVM.FormFileLocationsWithPics.Where(l => l.Id == 0))
+        //    {
+        //        LocationImage locationImage = new LocationImage
+        //        {
+        //            PathURL = newLocation.PathURL,
+        //            LocationOrder = newLocation.LocationOrder,
+        //            Location = newLocation.Location,
+        //            TimeId = formFileTimeVM.Id,
+        //            ImagePath = newLocation.ImagePath != null ? await FileHelper.SaveFileAsync(newLocation.ImageFile) : null
+        //        };
+
+        //        timeFromDB.LocationsWithPics.Add(locationImage);
+        //    }
+
+        //    // Save updates
+        //    Time updatedTime = await timeRepository.UpdateAsync(timeFromDB);
+
+        //    // Map the updated Time entity to ViewModel
+        //    return automapper.Map<IFormFileTimeVM>(updatedTime);
+        //}
+
+
+        public async Task<IFormFileTimeVM> EditTime(IFormFileTimeVM formFileTimeVM)
+        {
+            Time timeFromDB = await timeRepository.GetTimeByID(formFileTimeVM.Id);
+            if (timeFromDB == null) return null;
+
+            // Validate Bus Guide Role
+            ApplicationUser AdminBusGuide = await userManager.Users.FirstOrDefaultAsync(x => x.Id == formFileTimeVM.BusGuideId);
+            if (AdminBusGuide == null || !(await userManager.IsInRoleAsync(AdminBusGuide, "Admin"))) return null;
+
+            //automapper.Map(formFileTimeVM, timeFromDB);
+            timeFromDB.Fee = formFileTimeVM.Fee;
+            timeFromDB.Category = (Time.TripCategory)formFileTimeVM.Category;
+            timeFromDB.DueDateArrivalSubmission=formFileTimeVM.DueDateDepartureSubmission;
+            timeFromDB.DueDateDepartureSubmission = formFileTimeVM.DueDateDepartureSubmission;
+            timeFromDB.TimeOnly = formFileTimeVM.TimeOnly;
+            timeFromDB.BusGuideId = formFileTimeVM.BusGuideId;
+            timeFromDB.BusGuide=formFileTimeVM.BusGuide;
+            timeFromDB.AppointmentId = formFileTimeVM.AppointmentId;
+            timeFromDB.Appointment=formFileTimeVM.Appointment;
+            timeFromDB.Bus=formFileTimeVM.Bus;
+            timeFromDB.BusID = formFileTimeVM.BusID;
+            
+
+
+            // Update Locations
             foreach (var existingLocation in timeFromDB.LocationsWithPics.ToList())
             {
-                // Check if the current location exists in the updated request data
-                var updatedLocation = formFileTimeVM.FormFileLocationsWithPics
-                    .FirstOrDefault(l => l.Id == existingLocation.Id);
-
-                if (updatedLocation != null) // If the location exists in the update request
+                var updatedLocation = formFileTimeVM.FormFileLocationsWithPics.FirstOrDefault(l => l.Id == existingLocation.Id);
+                if (updatedLocation != null)
                 {
-                    // Update location name, order, and path URL from the request data
+                
                     existingLocation.TimeId = updatedLocation.TimeId;
                     existingLocation.Location = updatedLocation.Location;
                     existingLocation.LocationOrder = updatedLocation.LocationOrder;
                     existingLocation.PathURL = updatedLocation.PathURL;
 
-                    // If a new image is uploaded for this location, update it
-                    if (updatedLocation.ImagePath != null)
+                    if (updatedLocation.ImageFile != null)
                     {
-                        // Delete the existing image file if it exists
                         if (!string.IsNullOrEmpty(existingLocation.ImagePath))
                         {
                             FileHelper.Delete(existingLocation.ImagePath);
                         }
-
-                        // Save the new image and update the ImagePath property
-                        existingLocation.ImagePath = await FileHelper.SaveFileAsync(updatedLocation.ImagePath);
+                        existingLocation.ImagePath = await FileHelper.SaveFileAsync(updatedLocation.ImageFile);
                     }
                 }
-                else // If the location does NOT exist in the update request, mark it as deleted
+                else
                 {
-                    existingLocation.IsDeleted = true; // Soft delete (instead of permanently removing it)
+                    existingLocation.IsDeleted = true;
                 }
             }
 
-            // Loop through new locations that are not in the database yet (ID = 0)
-            foreach (var newLocation in formFileTimeVM.FormFileLocationsWithPics.Where(l => l.Id == 0))
-            {
-                // Create a new LocationImage object and populate it with values from the request
-                LocationImage locationImage = new LocationImage
-                {
-                    PathURL = newLocation.PathURL,           // Assign the new path URL
-                    LocationOrder = newLocation.LocationOrder, // Set the display order
-                    Location = newLocation.Location,         // Set the location name
-                    TimeId = formFileTimeVM.Id,              // Associate it with the Time entity
+            // Save changes
+            await timeRepository.UpdateAsync(timeFromDB);
+            return automapper.Map<IFormFileTimeVM>(timeFromDB);
+        }
 
-                    // Save the new image file (if provided) and store its path
-                    ImagePath = newLocation.ImagePath != null ?
-                        await FileHelper.SaveFileAsync(newLocation.ImagePath) : null
-                };
 
-                // Add the newly created location to the database entity
-                timeFromDB.LocationsWithPics.Add(locationImage);
-            }
-
-            // Save all changes to the database
-            Time updatedTime = await timeRepository.UpdateAsync(timeFromDB);
-
-            // Map the updated Time entity to a ViewModel and return it
-            return automapper.Map<TimeVM>(updatedTime);
+        public IFormFileTimeVM MappingToFormFile(TimeVM timeVM)
+        {
+            IFormFileTimeVM fileTimeVM = automapper.Map<IFormFileTimeVM>(timeVM);
+            return fileTimeVM;
         }
 
         public async Task<int> DeleteTime(int id)
@@ -228,6 +310,12 @@ namespace Your_Ride.Services.TimeServ
         {
             int result = await timeRepository.DeleteLocationImage(id);
             return result;
+        }
+        public async Task<LocationImage> AddLocationImage(int id , LocationImage Locationimage)
+        {
+            LocationImage locationImageFromDB = await timeRepository.AddLocationImage(id, Locationimage);   
+            return locationImageFromDB;
+ 
         }
         public async Task<LocationImage> GetLocationImage(int id)
         {

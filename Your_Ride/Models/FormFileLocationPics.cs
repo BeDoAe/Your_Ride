@@ -7,7 +7,8 @@ namespace Your_Ride.Models
     {
         public int Id { get; set; }
         public string Location { get; set; }
-        public IFormFile? ImagePath { get; set; }
+        public string? ImagePath { get; set; } 
+        public IFormFile? ImageFile { get; set; }
 
         public string? PathURL { get; set; }
 

@@ -16,10 +16,7 @@ namespace Your_Ride.ViewModels.AppointmentviewModel
         public double MaxAmount { get; set; }
 
 
-        // Bus Guide assigned to the appointment
-        [Required(ErrorMessage ="Must Have Bus Guide")]
-        public string BusGuideId { get; set; }
-        public ApplicationUser? BusGuide { get; set; }
+  
 
         // Mark as completed when the appointment finishes
         public bool HasCompleted { get; set; } = false;

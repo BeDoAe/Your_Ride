@@ -40,19 +40,20 @@ namespace Your_Ride.Controllers
             if (appointmentVM == null) return NotFound("No Appointment Found");
             return View("GetAppointmentByID", appointmentVM);
         }
-        // GET: /Appointment/GetAllAppointmentsByBusGuideID?id=
-        public async Task<IActionResult> GetAllAppointmentsByBusGuideID(String id)
-        {
-            List<AppointmentVM> appointmentVMs = await appointmentService.GetAppointmentsByBuisGuideID(id);
-            return View("GetAllAppointments", appointmentVMs);
-        }
+        //// GET: /Appointment/GetAllAppointmentsByBusGuideID?id=
+        //public async Task<IActionResult> GetAllAppointmentsByBusGuideID(String id)
+        //{
+        //    List<AppointmentVM> appointmentVMs = await appointmentService.GetAppointmentsByBuisGuideID(id);
+        //    return View("GetAllAppointments", appointmentVMs);
+        //}
         // GET: /Appointment/CreateAppointment (Show Form)
         [HttpGet]
         public async Task<IActionResult> CreateAppointment()
         {
-            var users = await userManager.Users.ToListAsync();
+            //var users = await userManager.Users.ToListAsync();
+            //ViewBag.Users = users; // Store users in ViewBag
+
             var appointmentVM = new AppointmentVM(); // Initialize an empty AppointmentVM
-            ViewBag.Users = users; // Store users in ViewBag
             return View("CreateAppointment", appointmentVM);
         }
 
@@ -64,11 +65,11 @@ namespace Your_Ride.Controllers
         {
             if (ModelState.IsValid)
             {
-                ApplicationUser user = userManager.Users.FirstOrDefault(x => x.Id == appointmentVM.BusGuideId);
-                if (user == null)
-                {
-                    return RedirectToAction("CreateAppointment",appointmentVM);
-                }
+                //ApplicationUser user = userManager.Users.FirstOrDefault(x => x.Id == appointmentVM.BusGuideId);
+                //if (user == null)
+                //{
+                //    return RedirectToAction("CreateAppointment",appointmentVM);
+                //}
                 AppointmentVM createdAppointment = await appointmentService.CreateAppointment(appointmentVM);
                 if (createdAppointment == null)
                 {
@@ -86,8 +87,8 @@ namespace Your_Ride.Controllers
         {
             AppointmentVM appointmentVM = await appointmentService.GetAppointmentByID(id);
             if (appointmentVM == null) return NotFound("Appointment not found");
-            List<ApplicationUser> users = await userManager.Users.ToListAsync();
-             ViewBag.users=users;
+            //List<ApplicationUser> users = await userManager.Users.ToListAsync();
+            // ViewBag.users=users;
             return View("EditAppointment", appointmentVM);
         }
 
@@ -106,8 +107,8 @@ namespace Your_Ride.Controllers
                 }
                 return RedirectToAction("GetAllAppointments");
             }
-            List<ApplicationUser> users = await userManager.Users.ToListAsync();
-            ViewBag.users = users;
+            //List<ApplicationUser> users = await userManager.Users.ToListAsync();
+            //ViewBag.users = users;
             return View("EditAppointment", appointmentVM);
         }
 

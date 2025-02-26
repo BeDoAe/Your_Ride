@@ -14,23 +14,28 @@ namespace Your_Ride.Repository.TimeRepo
         }
         public async Task<List<Time>> GetAllTimes()
         {
-            List<Time> times = await context.Times.Include(x=>x.LocationsWithPics).Include(x=>x.Bus).Include(x=>x.Appointment).ThenInclude(x=>x.BusGuide).ToListAsync();
+            List<Time> times = await context.Times.Include(x=>x.LocationsWithPics).Include(x=>x.BusGuide).Include(x=>x.Bus).Include(x=>x.Appointment).ToListAsync();
             return times;
         }
 
         public async Task<Time> GetTimeByID(int id)
         {
-            Time time = await context.Times.Include(x => x.LocationsWithPics).Include(x => x.Bus).Include(x => x.Appointment).ThenInclude(x => x.BusGuide).FirstOrDefaultAsync(x=>x.Id==id);
+            Time time = await context.Times.Include(x => x.LocationsWithPics).Include(x => x.BusGuide).Include(x => x.Bus).Include(x => x.Appointment).FirstOrDefaultAsync(x=>x.Id==id);
             return time;
         }
         public async Task<List<Time>> GetAllTimesByBusID(int id)
         {
-            List<Time> times = await context.Times.Include(x => x.LocationsWithPics).Include(x=>x.Bus).Include(x=>x.Appointment).ThenInclude(x => x.BusGuide).Where(x=>x.BusID==id).ToListAsync();
+            List<Time> times = await context.Times.Include(x => x.LocationsWithPics).Include(x => x.BusGuide).Include(x=>x.Bus).Include(x=>x.Appointment).Where(x=>x.BusID==id).ToListAsync();
             return times;
         }
         public async Task<List<Time>> GetAllTimesByAppointmentID(int id)
         {
-            List<Time> times = await context.Times.Include(x => x.LocationsWithPics).Include(x => x.Bus).Include(x => x.Appointment).ThenInclude(x => x.BusGuide).Where(x => x.AppointmentId == id).ToListAsync();
+            List<Time> times = await context.Times.Include(x => x.LocationsWithPics).Include(x => x.BusGuide).Include(x => x.Bus).Include(x => x.Appointment).Where(x => x.AppointmentId == id).ToListAsync();
+            return times;
+        }
+        public async Task<List<Time>> GetAppointmentsByBusGuideID(string id)
+        {
+            List<Time> times = await context.Times.Include(x => x.LocationsWithPics).Include(x => x.BusGuide).Include(x => x.Bus).Include(x => x.Appointment).Where(x => x.BusGuideId == id).ToListAsync();
             return times;
         }
 
@@ -105,6 +110,28 @@ namespace Your_Ride.Repository.TimeRepo
                 return 1;
             }
         }
+        public async Task<LocationImage> AddLocationImage(int id , LocationImage locationImage)
+        {
+            Time timeFromDB = await context.Times.FirstOrDefaultAsync(x => x.Id ==id);
+
+            if (timeFromDB == null) return null;
+
+            //check in same time there isn't location with same name !!
+            bool existed =  timeFromDB.LocationsWithPics.Any(x => x.Location == locationImage.Location);
+
+            if (existed == false)
+            {
+                await context.LocationImages.AddAsync(locationImage);
+                await SaveDB();
+                return locationImage;
+            }
+            else
+            {
+                return null;
+            }
+
+        }
+
         public async Task<LocationImage> GetLocationImage(int id)
         {
             LocationImage locationImage = await context.LocationImages.FirstOrDefaultAsync(x => x.Id == id);

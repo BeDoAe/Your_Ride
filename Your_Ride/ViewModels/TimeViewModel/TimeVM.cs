@@ -15,7 +15,7 @@ namespace Your_Ride.ViewModels.TimeViewModel
 
         //public List<string>? LocationsPics { get; set; }
         //public Dictionary<string, string?> LocationsWithPics { get; set; } = new();
-        public List<LocationImage> LocationImages { get; set; }
+        public List<LocationImage> LocationImages { get; set; }= new List<LocationImage>();
 
 
         public DateTime? DueDateArrivalSubmission { get; set; }
@@ -41,6 +41,11 @@ namespace Your_Ride.ViewModels.TimeViewModel
         [Required(ErrorMessage = "Must Have Bus ")]
         public int BusID { get; set; }
         public Bus? Bus { get; set; }
+
+        // Bus Guide assigned to the appointment
+        [Required(ErrorMessage = "Must Have Bus Guide")]
+        public string BusGuideId { get; set; }
+        public ApplicationUser? BusGuide { get; set; }
 
         [Required(ErrorMessage = "Must Have An Appointment ")]
         // Foreign key for Appointment

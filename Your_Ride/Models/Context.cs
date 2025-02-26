@@ -63,8 +63,8 @@ namespace Your_Ride.Models
                 .HasForeignKey(b => b.SeatId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // One-to-Many: Bus Guide is a User
-            modelBuilder.Entity<Appointment>()
+            // One-to-Many: Bus Guide has a User
+            modelBuilder.Entity<Time>()
                 .HasOne(a => a.BusGuide)
                 .WithMany()
                 .HasForeignKey(a => a.BusGuideId)

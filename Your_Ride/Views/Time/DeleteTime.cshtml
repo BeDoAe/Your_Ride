@@ -6,7 +6,7 @@
 <table class="table table-bordered">
     <tr><th>Time</th><td>@Model.TimeOnly.ToString("hh:mm tt")</td></tr>
     <tr><th>Appointment Date</th><td>@Model.Appointment?.Date.ToString("yyyy-MM-dd")</td></tr>
-    <tr><th>Bus Guide</th><td>@Model.Appointment?.BusGuide.FirstName @Model.Appointment.BusGuide.LastName</td></tr>
+    <tr><th>Bus Guide</th><td>@Model.BusGuide?.FirstName @Model.BusGuide?.LastName</td></tr>
     <tr>
         <th>Locations & Images</th>
         <td>

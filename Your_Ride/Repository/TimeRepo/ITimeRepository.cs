@@ -14,6 +14,11 @@ namespace Your_Ride.Repository.TimeRepo
         public Task<int> DeleteLocationImage(int id);
         public Task<LocationImage> GetLocationImage(int id);
 
+        public Task<List<Time>> GetAppointmentsByBusGuideID(string id);
+
+        public Task<LocationImage> AddLocationImage(int id, LocationImage locationImage);
+
+
 
     }
 }

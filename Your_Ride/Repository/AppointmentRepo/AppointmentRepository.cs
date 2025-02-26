@@ -15,21 +15,19 @@ namespace Your_Ride.Repository.AppointmentRepo
         }
         public async Task<List<Appointment>> GetAllAppointments()
         {
-            List<Appointment> appointments = await context.Appointments.Include(x => x.Times).Include(x => x.BusGuide).ToListAsync();
+            List<Appointment> appointments = await context.Appointments.Include(x => x.Times).ToListAsync();
             return appointments;
         }
         public async Task<List<Appointment>> GetAllAppointments(string searchQuery, string sortOrder)
         {
             IQueryable<Appointment> query = context.Appointments
-                .Include(a => a.Times)
-                .Include(a => a.BusGuide);
+                .Include(a => a.Times);
 
             // Search by date or admin name
             if (!string.IsNullOrEmpty(searchQuery))
             {
                 query = query.Where(a =>
-                    a.Date.ToString().Contains(searchQuery) ||
-                    (a.BusGuide != null && a.BusGuide.UserName.Contains(searchQuery))
+                    a.Date.ToString().Contains(searchQuery) 
                 );
             }
 
@@ -40,14 +38,14 @@ namespace Your_Ride.Repository.AppointmentRepo
         }
         public async Task<Appointment> GetAppointmentByID(int id)
         {
-            Appointment appointment = await context.Appointments.Include(x => x.Times).Include(x => x.BusGuide).FirstOrDefaultAsync(x => x.Id == id);
+            Appointment appointment = await context.Appointments.Include(x => x.Times).FirstOrDefaultAsync(x => x.Id == id);
             return appointment;
         }
-        public async Task<List<Appointment>> GetAppointmentsByBusGuideID(string id)
-        {
-           List<Appointment> appointments = await context.Appointments.Include(x => x.Times).Include(x => x.BusGuide).Where(x => x.BusGuideId == id).ToListAsync();
-            return appointments;
-        }
+        //public async Task<List<Appointment>> GetAppointmentsByBusGuideID(string id)
+        //{
+        //   List<Appointment> appointments = await context.Appointments.Include(x => x.Times).Include(x => x.BusGuide).Where(x => x.BusGuideId == id).ToListAsync();
+        //    return appointments;
+        //}
 
         public async Task<Appointment> CreateAppointment(Appointment appointment)
         {
@@ -59,6 +57,7 @@ namespace Your_Ride.Repository.AppointmentRepo
             }
 
             await context.Appointments.AddAsync(appointment);
+            await SaveDB();
             return appointment;
         }
         public async Task<int> DeleteAppointment(int id)

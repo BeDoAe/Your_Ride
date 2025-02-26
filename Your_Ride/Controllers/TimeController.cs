@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Your_Ride.Helper;
 using Your_Ride.Models;
 using Your_Ride.Repository.BusRepo;
@@ -114,6 +115,9 @@ namespace Your_Ride.Controllers
             //TimeVM timeVM = new TimeVM();
             IFormFileTimeVM formFileTimeVM = new IFormFileTimeVM();
 
+            List<ApplicationUser> AdminBusGuides = (await userManager.GetUsersInRoleAsync("Admin")).ToList();
+            ViewBag.BusGuides = AdminBusGuides;
+
             return View("CreateTime", formFileTimeVM);
         }
         [HttpPost]
@@ -124,8 +128,10 @@ namespace Your_Ride.Controllers
             {
                 List<BusVM> busVMs = await busService.GetAllBuses();
                 List<AppointmentVM> appointmentVMs = await appointmentService.GetAllAppointments();
+                List<ApplicationUser> AdminBusGuides = (await userManager.GetUsersInRoleAsync("Admin")).ToList();
                 ViewBag.Buses = busVMs;
                 ViewBag.Appointments = appointmentVMs;
+                ViewBag.BusGuides = AdminBusGuides;
                 return RedirectToAction("CreateTime", formFileTimeVM);
             }
             TimeVM TVM = await timeService.CreateTime(formFileTimeVM);
@@ -139,16 +145,21 @@ namespace Your_Ride.Controllers
         {
             List<BusVM> busVMs = await busService.GetAllBuses();
             List<AppointmentVM> appointmentVMs = await appointmentService.GetAllAppointments();
+            List<ApplicationUser> AdminBusGuides = (await userManager.GetUsersInRoleAsync("Admin")).ToList();
             ViewBag.Buses = busVMs;
             ViewBag.Appointments = appointmentVMs;
+            ViewBag.BusGuides = AdminBusGuides;
+
 
             TimeVM timeVM = await timeService.GetTimeByID(id);
             if (timeVM == null)
             {
                 return NotFound("Time");
             }
+            IFormFileTimeVM formFileTimeVM = timeService.MappingToFormFile(timeVM);
+            
 
-            return View("EditTime", timeVM);
+            return View("EditTime", formFileTimeVM);
         }
         [HttpPost]
         [AutoValidateAntiforgeryToken]
@@ -159,12 +170,14 @@ namespace Your_Ride.Controllers
 
                 List<BusVM> busVMs = await busService.GetAllBuses();
                 List<AppointmentVM> appointmentVMs = await appointmentService.GetAllAppointments();
+                List<ApplicationUser> AdminBusGuides = (await userManager.GetUsersInRoleAsync("Admin")).ToList();
                 ViewBag.Buses = busVMs;
                 ViewBag.Appointments = appointmentVMs;
+                ViewBag.BusGuides = AdminBusGuides;
                 return View("EditTime", formFileTimeVM);
             }
-            TimeVM TVM = await timeService.EditTime(formFileTimeVM);
-            if (TVM == null) return NotFound("Error Editing");
+            IFormFileTimeVM fileTimeVM = await timeService.EditTime(formFileTimeVM);
+            if (fileTimeVM == null) return NotFound("Error Editing");
             return RedirectToAction("GetTimeByID", new { id = formFileTimeVM.Id });
 
         }
@@ -209,5 +222,15 @@ namespace Your_Ride.Controllers
 
             return RedirectToAction("GetAllTimes");
         }
-    }
+        [HttpPost]
+        [AutoValidateAntiforgeryToken]
+        public async Task<IActionResult> AddLocationImage(int id , LocationImage locationImage)
+        {
+            LocationImage result = await timeService.AddLocationImage(id, locationImage);
+                if (result == null)
+            {
+                return BadRequest("Invalid cause this Time Has already Location with this name !");
+            }return View(result);
+        }
+        }
 }

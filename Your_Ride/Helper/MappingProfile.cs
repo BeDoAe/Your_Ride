@@ -41,19 +41,41 @@ namespace Your_Ride.Helper
 
             CreateMap<Appointment, AppointmentVM>().ReverseMap();
 
-            //CreateMap<Time, TimeVM>().ReverseMap();
+            // Time <-> TimeVM Mapping
             CreateMap<Time, TimeVM>()
-                .ForMember(dest => dest.LocationImages, opt => opt.MapFrom(src => src.LocationsWithPics ?? new List<LocationImage>()))
+                .ForMember(dest => dest.LocationImages, opt => opt.MapFrom(src => src.LocationsWithPics)) // Correct mapping
                 .ReverseMap();
 
-            // Mapping Time to IFormFileTimeVM
+            // Time <-> IFormFileTimeVM Mapping
             CreateMap<Time, IFormFileTimeVM>()
-                //.ForMember(dest => dest.FormFileLocationsWithPics, opt => opt.MapFrom(src => src.LocationsWithPics ?? new List<FormFileLocationPics>()))
+                .ForMember(dest => dest.FormFileLocationsWithPics, opt => opt.MapFrom(src =>
+                    src.LocationsWithPics.Select(li => new FormFileLocationPics
+                    {
+                        Id = li.Id,
+                        Location = li.Location,
+                        LocationOrder = li.LocationOrder,
+                        TimeId = li.TimeId,
+                        ImagePath = li.ImagePath
+                    }).ToList()))
                 .ReverseMap();
 
-            // Mapping between TimeVM and IFormFileTimeVM
-            CreateMap<IFormFileTimeVM, TimeVM>()
-                .ForMember(dest => dest.LocationImages, opt => opt.MapFrom(src => src.FormFileLocationsWithPics))
+            // TimeVM <-> IFormFileTimeVM Mapping
+            CreateMap<TimeVM, IFormFileTimeVM>()
+                .ForMember(dest => dest.FormFileLocationsWithPics, opt => opt.MapFrom(src =>
+                    src.LocationImages.Select(li => new FormFileLocationPics
+                    {
+                        Id = li.Id,
+                        Location = li.Location,
+                        LocationOrder = li.LocationOrder,
+                        TimeId = li.TimeId,
+                        ImagePath = li.ImagePath
+                    }).ToList()))
+                .ReverseMap();
+
+            // LocationImage <-> FormFileLocationPics Mapping
+            CreateMap<LocationImage, FormFileLocationPics>()
+                .ForMember(dest => dest.ImagePath, opt => opt.MapFrom(src => src.ImagePath))
+                .ForMember(dest => dest.ImageFile, opt => opt.Ignore()) // Ignore ImageFile since it's a file input
                 .ReverseMap();
 
 
