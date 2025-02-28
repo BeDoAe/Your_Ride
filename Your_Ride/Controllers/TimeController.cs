@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Your_Ride.Helper;
 using Your_Ride.Models;
 using Your_Ride.Repository.BusRepo;
+using Your_Ride.Repository.TimeRepo;
 using Your_Ride.Services.AppointmentServ;
 using Your_Ride.Services.BusServ;
 using Your_Ride.Services.TimeServ;
@@ -233,20 +234,36 @@ namespace Your_Ride.Controllers
             if (timeVM == null) return NotFound("No Time Found !!");
 
             List<LocationImage> locationImages = await timeService.GetLocationImagessByTimeID(id);
-            ViewBag.TimeID=id;
+            List<FormFileLocationPics> formFileLocationImageVMs = timeService.MapToFormFileLocationImages(locationImages);
+            ViewBag.TimeID = id;
 
-            return View("AddLocationImage", locationImages);
-
+            return View("AddLocationImage", formFileLocationImageVMs);
         }
+
         [HttpPost]
-        [AutoValidateAntiforgeryToken]
-        public async Task<IActionResult> ConfirmAddLocationImage(int id , LocationImage locationImage)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ConfirmAddLocationImage(int id, List<FormFileLocationPics> formFileLocationImageVMs)
         {
-            LocationImage result = await timeService.AddLocationImage(id, locationImage);
-                if (result == null)
+            bool result = await timeService.AddLocationImages(id, formFileLocationImageVMs);
+
+            if (!result)
             {
-                return BadRequest("Invalid cause this Time Has already Location with this name !");
-            }return View(result);
+                return BadRequest("Invalid request: Duplicate locations not allowed.");
+            }
+
+            return RedirectToAction("AddLocationImage", new { id });
         }
+
+        [HttpGet("GetNextLocationOrder/{timeId}")]
+        public async Task<IActionResult> GetNextLocationOrder(int timeId)
+        {
+            List<int> existingOrders = await timeService.GetTimeLocationOrder(timeId);
+
+            // Determine the next expected order
+            int nextOrder = (existingOrders.Count > 0) ? existingOrders.Max() + 1 : 1;
+
+            return Ok(new { expectedOrder = nextOrder });
         }
+
+    }
 }

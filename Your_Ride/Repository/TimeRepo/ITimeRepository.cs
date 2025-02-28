@@ -16,11 +16,13 @@ namespace Your_Ride.Repository.TimeRepo
 
         public Task<List<Time>> GetAppointmentsByBusGuideID(string id);
 
-        public Task<LocationImage> AddLocationImage(int id, LocationImage locationImage);
+        public Task<bool> AddLocationImages(int id, List<LocationImage> locationImages);
         public Task<Time> UpdateTime(Time time);
 
 
         public Task<List<LocationImage>> GetLocationImagessByTimeID(int id);
+
+        public Task<List<int>> GetTimeLocationOrder(int timeId);
 
     }
 }

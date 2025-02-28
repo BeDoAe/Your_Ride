@@ -1,4 +1,4 @@
-﻿@model List<Your_Ride.Models.LocationImage>
+﻿@model List<Your_Ride.Models.FormFileLocationPics>
 
 @{
     ViewData["Title"] = "Add Location Image";
@@ -21,9 +21,6 @@ else
                     <div class="card-body">
                         <h5 class="card-title">@location.Location</h5>
                         <p class="card-text">Order: @location.LocationOrder</p>
-                        <p class="card-text">
-                            <a href="@location.PathURL" target="_blank">View Location</a>
-                        </p>
                     </div>
                 </div>
             </div>
@@ -31,34 +28,108 @@ else
     </div>
 }
 
-<h3 class="mt-4">Add New Location Image</h3>
+<h3 class="mt-4">Add New Location Images</h3>
 
-<form asp-action="ConfirmAddLocationImage" method="post" enctype="multipart/form-data">
+<form id="locationForm" asp-action="ConfirmAddLocationImage" method="post" enctype="multipart/form-data">
     <input type="hidden" name="id" value="@ViewBag.TimeID" />
 
-    <input type="hidden" name="TimeId" value="@ViewBag.TimeID" />
+    <div id="locationContainer">
+        <div class="location-group">
+            <div class="form-group">
+                <label for="Location">Location Name</label>
+                <input type="text" name="formFileLocationImageVMs[0].Location" class="form-control" required />
+            </div>
 
+            <div class="form-group">
+                <label for="LocationOrder">Order</label>
+                <input type="number" name="formFileLocationImageVMs[0].LocationOrder" class="form-control order-input" required />
+                <small class="text-danger order-error"></small>
+            </div>
 
-    <div class="form-group">
-        <label for="Location">Location Name</label>
-        <input type="text" name="Location" class="form-control" placeholder="Enter location name" required />
+            <div class="form-group">
+                <label for="PathURL">Location URL (Optional)</label>
+                <input type="text" name="formFileLocationImageVMs[0].PathURL" class="form-control" />
+            </div>
+
+            <div class="form-group">
+                <label for="ImageFile">Upload Image</label>
+                <input type="file" name="formFileLocationImageVMs[0].ImageFile" class="form-control" required />
+            </div>
+        </div>
     </div>
 
-    <div class="form-group">
-        <label for="LocationOrder">Order</label>
-        <input type="number" name="LocationOrder" class="form-control" placeholder="Enter order number" />
-    </div>
-
-    <div class="form-group">
-        <label for="PathURL">Location URL (Optional)</label>
-        <input type="text" name="PathURL" class="form-control" placeholder="Enter GPS URL (optional)" />
-    </div>
-
-    <div class="form-group">
-        <label for="ImageFile">Upload Image</label>
-        <input type="file" name="ImageFile" class="form-control" required />
-    </div>
-
-    <button type="submit" class="btn btn-success mt-2">Add Location Image</button>
-    <a asp-action="EditTime" asp-route-id="@ViewBag.TimeId" class="btn btn-secondary mt-2">Back to Edit Time</a>
+    <button type="button" id="addMoreLocations" class="btn btn-primary mt-2">Add Another Location</button>
+    <button type="submit" class="btn btn-success mt-2">Submit Locations</button>
 </form>
+
+<script>
+    let locationIndex = 1;
+    let expectedOrder = 1;
+    let timeId = @ViewBag.TimeID;
+
+    // Fetch the next expected order from the server
+    async function fetchNextOrder() {
+        try {
+            const response = await fetch(`/GetNextLocationOrder/${timeId}`);
+            const data = await response.json();
+            expectedOrder = data.expectedOrder;
+        } catch (error) {
+            console.error("Error fetching order:", error);
+        }
+    }
+
+    fetchNextOrder(); // Call on page load
+
+    document.getElementById("addMoreLocations").addEventListener("click", function () {
+        const container = document.getElementById("locationContainer");
+        const newGroup = document.createElement("div");
+        newGroup.classList.add("location-group");
+        newGroup.innerHTML = `
+            <div class="form-group">
+                <label>Location Name</label>
+                <input type="text" name="formFileLocationImageVMs[${locationIndex}].Location" class="form-control" required />
+            </div>
+            <div class="form-group">
+                <label>Order</label>
+                <input type="number" name="formFileLocationImageVMs[${locationIndex}].LocationOrder" class="form-control order-input" required />
+                <small class="text-danger order-error"></small>
+            </div>
+            <div class="form-group">
+                <label>Location URL (Optional)</label>
+                <input type="text" name="formFileLocationImageVMs[${locationIndex}].PathURL" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label>Upload Image</label>
+                <input type="file" name="formFileLocationImageVMs[${locationIndex}].ImageFile" class="form-control" required />
+            </div>
+        `;
+        container.appendChild(newGroup);
+        locationIndex++;
+    });
+
+    document.getElementById("locationForm").addEventListener("submit", function (event) {
+        const orderInputs = document.querySelectorAll(".order-input");
+        let valid = true;
+        let orders = [];
+
+        orderInputs.forEach(input => {
+            let orderValue = parseInt(input.value);
+            orders.push(orderValue);
+        });
+
+        orders.sort((a, b) => a - b);
+
+        for (let i = 0; i < orders.length; i++) {
+            if (orders[i] !== expectedOrder + i) {
+                valid = false;
+                document.querySelectorAll(".order-error")[i].innerText = `Order must be ${expectedOrder + i}`;
+            } else {
+                document.querySelectorAll(".order-error")[i].innerText = "";
+            }
+        }
+
+        if (!valid) {
+            event.preventDefault();
+        }
+    });
+</script>

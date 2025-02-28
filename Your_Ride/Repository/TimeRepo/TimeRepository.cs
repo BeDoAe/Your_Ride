@@ -130,30 +130,34 @@ namespace Your_Ride.Repository.TimeRepo
                 return 1;
             }
         }
-        public async Task<LocationImage> AddLocationImage(int id , LocationImage locationImage)
+        public async Task<bool> AddLocationImages(int id, List<LocationImage> locationImages)
         {
-            Time timeFromDB = await context.Times.FirstOrDefaultAsync(x => x.Id ==id);
+            Time timeFromDB = await context.Times
+                .Include(t => t.LocationsWithPics)
+                .FirstOrDefaultAsync(t => t.Id == id);
 
-            if (timeFromDB == null) return null;
+            if (timeFromDB == null) return false;
 
-            //check in same time there isn't location with same name !!
-            bool existed =  timeFromDB.LocationsWithPics.Any(x => x.Location == locationImage.Location);
-
-            if (existed == false)
+            foreach (var locationImage in locationImages)
             {
-                //locationImage.Time = timeFromDB;
-                //locationImage.TimeId = id;
-                await context.LocationImages.AddAsync(locationImage);
-                await context.SaveChangesAsync();
-                //await SaveDB();
-                return locationImage;
-            }
-            else
-            {
-                return null;
+                bool exists = timeFromDB.LocationsWithPics.Any(x => x.Location == locationImage.Location);
+                if (!exists)
+                {
+                    locationImage.TimeId = id;
+                    await context.LocationImages.AddAsync(locationImage);
+                }
+                else
+                {
+                    return false;
+                }
             }
 
+            await context.SaveChangesAsync();
+            return true;
         }
+
+
+        
 
         public async Task<LocationImage> GetLocationImage(int id)
         {
@@ -162,6 +166,15 @@ namespace Your_Ride.Repository.TimeRepo
 
             return locationImage;
 
+        }
+
+        public async Task<List<int>> GetTimeLocationOrder(int timeId)
+        {
+            return await context.LocationImages
+                .Where(l => l.TimeId == timeId)
+                .OrderBy(l => l.LocationOrder)
+                .Select(l => l.LocationOrder)
+                .ToListAsync();
         }
 
 

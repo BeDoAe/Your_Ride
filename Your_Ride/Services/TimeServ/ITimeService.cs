@@ -24,8 +24,12 @@ namespace Your_Ride.Services.TimeServ
         public IFormFileTimeVM MappingToFormFile(TimeVM timeVM);
 
 
-        public Task<LocationImage> AddLocationImage(int id, LocationImage Locationimage);
+        public Task<bool> AddLocationImages(int id, List<FormFileLocationPics> formFileLocationImageVMs);
+        public List<FormFileLocationPics> MapToFormFileLocationImages(List<LocationImage> locationImages);
+
         public Task<List<LocationImage>> GetLocationImagessByTimeID(int id);
+        public Task<List<int>> GetTimeLocationOrder(int timeId);
+
 
 
     }

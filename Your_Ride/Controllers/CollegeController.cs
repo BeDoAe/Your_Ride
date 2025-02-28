@@ -90,7 +90,7 @@ namespace Your_Ride.Controllers
                 if (collegeVM != null)
                 {
                     await collegeService.UpdateCollege(id, collegeVM);
-                    return RedirectToAction("Index", "Home");
+                    return RedirectToAction("GetAllCollege");
                 }
             }
 
@@ -125,7 +125,8 @@ namespace Your_Ride.Controllers
             {
                 return Content("Already been Deleted ");
             }
-            else return RedirectToAction("Index", "Home");
+            else return RedirectToAction("GetAllCollege");
+
         }
     }
 }

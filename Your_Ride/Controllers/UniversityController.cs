@@ -38,12 +38,13 @@ namespace Your_Ride.Controllers
 
         // Handle create university form submission
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CreateUniversityVM model)
         {
             if (ModelState.IsValid)
             {
                 await universityService.CreateUniversity(model);
-                return RedirectToAction("Index","Home");
+                return RedirectToAction("GetAllUniversity");
             }
             return View(model);
         }
@@ -67,7 +68,7 @@ namespace Your_Ride.Controllers
             if (ModelState.IsValid)
             {
                 await universityService.UpdateUniversity(id, model);
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("EditUniversity", new {id=model.Id});
             }
             return View(model);
         }
@@ -97,7 +98,8 @@ namespace Your_Ride.Controllers
             {
                 return Content("Already been Deleted ");
             }
-            else return RedirectToAction("Index", "Home");
+            else return RedirectToAction("GetAllUniversity");
+
         }
     }
 }

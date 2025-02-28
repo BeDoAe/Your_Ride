@@ -311,12 +311,53 @@ namespace Your_Ride.Services.TimeServ
             int result = await timeRepository.DeleteLocationImage(id);
             return result;
         }
-        public async Task<LocationImage> AddLocationImage(int id , LocationImage Locationimage)
+        public async Task<bool> AddLocationImages(int id, List<FormFileLocationPics> formFileLocationImageVMs)
         {
+            List<LocationImage> locationImages = automapper.Map<List<LocationImage>>(formFileLocationImageVMs);
 
-            LocationImage locationImageFromDB = await timeRepository.AddLocationImage(id, Locationimage);   
-            return locationImageFromDB;
- 
+            for (int i = 0; i < formFileLocationImageVMs.Count; i++)
+            {
+                locationImages[i].ImagePath = await FileHelper.SaveFileAsync(formFileLocationImageVMs[i].ImageFile);
+            }
+
+            return await timeRepository.AddLocationImages(id, locationImages);
+        }
+        #region Old Add Location
+        //public async Task<bool> AddLocationImages(int timeId, List<FormFileLocationPics> formFileLocationImageVMs)
+        //{
+        //    // Fetch existing orders for this TimeId
+        //    List<int> existingOrders = await timeRepository.GetTimeLocationOrder(timeId);
+
+        //    // Find the next expected order number
+        //    int expectedOrder = (existingOrders.Count > 0) ? existingOrders.Max() + 1 : 1;
+
+        //    foreach (var newLocation in formFileLocationImageVMs)
+        //    {
+        //        if (newLocation.LocationOrder != expectedOrder)
+        //        {
+        //            // Order is incorrect
+        //            return false;  // Or throw a custom exception
+        //        }
+
+        //        expectedOrder++;  // Move to the next expected number
+        //    }
+
+        //    // Proceed with saving
+        //    List<LocationImage> locationImages = automapper.Map<List<LocationImage>>(formFileLocationImageVMs);
+
+        //    for (int i = 0; i < formFileLocationImageVMs.Count; i++)
+        //    {
+        //        locationImages[i].ImagePath = await FileHelper.SaveFileAsync(formFileLocationImageVMs[i].ImageFile);
+        //    }
+
+        //    return await timeRepository.AddLocationImages(timeId, locationImages);
+        //} 
+        #endregion
+
+
+        public List<FormFileLocationPics> MapToFormFileLocationImages(List<LocationImage> locationImages)
+        {
+            return automapper.Map<List<FormFileLocationPics>>(locationImages);
         }
         public async Task<LocationImage> GetLocationImage(int id)
         {
@@ -330,6 +371,11 @@ namespace Your_Ride.Services.TimeServ
             return locationImages;
         }
 
+        public async Task<List<int>> GetTimeLocationOrder(int timeId)
+        {
+            List<int> orders = await timeRepository.GetTimeLocationOrder(timeId);
+            return orders;
+        }
 
     }
 }
