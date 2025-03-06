@@ -30,6 +30,7 @@ namespace Your_Ride.Models
 
         public DbSet<UserNotification> userNotifications { get; set; }  
 
+        public DbSet<UserTransactionLog> userTransactionLogs { get; set; }
 
         public Context(DbContextOptions<Context> options) : base(options)
         { }
@@ -62,6 +63,28 @@ namespace Your_Ride.Models
                 .WithMany()
                 .HasForeignKey(b => b.SeatId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            // One-to-Many with UserTransactionLog
+            modelBuilder.Entity<UserTransactionLog>()
+                   .HasOne(utl => utl.User)
+                   .WithMany(u => u.userTransactions)  
+                   .HasForeignKey(utl => utl.UserId)
+                   .OnDelete(DeleteBehavior.Restrict);
+
+            // One-to-Many with UserTransactionLog
+            modelBuilder.Entity<UserTransactionLog>()
+                .HasOne(utl => utl.Time)
+                .WithMany(t => t.userTransactions)  
+                .HasForeignKey(utl => utl.TimeId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // One-to-Many with UserTransactionLog
+            modelBuilder.Entity<UserTransactionLog>()
+                .HasOne(utl => utl.Appointment)
+                .WithMany(a => a.userTransactions)  
+                .HasForeignKey(utl => utl.AppointmentId)
+                .OnDelete(DeleteBehavior.Restrict);
+
 
             // One-to-Many: Bus Guide has a User
             modelBuilder.Entity<Time>()

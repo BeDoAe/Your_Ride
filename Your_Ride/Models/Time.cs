@@ -46,6 +46,9 @@ namespace Your_Ride.Models
         public int AppointmentId { get; set; }
         public Appointment? Appointment { get; set; }
 
+        // One-to-Many with UserTransactionLog
+        public List<UserTransactionLog> userTransactions { get; set; } = new List<UserTransactionLog>();
+
 
     }
 }

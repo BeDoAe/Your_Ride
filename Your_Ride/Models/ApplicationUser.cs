@@ -26,5 +26,9 @@ namespace Your_Ride.Models
 
         // Many-to-Many with Notifications
         public List<UserNotification> UserNotifications { get; set; } = new List<UserNotification>();
+
+        // One-to-Many with UserTransactionLog
+        public List<UserTransactionLog> userTransactions { get; set; } = new List<UserTransactionLog>();
+        
     }
 }
