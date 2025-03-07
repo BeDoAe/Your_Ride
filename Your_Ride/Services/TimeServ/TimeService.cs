@@ -8,6 +8,7 @@ using Your_Ride.Repository.AppointmentRepo;
 using Your_Ride.Repository.BusRepo;
 using Your_Ride.Repository.TimeRepo;
 using Your_Ride.Services.Generic;
+using Your_Ride.ViewModels.AppointmentviewModel;
 using Your_Ride.ViewModels.TimeViewModel;
 
 namespace Your_Ride.Services.TimeServ
@@ -45,8 +46,23 @@ namespace Your_Ride.Services.TimeServ
 
         public async Task<List<TimeVM>> GetAllTimesByAppointmentID(int id)
         {
-            List<Time> times = await timeRepository.GetAllTimesByBusID(id);
+            List<Time> times = await timeRepository.GetAllTimesByAppointmentID(id);
             List<TimeVM> timeVMs = automapper.Map<List<TimeVM>>(times);
+            foreach (var timeVM in timeVMs)
+            {
+                // Ensure Category is properly mapped to the enum
+                if (timeVM.Category == 0)
+                {
+                    timeVM.Category = TimeVM.TripCategory.Arrival;
+                }
+                else 
+                {
+                    timeVM.Category = TimeVM.TripCategory.Departure;
+                }
+                timeVM.FormattedTime = timeVM.TimeOnly.ToString("hh:mm tt");
+            }
+
+
             return timeVMs;
         }
         public async Task<List<TimeVM>> GetAppointmentsByBuisGuideID(string id)
@@ -375,6 +391,18 @@ namespace Your_Ride.Services.TimeServ
         {
             List<int> orders = await timeRepository.GetTimeLocationOrder(timeId);
             return orders;
+        }
+
+        public async Task<TimeVM> CompleteTime(int id)
+        {
+            Time timeFromDB = await timeRepository.GetTimeByID(id);
+            if (timeFromDB != null)
+            {
+                timeFromDB.HasCompleted = true;
+                await timeRepository.SaveDB();
+                return automapper.Map<TimeVM>(timeFromDB);
+            }
+            return null;
         }
 
     }

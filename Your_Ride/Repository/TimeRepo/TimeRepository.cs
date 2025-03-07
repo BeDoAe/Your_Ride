@@ -30,7 +30,7 @@ namespace Your_Ride.Repository.TimeRepo
         }
         public async Task<List<Time>> GetAllTimesByAppointmentID(int id)
         {
-            List<Time> times = await context.Times.Include(x => x.LocationsWithPics).Include(x => x.BusGuide).Include(x => x.Bus).Include(x => x.Appointment).Where(x => x.AppointmentId == id).ToListAsync();
+            List<Time> times = await context.Times.Where(x => x.AppointmentId == id).ToListAsync();
             return times;
         }
         public async Task<List<Time>> GetAppointmentsByBusGuideID(string id)
@@ -49,7 +49,7 @@ namespace Your_Ride.Repository.TimeRepo
             // Check if `time.Appointment` is null to prevent NullReferenceException
             if (time.Appointment == null)
             {
-                throw new ArgumentNullException(nameof(time.Appointment), "Time must have an associated Appointment.");
+                return null;
             }
 
             // Check if there is an appointment on the same date

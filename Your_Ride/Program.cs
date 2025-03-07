@@ -10,6 +10,7 @@ using Your_Ride.Repository.Generic;
 using Your_Ride.Repository.TimeRepo;
 using Your_Ride.Repository.TransactionRepo;
 using Your_Ride.Repository.UniversityRepo;
+using Your_Ride.Repository.UserTransactionLogRepo;
 using Your_Ride.Repository.WalletRepo;
 using Your_Ride.Services.AppointmentServ;
 using Your_Ride.Services.BookServ;
@@ -18,6 +19,7 @@ using Your_Ride.Services.CollegeServ;
 using Your_Ride.Services.TimeServ;
 using Your_Ride.Services.TransactionServ;
 using Your_Ride.Services.UniversityServ;
+using Your_Ride.Services.UserTransactionLogServ;
 using Your_Ride.Services.WalletServ;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -80,6 +82,12 @@ builder.Services.AddScoped<IAppointmentService, AppointmentService>();
 
 builder.Services.AddScoped<ITimeRepository, TimeRepository>();
 builder.Services.AddScoped<ITimeService, TimeService>();
+
+
+builder.Services.AddScoped<IUserTransactionLogRepository, UserTransactionLogRepository>();
+builder.Services.AddScoped<IUserTransactionLogService, UserTransactionLogService>();
+
+
 
 //////////////////////////////////////////////////////////////////
 var app = builder.Build();

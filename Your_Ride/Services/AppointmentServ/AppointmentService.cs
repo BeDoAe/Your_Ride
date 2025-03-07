@@ -97,17 +97,7 @@ namespace Your_Ride.Services.AppointmentServ
 
 
         }
-        public async Task<AppointmentVM> CompleteAppointment(int id)
-        {
-            Appointment appointmentFromDB = await appointmentRepository.GetAppointmentByID(id);
-            if (appointmentFromDB != null)
-            {
-                appointmentFromDB.HasCompleted = true;
-                await appointmentRepository.SaveDB();
-                return automapper.Map<AppointmentVM>(appointmentFromDB);
-            }
-            return null;
-        }
+      
 
     }
 }

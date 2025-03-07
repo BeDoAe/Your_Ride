@@ -10,6 +10,7 @@ using Your_Ride.ViewModels.BookViewModel;
 using Your_Ride.Models.Your_Ride.Models;
 using Your_Ride.ViewModels.AppointmentviewModel;
 using Your_Ride.ViewModels.TimeViewModel;
+using Your_Ride.ViewModels.UserTransactionLogViewModel;
 
 namespace Your_Ride.Helper
 {
@@ -78,6 +79,7 @@ namespace Your_Ride.Helper
                 .ForMember(dest => dest.ImageFile, opt => opt.Ignore()) // Ignore ImageFile since it's a file input
                 .ReverseMap();
 
+            CreateMap<UserTransactionLog, UserTransactionLogVM>().ReverseMap();
 
             // Use the corrected value converter
             //CreateMap<AddProductVM, Product>()

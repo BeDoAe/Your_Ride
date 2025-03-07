@@ -32,17 +32,17 @@
                 <td>@appointment.Date.ToString("yyyy-MM-dd")</td>
                 <td>@appointment.MaxAmount</td>
                 @*                 <td>@(appointment.BusGuide != null ? appointment.BusGuide.UserName : "Not Assigned")</td>
- *@                <td>@(appointment.HasCompleted ? "Yes" : "No")</td>
+ *@                @* <td>@(appointment.HasCompleted ? "Yes" : "No")</td> *@
                 <td>
                     <a asp-action="GetAppointmentByID" asp-route-id="@appointment.Id" class="btn btn-info">View</a>
                     <a asp-action="EditAppointment" asp-route-id="@appointment.Id" class="btn btn-warning">Edit</a>
-                    @if (appointment.HasCompleted != true)
+                    @* @if (appointment.HasCompleted != true)
                     {
                         <form asp-action="CompleteAppointment" method="post" style="display:inline;">
                             <input type="hidden" name="id" value="@appointment.Id" />
                             <button type="submit" class="btn btn-warning">Complete</button>
                         </form>
-                    }
+                    } *@
                     <a asp-action="DeleteAppointment" asp-route-id="@appointment.Id" class="btn btn-danger">Delete</a>
                 </td>
             </tr>

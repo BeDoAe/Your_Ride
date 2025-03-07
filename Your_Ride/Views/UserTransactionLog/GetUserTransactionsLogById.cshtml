@@ -1,0 +1,15 @@
+﻿@model Your_Ride.ViewModels.UserTransactionLogViewModel.UserTransactionLogVM
+
+<h2>📄 Transaction Details</h2>
+
+<table class="table table-bordered">
+    <tr><th>#️⃣ ID:</th><td>@Model.Id</td></tr>
+    <tr><th>👤 User:</th><td>@Model.User?.UserName</td></tr>
+    <tr><th>📅 Appointment:</th><td>@Model.Appointment?.Date.ToShortDateString()</td></tr>
+    <tr><th>⏳ Time:</th><td>@Model.Time?.TimeOnly - @Model.Time.Category</td></tr>
+    <tr><th>💰 Amount:</th><td>$@Model.WithdrawalAmount</td></tr>
+    <tr><th>🕒 Transaction Time:</th><td>@Model.TransactionTime</td></tr>
+</table>
+
+<a asp-action="GetAllUserTransactionsLogs" class="btn btn-primary">🔙 Back to List</a>
+<a asp-action="DeleteUserTransactionLog" asp-route-id="@Model.Id" class="btn btn-danger">🗑 Delete</a>

@@ -13,8 +13,7 @@
 
       
 
-            // Mark as completed when the appointment finishes
-            public bool HasCompleted { get; set; } = false;
+
 
 
             // One-to-Many with UserTransactionLog

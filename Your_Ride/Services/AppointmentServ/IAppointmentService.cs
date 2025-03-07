@@ -15,7 +15,7 @@ namespace Your_Ride.Services.AppointmentServ
         public Task<int> DeleteAppointment(int id);
 
         //public Task<List<AppointmentVM>> GetAppointmentsByBuisGuideID(string id);
-        public Task<AppointmentVM> CompleteAppointment(int id);
+        //public Task<AppointmentVM> CompleteAppointment(int id);
 
 
 

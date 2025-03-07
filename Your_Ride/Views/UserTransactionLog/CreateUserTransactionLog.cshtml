@@ -1,0 +1,100 @@
+﻿@model Your_Ride.ViewModels.UserTransactionLogViewModel.UserTransactionLogVM
+
+@{
+    ViewData["Title"] = "Create User Transaction Log";
+}
+
+<h2><span>💳 Create Transaction Log</span></h2>
+
+<form method="post">
+    <div class="form-group">
+        <label for="AppointmentId">Appointment <span>📅</span></label>
+        <select id="AppointmentId" name="AppointmentId" class="form-control" required>
+            <option value="">Select an Appointment</option>
+            @foreach (var appointment in (List<Your_Ride.ViewModels.AppointmentviewModel.AppointmentVM>)ViewBag.Appointments)
+            {
+                <option value="@appointment.Id">@appointment.Date</option>
+            }
+        </select>
+        <span asp-validation-for="AppointmentId" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label for="TimeId">Time <span>⏰</span></label>
+        <select id="TimeId" name="TimeId" class="form-control" required>
+            <option value="">Select a Time</option>
+        </select>
+        <span asp-validation-for="TimeId" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label hidden for="WithdrawalAmount">Amount to Withdraw <span>💸</span></label>
+        <input hidden type="number" id="WithdrawalAmount" name="WithdrawalAmount" class="form-control" required readonly />
+        <span hidden asp-validation-for="WithdrawalAmount" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label for="Fee">Fee <span>💰</span></label>
+        <input type="text" id="Fee" name="Fee" class="form-control" readonly />
+    </div>
+    <input type="hidden" name="UserId" value="@Model.UserId" /> <!-- This automatically adds the logged-in user ID to the form -->
+
+
+    <button type="submit" class="btn btn-primary">Create Transaction</button>
+</form>
+
+@section Scripts {
+    <script>
+        // AJAX to fetch times based on the appointment selected
+        $('#AppointmentId').change(function () {
+            var appointmentId = $(this).val();
+
+            if (appointmentId) {
+                $.ajax({
+                    url: '@Url.Action("GetTimesByAppointmentId", "UserTransactionLog")',
+                    type: 'GET',
+                    data: { appointmentId: appointmentId },
+                    success: function (data) {
+                        $('#TimeId').empty().append('<option value="">Select a Time</option>');
+                        $.each(data, function (index, time) {
+                            var categoryLabel = ''; // Default to empty label
+
+                            // Ensure the Category is properly set
+                            if (time.category === 0) {
+                                categoryLabel = 'Arrival'; // Arrival
+                            } else if (time.category === 1) {
+                                categoryLabel = 'Departure'; // Departure
+                            }
+
+                            // Add the time option to the dropdown with proper label
+                            $('#TimeId').append('<option value="' + time.id + '">' + time.formattedTime + ' - ' + categoryLabel + '</option>');
+                        });
+                    }
+                });
+            } else {
+                $('#TimeId').empty().append('<option value="">Select a Time</option>');
+            }
+        });
+
+        // To auto-update Fee (WithdrawalAmount) based on Time selected
+        $('#TimeId').change(function () {
+            var timeId = $(this).val();
+            if (timeId) {
+                $.ajax({
+                    url: '@Url.Action("GetTimesByAppointmentId", "UserTransactionLog")',
+                    type: 'GET',
+                    data: { appointmentId: $('#AppointmentId').val() },
+                    success: function (data) {
+                        var selectedTime = data.find(time => time.id == timeId);
+                        if (selectedTime) {
+                            // Update Fee and WithdrawalAmount
+                            $('#Fee').val(selectedTime.fee);
+                            $('#WithdrawalAmount').val(selectedTime.fee); // Set WithdrawalAmount to the Fee
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+}
+

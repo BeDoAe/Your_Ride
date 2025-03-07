@@ -6,17 +6,17 @@
     <p><strong>Date:</strong> @Model.Date</p>
     <p><strong>Max Amount:</strong> @Model.MaxAmount</p>
 @*     <p><strong>Bus Guide:</strong> @(Model.BusGuide != null ? Model.BusGuide.UserName : "Not Assigned")</p>
- *@    <p><strong>Completed:</strong> @(Model.HasCompleted ? "Yes" : "No")</p>
+ *@    @* <p><strong>Completed:</strong> @(Model.HasCompleted ? "Yes" : "No")</p> *@
 </div>
 
 <a asp-action="EditAppointment" asp-route-id="@Model.Id" class="btn btn-warning">Edit</a>
 @* <a asp-action="CompleteAppointment" asp-route-id="@Model.Id" class="btn btn-warning">Complete</a>
  *@
- @if(Model.HasCompleted ==false)
+@*  @if(Model.HasCompleted ==false)
  {
 <form asp-action="CompleteAppointment" method="post" style="display:inline;">
     <input type="hidden" name="id" value="@Model.Id" />
     <button type="submit" class="btn btn-warning">Complete</button>
 </form>
- }
+ } *@
  <a asp-action="GetAllAppointments" class="btn btn-primary">Back to List</a>

@@ -18,7 +18,6 @@ namespace Your_Ride.ViewModels.AppointmentviewModel
 
   
 
-        // Mark as completed when the appointment finishes
-        public bool HasCompleted { get; set; } = false;
+
     }
 }

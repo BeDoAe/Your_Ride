@@ -53,6 +53,12 @@ namespace Your_Ride.ViewModels.TimeViewModel
         public Appointment? Appointment { get; set; }
 
 
+        // Mark as completed when the Time Arrives
+        public bool HasCompleted { get; set; } = false;
+
+        // Add a property to store formatted time
+        public string? FormattedTime { get; set; }
+
     }
     }
 

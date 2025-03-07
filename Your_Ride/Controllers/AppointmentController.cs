@@ -134,15 +134,7 @@ namespace Your_Ride.Controllers
             return RedirectToAction("GetAllAppointments");
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CompleteAppointment(int id)
-        {
-            AppointmentVM appointmentVM = await appointmentService.CompleteAppointment(id);
-            if (appointmentVM == null)
-                return NotFound("No Appointment Found");
-            return RedirectToAction("GetAppointmentByID", new { id = id });
-        }
+     
     }
 
 }

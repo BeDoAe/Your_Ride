@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 using Your_Ride.Models;
 using Your_Ride.Models.Your_Ride.Models;
 using Your_Ride.Repository.Generic;
@@ -73,7 +74,7 @@ namespace Your_Ride.Repository.UserTransactionLogRepo
             }
 
             // Ensure total withdrawals do not exceed the max appointment amount
-            if ((totalUserWithdrawals + userTransactionLog.WithdrawalAmount) > appointment.MaxAmount)
+            if ((totalUserWithdrawals + userTransactionLog.WithdrawalAmount) <= appointment.MaxAmount)
             {
                 return null; // Exceeds max allowed withdrawal
             }
@@ -103,6 +104,19 @@ namespace Your_Ride.Repository.UserTransactionLogRepo
                 userTransactionLog.IsDeleted = true;
                 await SaveDB();
                 return 1;
+            }
+        }
+
+        public async Task<bool> CheckUserLogTransactionLog(UserTransactionLog userTransactionLog)
+        {
+            UserTransactionLog userTransactionLogFromDB = await context.userTransactionLogs.FirstOrDefaultAsync(x => x.AppointmentId == userTransactionLog.AppointmentId && x.TimeId==userTransactionLog.TimeId && x.UserId==userTransactionLog.UserId);
+            if (userTransactionLogFromDB == null)
+            {
+                return false;
+            }
+            else
+            {
+                return true; 
             }
         }
     }

@@ -1,0 +1,20 @@
+﻿@model Your_Ride.ViewModels.UserTransactionLogViewModel.UserTransactionLogVM
+
+<h2>🗑 Delete Transaction</h2>
+
+<p class="alert alert-danger">⚠ Are you sure you want to delete this transaction?</p>
+
+<table class="table table-bordered">
+    <tr><th>#️⃣ ID:</th><td>@Model.Id</td></tr>
+    <tr><th>👤 User:</th><td>@Model.User?.UserName</td></tr>
+    <tr><th>📅 Appointment:</th><td>@Model.Appointment?.Date.ToShortDateString()</td></tr>
+    <tr><th>⏳ Time:</th><td>@Model.Time?.TimeOnly</td></tr>
+    <tr><th>💰 Amount:</th><td>$@Model.WithdrawalAmount</td></tr>
+    <tr><th>🕒 Transaction Time:</th><td>@Model.TransactionTime</td></tr>
+</table>
+
+<form asp-action="DeleteUserTransactionLog" method="post">
+    <input type="hidden" asp-for="Id" />
+    <button type="submit" class="btn btn-danger">🗑 Confirm Delete</button>
+    <a asp-action="GetAllUserTransactionsLogs" class="btn btn-secondary">🔙 Cancel</a>
+</form>

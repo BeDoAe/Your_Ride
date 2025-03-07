@@ -30,6 +30,7 @@ namespace Your_Ride.Services.TimeServ
         public Task<List<LocationImage>> GetLocationImagessByTimeID(int id);
         public Task<List<int>> GetTimeLocationOrder(int timeId);
 
+        public Task<TimeVM> CompleteTime(int id);
 
 
     }

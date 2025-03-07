@@ -9,6 +9,7 @@
             <div class="card-body">
                 <p><strong>Time:</strong> @Model.TimeOnly.ToString("hh:mm tt")</p>
                 <p><strong>Appointment Date:</strong> @Model.Appointment.Date.ToString("MM/dd/yyyy")</p>
+                <p><strong>Completed:</strong> @(Model.HasCompleted ? "Yes" : "No")</p>
                 <p><strong>Locations:</strong></p>
                 <ul class="list-unstyled">
                     @foreach (var loc in Model.LocationImages)
@@ -47,6 +48,13 @@
 </div>
 
 <div class="mt-3 d-flex gap-2">
+    @if (Model.HasCompleted == false)
+    {
+        <form asp-action="CompleteTime" method="post" style="display:inline;">
+            <input type="hidden" name="id" value="@Model.Id" />
+            <button type="submit" class="btn btn-warning">Complete</button>
+        </form>
+    }
     <a asp-action="EditTime" asp-route-id="@Model.Id" class="btn btn-warning">Edit</a>
     <a asp-action="DeleteTime" asp-route-id="@Model.Id" class="btn btn-danger">Delete</a>
     <a asp-action="GetAllTimes" class="btn btn-secondary">Back to List</a>

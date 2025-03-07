@@ -49,6 +49,9 @@ namespace Your_Ride.Models
         // One-to-Many with UserTransactionLog
         public List<UserTransactionLog> userTransactions { get; set; } = new List<UserTransactionLog>();
 
+        // Mark as completed when the Time Arrives
+        public bool HasCompleted { get; set; } = false;
+
 
     }
 }

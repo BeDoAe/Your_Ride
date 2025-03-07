@@ -8,7 +8,7 @@
     <p><strong>Date:</strong> @Model.Date</p>
     <p><strong>Max Amount:</strong> @Model.MaxAmount</p>
 @*     <p><strong>Bus Guide:</strong> @(Model.BusGuide != null ? Model.BusGuide.UserName : "Not Assigned")</p>
- *@    <p><strong>Completed:</strong> @(Model.HasCompleted ? "Yes" : "No")</p>
+ *@    @* <p><strong>Completed:</strong> @(Model.HasCompleted ? "Yes" : "No")</p> *@
 </div>
 
 <form asp-action="DeleteAppointment" method="post">

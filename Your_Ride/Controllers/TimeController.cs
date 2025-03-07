@@ -265,5 +265,15 @@ namespace Your_Ride.Controllers
             return Ok(new { expectedOrder = nextOrder });
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CompleteTime(int id)
+        {
+            TimeVM timeVM = await timeService.CompleteTime(id);
+            if (timeVM == null)
+                return NotFound("No Time Found");
+            return RedirectToAction("GetTimeByID", new { id = id });
+        }
+
     }
 }
