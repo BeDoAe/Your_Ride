@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Your_Ride.Models;
 using Your_Ride.Repository.BookRepo;
 using Your_Ride.Services.BookServ;
+using Your_Ride.Services.TimeServ;
 using Your_Ride.ViewModels.BookViewModel;
 using Your_Ride.ViewModels.TimeViewModel;
 
@@ -12,11 +13,13 @@ namespace Your_Ride.Controllers
     {
         private readonly UserManager<ApplicationUser> userManager;
         private readonly IBookService bookService;
+        private readonly ITimeService timeService;
 
-        public BookController(UserManager<ApplicationUser> userManager, IBookService bookService)
+        public BookController(UserManager<ApplicationUser> userManager, IBookService bookService , ITimeService timeService)
         {
             this.userManager = userManager;
             this.bookService = bookService;
+            this.timeService = timeService;
         }
         //         /Book/GetAllBooks
         [HttpGet]
@@ -33,7 +36,20 @@ namespace Your_Ride.Controllers
             BookVM bookVM = await bookService.GetBookByID(id);
             return View("GetBookByID", bookVM);
         }
-
+        //         /Book/GetAllTimesToBook
+        [HttpGet]
+        public async Task<IActionResult> GetAllTimesToBook()
+        {
+            List<TimeVM> timeVMs = await timeService.GetAllAvailableTimes();
+            return View("GetAllTimesToBook",timeVMs);
+        }
+        [HttpGet]
+        public async Task<IActionResult> GetBookTimeByID(int id)
+        {
+            TimeVM timeVM = await timeService.GetTimeByID(id);
+            if (timeVM == null) return NotFound("No Time Found !!");
+                return View("GetBookTimeByID", timeVM);
+        }
         //         /Book/GetAllBooksOfUser?id=
         [HttpGet]
         public async Task<IActionResult> GetAllBooksOfUser(string id)
@@ -42,6 +58,7 @@ namespace Your_Ride.Controllers
             if (applicationUser == null) return NotFound("No User Found");
 
             List<BookVM> bookVMs = await bookService.GetAllBooksOfUser(id);
+            if (bookVMs == null) return NotFound("This User Didn't Book anything Yet !");
             return View("GetAllBooksOfUser", bookVMs);
         }
         //         /Book/CreateBook
@@ -61,12 +78,10 @@ namespace Your_Ride.Controllers
             bookVM.UserID = user.Id;
 
             BookUserTransactionVM  bookUserTransactionVM = await bookService.CreateBook(bookVM);
-            if (bookUserTransactionVM == null)
+            if (bookUserTransactionVM == null)  
             {
                 return RedirectToAction("GetAllBooks");
-            }
-
-            else
+            }else
             {
                 return View(bookVM);
             }
@@ -77,9 +92,12 @@ namespace Your_Ride.Controllers
         [HttpGet]
         public async Task<IActionResult> EditBook(int id , int UserTransactionLogID)
         {
+            List<TimeVM> timeVMs = await timeService.GetAllAvailableTimes();
+
             BookVM bookVM = await bookService.GetBookByID(id);
             if (bookVM == null) return NotFound("Book isn't Found");
             ViewBag.UserTransactionLogID = UserTransactionLogID;
+            ViewBag.AvaiableTimes = timeVMs;
             return View("EditBook", bookVM );
 
         }

@@ -7,7 +7,7 @@
         public string SeatLabel { get; set; } 
 
         public bool IsDeleted {  get; set; }=false;
-        public bool IsAvailable { get; set; } = true; 
+        public bool IsAvailable { get; set; }=true; 
 
     }
 }

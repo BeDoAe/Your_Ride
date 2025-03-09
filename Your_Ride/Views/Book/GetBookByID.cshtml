@@ -1,20 +1,24 @@
-﻿@* @model Your_Ride.ViewModels.BookViewModel.BookVM
+﻿@model Your_Ride.ViewModels.BookViewModel.BookVM
 
-@{
-    ViewData["Title"] = "Booking Details";
-}
+<h2>📄 Booking Details</h2>
 
-<h2 class="text-center my-4">Booking Details</h2>
+<table class="table">
+    <tr>
+        <th>Booking ID</th>
+        <td>@Model.Id</td>
+    </tr>
+    <tr>
+        <th>Time ⏰</th>
+        <td>@Model.Time?.TimeOnly.ToString("hh:mm tt")</td>
+    </tr>
+    <tr>
+        <th>Seat No. 🪑</th>
+        <td>@Model.SeatId</td>
+    </tr>
+    <tr>
+        <th>Booking Date 📅</th>
+        <td>@Model.BookeDateTime.ToShortDateString()</td>
+    </tr>
+</table>
 
-<div class="card shadow-sm p-4">
-    <h4>Booking ID: @Model.Id</h4>
-    <p><strong>User:</strong> @Model.User?.UserName</p>
-    <p><strong>Email:</strong> @Model.User?.Email</p>
-    <p><strong>Appointment:</strong> @(Model.Appointment != null ? $"On {Model.Appointment.Date}" : "No Appointment")</p>
-    <p><strong>Max Amount:</strong> $@Model.MaxAmount</p>
-
-    <a asp-action="EditBook" asp-route-id="@Model.Id" class="btn btn-warning">Edit</a>
-    <a asp-action="DeleteBook" asp-route-id="@Model.Id" class="btn btn-danger">Delete</a>
-    <a asp-action="GetAllBooks" class="btn btn-secondary">Back to List</a>
-</div>
- *@
+<a asp-action="GetAllBooks" class="btn btn-primary">🔙 Back</a>

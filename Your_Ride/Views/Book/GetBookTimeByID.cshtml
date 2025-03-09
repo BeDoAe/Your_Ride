@@ -1,0 +1,50 @@
+﻿@model Your_Ride.ViewModels.TimeViewModel.TimeVM
+
+@{
+    ViewData["Title"] = "🚍 Booking Details";
+}
+
+<h2>🚌 Trip Details</h2>
+
+<div class="booking-container">
+    <h3>📅 Date: @Model.Appointment.Date.ToShortDateString()</h3>
+    <h3>⏰ Time: @Model.TimeOnly</h3>
+    <h3>💰 Fee: $@Model.Fee</h3>
+    <h3>🛬 Category: @(Model.Category == Your_Ride.ViewModels.TimeViewModel.TimeVM.TripCategory.Arrival ? "Arrival" : "Departure")</h3>
+
+    <div class="details">
+        <p><strong>🚌 Bus:</strong> @Model.Bus?.BusIdentifier</p>
+        <p><strong>👨‍✈️ Guide:</strong> @Model.BusGuide?.UserName</p>
+    </div>
+
+    <form asp-action="CreateBook" method="post">
+        <input type="hidden" name="timeId" value="@Model.Id" />
+        <button type="submit" class="btn btn-success">🎟️ Confirm Booking</button>
+    </form>
+
+    <a href="/Book/GetAllTimesToBook" class="btn btn-secondary">🔙 Back to Calendar</a>
+</div>
+
+<style>
+    .booking-container {
+        background: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    h3 {
+        color: #007bff;
+    }
+
+    .btn-success {
+        background-color: #28a745;
+        border: none;
+        padding: 10px 20px;
+        font-size: 18px;
+    }
+
+    .btn-secondary {
+        margin-top: 10px;
+    }
+</style>

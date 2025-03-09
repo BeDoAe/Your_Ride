@@ -7,6 +7,7 @@ namespace Your_Ride.Services.TimeServ
     public interface ITimeService : IService<Time>
     {
         public Task<List<TimeVM>> GetAllTimes();
+        public  Task<List<TimeVM>> GetAllAvailableTimes();
         public Task<List<TimeVM>> GetAllTimesByBusID(int id);
         public Task<List<TimeVM>> GetAllTimesByAppointmentID(int id);
 

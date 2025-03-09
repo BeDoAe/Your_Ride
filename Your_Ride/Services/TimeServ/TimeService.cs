@@ -37,6 +37,13 @@ namespace Your_Ride.Services.TimeServ
             List<TimeVM> timeVMs = automapper.Map<List<TimeVM>>(times);
             return timeVMs;
         }
+        public async Task<List<TimeVM>> GetAllAvailableTimes()
+        {
+            List<Time> times = await timeRepository.GetAllAvailableTimes();
+
+            List<TimeVM> timeVMs = automapper.Map<List<TimeVM>>(times);
+            return timeVMs;
+        }
         public async Task<List<TimeVM>> GetAllTimesByBusID(int id)
         {
             List<Time> times = await timeRepository.GetAllTimesByBusID(id);

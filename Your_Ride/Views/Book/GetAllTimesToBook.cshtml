@@ -1,0 +1,113 @@
+﻿@* @model List<Your_Ride.ViewModels.TimeViewModel.TimeVM>
+
+<h2>🗓️ Available Times for Booking</h2>
+<p>Select an available time from the calendar below:</p>
+
+<div class="calendar-container">
+    <table class="calendar-table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Fee 💰</th>
+                <th>Trip Category 🚌</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var time in Model)
+            {
+                <tr>
+                    <td>@time.DueDateArrivalSubmission?.ToShortDateString()</td>
+                    <td>@time.FormattedTime ⏰</td>
+                    <td>$@time.Fee</td>
+                    <td>
+                        @if (time.Category == Your_Ride.ViewModels.TimeViewModel.TimeVM.TripCategory.Arrival)
+                        {
+                            <span title="This is an arrival trip">🛬 Arrival</span>
+                        }
+                        else
+                        {
+                            <span title="This is a departure trip">🛫 Departure</span>
+                        }
+                    </td>
+                    <td>
+                        <form asp-action="CreateBook" method="post">
+                            <input type="hidden" name="timeId" value="@time.Id" />
+                            <button type="submit" class="btn btn-success">📅 Book Now</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<style>
+    .calendar-container {
+        overflow-x: auto;
+        padding: 15px;
+        background: #f9f9f9;
+        border-radius: 10px;
+    }
+    .calendar-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    .calendar-table th, .calendar-table td {
+        padding: 10px;
+        text-align: center;
+        border: 1px solid #ddd;
+    }
+    .calendar-table th {
+        background-color: #007bff;
+        color: white;
+    }
+    .btn-success {
+        background-color: #28a745;
+        border: none;
+    }
+</style>
+ *@
+
+    @model IEnumerable<Your_Ride.ViewModels.TimeViewModel.TimeVM>
+
+@{
+    ViewData["Title"] = "📅 Available Times for Booking";
+}
+
+<h2>📅 Available Times</h2>
+<p>🚍 Choose your ride and book instantly! 🎟️</p>
+
+<div id="calendar"></div>
+
+<!-- FullCalendar CSS & JS -->
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var calendarEl = document.getElementById('calendar');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            events: [
+    @foreach (var time in Model)
+    {
+        <text>
+                            {
+                                title: "🚌 Trip - @time.TimeOnly",
+                                start: "@time.Appointment.Date.ToString("yyyy-MM-dd")",
+                                description: "💰 Fee: $@time.Fee \n 🛬 Category: @(time.Category == Your_Ride.ViewModels.TimeViewModel.TimeVM.TripCategory.Arrival ? "Arrival" : "Departure")",
+                                id: "@time.Id"
+                            },
+        </text>
+    }
+            ],
+            eventClick: function(info) {
+                window.location.href = '/Book/GetBookTimeByID?id=' + info.event.id;
+            }
+        });
+        calendar.render();
+    });
+</script>
+

@@ -1,19 +1,16 @@
-﻿@* @model List<Your_Ride.ViewModels.BookViewModel.BookVM>
+﻿@model List<Your_Ride.ViewModels.BookViewModel.BookVM>
 
-@{
-    ViewData["Title"] = "All Bookings";
-}
+<h2>📚 All Bookings</h2>
 
-<h2 class="text-center my-4">All Bookings</h2>
-
-<table class="table table-striped table-bordered">
-    <thead class="thead-dark">
+<table class="table table-striped">
+    <thead>
         <tr>
-            <th>Booking ID</th>
-            <th>User Name</th>
-            <th>Appointment Details</th>
-            <th>Max Amount</th>
-            <th>Actions</th>
+            <th>📖 Book ID</th>
+            <th>🕒 Time</th>
+            <th>🚌 Bus</th>
+            <th>💺 Seat</th>
+            <th>👤 User</th>
+            <th>🔧 Actions</th>
         </tr>
     </thead>
     <tbody>
@@ -21,18 +18,18 @@
         {
             <tr>
                 <td>@book.Id</td>
-                <td>@book.User?.UserName</td>
-                <td>@(book.Appointment != null ? $"Appointment on {book.Appointment.Date}" : "No Appointment")</td>
-                <td>$@book.MaxAmount</td>
+                <td>@book.Time?.Appointment?.Date</td>
+                <td>@book.Time?.BusID</td>
+                <td>@book.SeatId</td>
+                <td>@book.UserID</td>
                 <td>
-                    <a asp-action="GetBookByID" asp-route-id="@book.Id" class="btn btn-info btn-sm">View</a>
-                    <a asp-action="EditBook" asp-route-id="@book.Id" class="btn btn-warning btn-sm">Edit</a>
-                    <a asp-action="DeleteBook" asp-route-id="@book.Id" class="btn btn-danger btn-sm">Delete</a>
+                    <a asp-action="GetBookByID" asp-route-id="@book.Id" class="btn btn-info" title="View Details">👁</a>
+                    <a asp-action="EditBook" asp-route-id="@book.Id" class="btn btn-warning" title="Edit Booking">✏</a>
+                    <a asp-action="DeleteBook" asp-route-id="@book.Id" class="btn btn-danger" title="Cancel Booking">🗑</a>
                 </td>
             </tr>
         }
     </tbody>
 </table>
 
-<a asp-action="CreateBook" class="btn btn-success mt-3">Create New Booking</a>
- *@
+<a asp-action="CreateBook" class="btn btn-success">➕ Create New Booking</a>

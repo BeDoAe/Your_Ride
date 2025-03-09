@@ -1,31 +1,26 @@
-﻿@* @model Your_Ride.ViewModels.BookViewModel.BookVM
+﻿@model Your_Ride.ViewModels.BookViewModel.BookVM
 
 @{
-    ViewData["Title"] = "Create Booking";
+    ViewData["Title"] = "Book a Ride";
 }
 
-<h2 class="text-center my-4">Create Booking</h2>
+<h2>🛒 Book Your Ride</h2>
 
-<div class="card shadow-sm p-4">
-    <form asp-action="CreateBook" method="post">
-        <div class="form-group">
-            <label asp-for="UserID">User ID</label>
-            <input asp-for="UserID" class="form-control" placeholder="Enter User ID" />
-            <span asp-validation-for="UserID" class="text-danger"></span>
-        </div>
+<form asp-action="CreateBook" method="post">
+    <div class="form-group">
+        <label>🕒 Selected Time:</label>
+        <input type="text" class="form-control" value="@Model.Time?.TimeOnly.ToString(" hh:mm tt")" readonly>
+    </div>
 
-        <div class="form-group">
-            <label asp-for="MaxAmount">Max Amount</label>
-            <input asp-for="MaxAmount" type="number" step="0.01" class="form-control" placeholder="Enter Amount" />
-            <span asp-validation-for="MaxAmount" class="text-danger"></span>
-        </div>
+    <div class="form-group">
+        <label>💺 Seat ID:</label>
+        <input type="text" class="form-control" value="@Model.SeatId" readonly>
+    </div>
 
-        <button type="submit" class="btn btn-primary">Create</button>
-        <a asp-action="GetAllBooks" class="btn btn-secondary">Cancel</a>
-    </form>
-</div>
+    <div class="form-group">
+        <label>💰 Fee:</label>
+        <input type="text" class="form-control" value="$@Model.Time.Fee" readonly>
+    </div>
 
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-}
- *@
+    <button type="submit" class="btn btn-success">✅ Confirm Booking</button>
+</form>

@@ -6,6 +6,8 @@ namespace Your_Ride.Repository.TimeRepo
     public interface ITimeRepository :IRepository<Time>
     {
         public Task<List<Time>> GetAllTimes();
+        public Task<List<Time>> GetAllAvailableTimes();
+
         public Task<Time> GetTimeByID(int id);
         public Task<List<Time>> GetAllTimesByBusID(int id);
         public Task<List<Time>> GetAllTimesByAppointmentID(int id);

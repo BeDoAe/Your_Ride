@@ -17,7 +17,17 @@ namespace Your_Ride.Repository.TimeRepo
             List<Time> times = await context.Times.Include(x=>x.LocationsWithPics).Include(x=>x.BusGuide).Include(x=>x.Bus).Include(x=>x.Appointment).ToListAsync();
             return times;
         }
-
+        public async Task<List<Time>> GetAllAvailableTimes()
+        {
+            List<Time> times = await context.Times.Include(x => x.LocationsWithPics).Include(x => x.BusGuide)
+                .Include(x => x.Bus)
+                .Include(x => x.Appointment)
+                .Where(x => x.HasCompleted != true &&
+                     (x.DueDateArrivalSubmission == null || x.DueDateArrivalSubmission <= DateTime.Now ||
+                      x.DueDateDepartureSubmission == null || x.DueDateDepartureSubmission <= DateTime.Now))
+        .       ToListAsync();            
+            return times;
+        }
         public async Task<Time> GetTimeByID(int id)
         {
             Time time = await context.Times.Include(x => x.LocationsWithPics).Include(x => x.BusGuide).Include(x => x.Bus).Include(x => x.Appointment).FirstOrDefaultAsync(x=>x.Id==id);
