@@ -13,6 +13,8 @@ namespace Your_Ride.Services.UserTransactionLogServ
         public Task<List<UserTransactionLogVM>> GetAllUserTransactioLogsByTimeId(int id);
         public Task<List<UserTransactionLogVM>> GetAllUserTransactioLogsByAppointmentId(int id);
         public Task<UserTransactionLogVM> CreateUserTransactionLog(UserTransactionLogVM userTransactionVM);
+        public Task<UserTransactionLogVM> EditUserTransactionLog(UserTransactionLogVM userTransactionVM);
+
         public Task<int> DeleteUserTransactionLog(int id);
 
     }

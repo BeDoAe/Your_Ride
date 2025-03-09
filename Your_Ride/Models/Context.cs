@@ -50,11 +50,11 @@ namespace Your_Ride.Models
                 .HasForeignKey(b => b.UserID)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // One-to-One: Each Booking is linked to one Appointment
+            // One-to-One: Each Booking is linked to one Time
             modelBuilder.Entity<Book>()
-                .HasOne(b => b.Appointment)
-                .WithMany() // Appointments exist independently
-                .HasForeignKey(b => b.AppointmentId)
+                .HasOne(b => b.Time)
+                .WithMany() // Times exist independently
+                .HasForeignKey(b => b.timeId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             // One-to-One: Each Booking reserves one Seat

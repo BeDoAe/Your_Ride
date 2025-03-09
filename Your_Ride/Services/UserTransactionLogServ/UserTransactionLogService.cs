@@ -94,9 +94,30 @@ namespace Your_Ride.Services.UserTransactionLogServ
             UserTransactionLogVM userTransactionLogVM = autoMapper.Map<UserTransactionLogVM>(NewuserTransactionLog);
             return userTransactionLogVM;
 
-
-
         }
+        public async Task<UserTransactionLogVM> EditUserTransactionLog(UserTransactionLogVM userTransactionVM)
+        {
+
+            Appointment appointment = await appointmentRepository.GetAppointmentByID(userTransactionVM.AppointmentId);
+            Time time = await timeRepository.GetTimeByID(userTransactionVM.TimeId);
+            ApplicationUser user = await userManager.FindByIdAsync(userTransactionVM.UserId);
+
+            if (appointment == null || time == null || user == null) return null;
+            UserTransactionLog userTransactionLog = autoMapper.Map<UserTransactionLog>(userTransactionVM);
+
+            UserTransactionLog UserTransactioExist = await userTransactionLogRepository.GetUserTransactionLogsById(userTransactionLog.Id);
+            if (UserTransactioExist == null) return null;
+
+            UserTransactioExist.AppointmentId = userTransactionVM.AppointmentId;
+            UserTransactioExist.TimeId = userTransactionVM.TimeId;
+            UserTransactioExist.UserId = userTransactionVM.UserId;
+            UserTransactioExist.WithdrawalAmount = userTransactionVM.WithdrawalAmount;
+
+            await userTransactionLogRepository.SaveDB();
+
+            return autoMapper.Map<UserTransactionLogVM>(UserTransactioExist);
+        }
+
         public async Task<int> DeleteUserTransactionLog(int id)
         {
             int result = await userTransactionLogRepository.DeleteUserTransactionLog(id);

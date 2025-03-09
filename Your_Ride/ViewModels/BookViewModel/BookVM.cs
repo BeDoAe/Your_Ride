@@ -8,14 +8,16 @@ namespace Your_Ride.ViewModels.BookViewModel
     {
         public int Id { get; set; }
 
-        // one -to-Many Relationship between User and Appointment
         public string UserID { get; set; }
         public ApplicationUser? User { get; set; }
 
-        public Appointment? Appointment { get; set; } // One-to-One Relationship
+        public int timeId { get; set; }
+        public Time? Time { get; set; }
 
-        [Required]
-        [Range(0.01, double.MaxValue, ErrorMessage = "Amount must be greater than zero.")]
-        public double MaxAmount { get; set; }
+
+        public int SeatId { get; set; }
+        public Seat? Seat { get; set; }
+
+        public DateTime BookeDateTime { get; set; } = DateTime.Now;
     }
 }

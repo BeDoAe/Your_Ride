@@ -1,8 +1,9 @@
 ﻿using Your_Ride.Models;
+using Your_Ride.Repository.Generic;
 
 namespace Your_Ride.Repository.UserTransactionLogRepo
 {
-    public interface IUserTransactionLogRepository
+    public interface IUserTransactionLogRepository : IRepository<UserTransactionLog>
     {
         public Task<List<UserTransactionLog>> GetAllUserTransactionLogs();
         public Task<UserTransactionLog> GetUserTransactionLogsById(int id);

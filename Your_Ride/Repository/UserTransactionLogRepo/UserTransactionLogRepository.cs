@@ -109,7 +109,7 @@ namespace Your_Ride.Repository.UserTransactionLogRepo
 
         public async Task<bool> CheckUserLogTransactionLog(UserTransactionLog userTransactionLog)
         {
-            UserTransactionLog userTransactionLogFromDB = await context.userTransactionLogs.FirstOrDefaultAsync(x => x.AppointmentId == userTransactionLog.AppointmentId && x.TimeId==userTransactionLog.TimeId && x.UserId==userTransactionLog.UserId);
+            UserTransactionLog userTransactionLogFromDB = await context.userTransactionLogs.FirstOrDefaultAsync(x => x.AppointmentId == userTransactionLog.AppointmentId && x.TimeId==userTransactionLog.TimeId  && x.UserId==userTransactionLog.UserId);
             if (userTransactionLogFromDB == null)
             {
                 return false;

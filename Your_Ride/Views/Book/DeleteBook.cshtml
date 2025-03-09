@@ -1,4 +1,4 @@
-﻿@model Your_Ride.ViewModels.BookViewModel.BookVM
+﻿@* @model Your_Ride.ViewModels.BookViewModel.BookVM
 
 @{
     ViewData["Title"] = "Delete Booking";
@@ -8,7 +8,7 @@
 
 <div class="card shadow-sm p-4">
     <h4>Booking ID: @Model.Id</h4>
-    <p><strong>User:</strong> @Model.User?.UserName</p>
+    <p><strong>User:</strong> @Model.?.UserName</p>
     <p><strong>Appointment:</strong> @(Model.Appointment != null ? $"On {Model.Appointment.Date}" : "No Appointment")</p>
     <p><strong>Max Amount:</strong> $@Model.MaxAmount</p>
 
@@ -18,3 +18,4 @@
         <a asp-action="GetAllBooks" class="btn btn-secondary">Cancel</a>
     </form>
 </div>
+ *@
