@@ -43,6 +43,15 @@ namespace Your_Ride.Services.UserTransactionLogServ
 
             return userTransactionLogVM;
         }
+
+        public async Task<UserTransactionLogVM> GetUserTransactioLogByTimeIdUserId(int id , string userId)
+        {
+            UserTransactionLog userTransactionLog = await userTransactionLogRepository.GetUserTransactionLogsByTimeIdandUserId(id , userId);
+
+            UserTransactionLogVM userTransactionLogVM = autoMapper.Map<UserTransactionLogVM>(userTransactionLog);
+
+            return userTransactionLogVM;
+        }
         public async Task<List<UserTransactionLogVM>> GetAllUserTransactioLogsByUserId( string id)
         {
             ApplicationUser user = await userManager.FindByIdAsync(id);

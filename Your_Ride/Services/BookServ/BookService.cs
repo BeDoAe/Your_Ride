@@ -28,6 +28,7 @@ namespace Your_Ride.Services.BookServ
             this.userTransactionLogService = userTransactionLogService;
         }
 
+
         public async Task<List<BookVM>> GetAllBooks()
         {
             List<Book> books = await bookRepository.GetAllBooks();
@@ -72,19 +73,21 @@ namespace Your_Ride.Services.BookServ
             Book book = automapper.Map<Book>(bookVM);
 
 
-            Book newbook = await bookRepository.CreateBook(book);
-            if (newbook == null) return null;
-
             UserTransactionLogVM userTransactionLogVM = new UserTransactionLogVM
             {
-                UserId=bookVM.UserID ,
-                AppointmentId=timeVM.AppointmentId,
-                TimeId=timeVM.Id,
-                WithdrawalAmount=timeVM.Fee
+                UserId = bookVM.UserID,
+                AppointmentId = timeVM.AppointmentId,
+                TimeId = timeVM.Id,
+                WithdrawalAmount = timeVM.Fee
             };
 
             UserTransactionLogVM newUserTransactionLogVM = await userTransactionLogService.CreateUserTransactionLog(userTransactionLogVM);
             if (newUserTransactionLogVM == null) return null;
+
+
+            Book newbook = await bookRepository.CreateBook(book);
+            if (newbook == null) return null;
+
 
           BookVM returnBookVM =   automapper.Map<BookVM>(newbook);
 

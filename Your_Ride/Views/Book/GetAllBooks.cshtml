@@ -25,11 +25,12 @@
                 <td>
                     <a asp-action="GetBookByID" asp-route-id="@book.Id" class="btn btn-info" title="View Details">👁</a>
                     <a asp-action="EditBook" asp-route-id="@book.Id" class="btn btn-warning" title="Edit Booking">✏</a>
-                    <a asp-action="DeleteBook" asp-route-id="@book.Id" class="btn btn-danger" title="Cancel Booking">🗑</a>
+                    <a asp-action="DeleteBook" class="btn btn-secondary" title="Return to Available Trips"> </a>
                 </td>
             </tr>
         }
     </tbody>
 </table>
 
-<a asp-action="CreateBook" class="btn btn-success">➕ Create New Booking</a>
+@* <a asp-action="CreateBook" class="btn btn-success">➕ Create New Booking</a>
+ *@

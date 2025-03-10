@@ -34,6 +34,11 @@ namespace Your_Ride.Repository.UserTransactionLogRepo
             return userTransactionLogs;
 
         }
+        public async Task<UserTransactionLog> GetUserTransactionLogsByTimeIdandUserId(int id , string userId)
+        {
+            UserTransactionLog userTransactionLog = await context.userTransactionLogs.Include(x => x.User).Include(x => x.Appointment).Include(x => x.Time).FirstOrDefaultAsync(x => x.TimeId == id && x.UserId==userId);
+            return userTransactionLog;
+        }
         public async Task<List<UserTransactionLog>> GetAllUserTransactionLogsByTimeID(int id)
         {
 
@@ -74,7 +79,7 @@ namespace Your_Ride.Repository.UserTransactionLogRepo
             }
 
             // Ensure total withdrawals do not exceed the max appointment amount
-            if ((totalUserWithdrawals + userTransactionLog.WithdrawalAmount) <= appointment.MaxAmount)
+            if ((totalUserWithdrawals + userTransactionLog.WithdrawalAmount) > appointment.MaxAmount)
             {
                 return null; // Exceeds max allowed withdrawal
             }

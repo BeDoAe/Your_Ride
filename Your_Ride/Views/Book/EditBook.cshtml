@@ -1,36 +1,8 @@
-﻿@* @model Your_Ride.ViewModels.BookViewModel.BookVM
-@{
-    var availableTimes = ViewBag.AvaiableTimes as List<Your_Ride.ViewModels.TimeViewModel.TimeVM>;
-}
-
-<h2>✏️ Edit Booking</h2>
-
-<form asp-action="EditBook" method="post">
-    <input type="hidden" asp-for="Id" />
-    <input type="hidden" asp-for="UserID" />
-
-    <div class="form-group">
-        <label>Current Time:</label>
-        <input type="text" class="form-control" value="@Model.Time?.TimeOnly.ToString(" hh:mm tt")" readonly />
-    </div>
-
-    <div class="form-group">
-        <label>Change Time (Select from Calendar) 🗓️</label>
-        <select class="form-control" name="NewtimeVM">
-            @foreach (var time in availableTimes)
-            {
-                <option value="@time.Id">@time.FormattedTime - $@time.Fee</option>
-            }
-        </select>
-    </div>
-
-    <button type="submit" class="btn btn-warning">💾 Save Changes</button>
-</form>
- *@
- @model Your_Ride.ViewModels.BookViewModel.BookVM
+﻿@model Your_Ride.ViewModels.BookViewModel.BookVM
 
 @{
     ViewData["Title"] = "Edit Booking";
+    var availableTimes = ViewBag.AvaiableTimes as List<Your_Ride.ViewModels.TimeViewModel.TimeVM>;
 }
 
 <h2>✏ Edit Your Booking</h2>
@@ -38,6 +10,7 @@
 <form asp-action="EditBook" method="post">
     <input type="hidden" asp-for="Id" />
     <input type="hidden" asp-for="UserID" />
+    <input type="hidden" id="selectedTimeId" name="NewtimeVM.Id" />
 
     <div class="form-group">
         <label>🔑 Transaction Log ID:</label>
@@ -51,7 +24,7 @@
 
     <div class="form-group">
         <label>💺 Seat:</label>
-        <input type="text" class="form-control" value="@Model.SeatId" readonly>
+        <input type="text" class="form-control" value="@Model.Seat.SeatLabel" readonly>
     </div>
 
     <div class="form-group">
@@ -62,7 +35,13 @@
     <h3>📅 Select a New Available Time:</h3>
     <div id="calendar"></div>
 
-    <input type="hidden" id="newTimeId" name="NewtimeVM.Id" />
+    <div id="timeDetails" class="hidden">
+        <h4>Selected Time Details</h4>
+        <p>🕒 Time: <span id="previewTime"></span></p>
+        <p>💰 Fee: <span id="previewFee"></span></p>
+        <p>📍 Location: <span id="previewLocation"></span></p>
+        <div id="previewImages"></div>
+    </div>
 
     <button type="submit" class="btn btn-primary">💾 Save Changes</button>
 </form>
@@ -77,24 +56,65 @@
         var calendar = new FullCalendar.Calendar(calendarEl, {
             initialView: 'dayGridMonth',
             events: [
-    @foreach (var time in ViewBag.AvaiableTimes as List<Your_Ride.ViewModels.TimeViewModel.TimeVM>)
+    @for (int i = 0; i < availableTimes.Count; i++)
     {
+        var time = availableTimes[i];
         <text>
-                        {
-                            title: "🚌 Trip - @time.TimeOnly.ToString("hh:mm tt")",
-                            start: "@time.DueDateArrivalSubmission?.ToString("yyyy-MM-dd")",
-                            end: "@time.DueDateDepartureSubmission?.ToString("yyyy-MM-dd")",
-                            description: "Fee: $@time.Fee",
-                            id: "@time.Id"
-                        },
+                            {
+                                title: "🚌 @time.TimeOnly.ToString("hh:mm tt")",
+                                start: "@time.DueDateArrivalSubmission?.ToString("yyyy-MM-dd")",
+                                end: "@time.DueDateDepartureSubmission?.ToString("yyyy-MM-dd")",
+                                description: "Fee: $@time.Fee",
+                                id: "@time.Id",
+                                location: "@(time.LocationImages.FirstOrDefault()?.Location ?? "Unknown")",
+                                images: @Json.Serialize(time.LocationImages.OrderBy(img => img.Id).Select(img => img.ImagePath))
+                            }
         </text>
+        @(i < availableTimes.Count - 1 ? "," : "")
+        // Prevents trailing comma
     }
             ],
             eventClick: function(info) {
-                document.getElementById("newTimeId").value = info.event.id;
-                alert("Selected Time: " + info.event.title);
+                document.getElementById("selectedTimeId").value = info.event.id;
+                document.getElementById("previewTime").innerText = info.event.title;
+                document.getElementById("previewFee").innerText = info.event.extendedProps.description;
+                document.getElementById("previewLocation").innerText = info.event.extendedProps.location;
+
+                var imagesContainer = document.getElementById("previewImages");
+                imagesContainer.innerHTML = "";
+                if (info.event.extendedProps.images.length > 0) {
+                    info.event.extendedProps.images.forEach(function(imgSrc) {
+                        var img = document.createElement("img");
+                        img.src = imgSrc;
+                        img.style.width = "100px";
+                        img.style.margin = "5px";
+                        imagesContainer.appendChild(img);
+                    });
+                }
+
+                document.getElementById("timeDetails").classList.remove("hidden");
             }
         });
         calendar.render();
     });
 </script>
+
+<style>
+    #timeDetails {
+        background: #f8f9fa;
+        padding: 10px;
+        margin-top: 10px;
+        border-radius: 5px;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    #previewImages img {
+        border: 2px solid #ddd;
+        border-radius: 5px;
+        padding: 5px;
+        background: #fff;
+    }
+</style>

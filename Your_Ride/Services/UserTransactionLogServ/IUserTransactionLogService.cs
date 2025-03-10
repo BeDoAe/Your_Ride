@@ -16,6 +16,7 @@ namespace Your_Ride.Services.UserTransactionLogServ
         public Task<UserTransactionLogVM> EditUserTransactionLog(UserTransactionLogVM userTransactionVM);
 
         public Task<int> DeleteUserTransactionLog(int id);
+        public Task<UserTransactionLogVM> GetUserTransactioLogByTimeIdUserId(int id, string userId);
 
     }
 }

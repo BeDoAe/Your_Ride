@@ -12,20 +12,38 @@ namespace Your_Ride.Repository.BookRepo
         {
             this.context = context;
         }
-
+        
         public async Task<List<Book>> GetAllBooks()
         {
-            List<Book> books = await context.Books.Include(x=>x.User).Include(x=>x.Time).ThenInclude(x=>x.Appointment).ToListAsync();
+            List<Book> books = await context.Books
+                   .Include(x => x.User)
+                   .Include(x => x.Seat)
+                   .Include(x => x.Time)
+                       .ThenInclude(t => t.Appointment)
+                   .Include(x => x.Time)
+                       .ThenInclude(t => t.BusGuide)
+                   .Include(x => x.Time)
+                       .ThenInclude(t => t.LocationsWithPics)
+                   .ToListAsync();
             return books;
         }
         public async Task<Book> GetBookByID(int id)
         {
-            Book book = await context.Books.Include(x => x.User).Include(x => x.Time).ThenInclude(x => x.Appointment).FirstOrDefaultAsync(x=>x.Id==id);
+            Book? book = await context.Books
+                   .Include(x => x.User)
+                   .Include(x => x.Seat)
+                   .Include(x => x.Time)
+                       .ThenInclude(t => t.Appointment)   
+                   .Include(x => x.Time)
+                       .ThenInclude(t => t.BusGuide)     
+                   .Include(x => x.Time)
+                       .ThenInclude(t => t.LocationsWithPics) 
+                   .FirstOrDefaultAsync(x => x.Id == id);
             return book;
         }
         public async Task<List<Book>> GetAllBooksOfUser(string id)
         {
-            List<Book> books = await context.Books.Include(x => x.User).Include(x => x.Time).ThenInclude(x => x.Appointment).Where(x => x.UserID == id).ToListAsync();
+            List<Book> books = await context.Books.Include(x => x.User).Include(x => x.Seat).Include(x => x.Time).ThenInclude(x => x.Appointment).Where(x => x.UserID == id).ToListAsync();
             return books;
         }
         public async Task<Book> CreateBook(Book book)
@@ -49,8 +67,13 @@ namespace Your_Ride.Repository.BookRepo
         }
         public async Task<List<Seat>> GetAllAvailbleSeats(int id)
         {
-            List<Seat> seats =await context.Seats.Where(x => x.IsAvailable == true && x.BusId==id)
-                .OrderBy(x=>x.SeatLabel).ToListAsync();
+            List<Seat> seats = (await context.Seats
+                      .Where(x => x.IsAvailable == true && x.BusId == id)
+                      .ToListAsync())
+                      .OrderBy(x => new string(x.SeatLabel.TakeWhile(char.IsLetter).ToArray()))
+                      .ThenBy(x => int.Parse(new string(x.SeatLabel.SkipWhile(char.IsLetter).ToArray())))
+                      .ToList();
+
             return seats;
 
         }

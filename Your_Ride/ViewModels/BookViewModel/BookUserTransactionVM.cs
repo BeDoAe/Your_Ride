@@ -2,8 +2,8 @@
 {
     public class BookUserTransactionVM
     {
-        public BookVM bookVM { get; set; }
+        public BookVM? bookVM { get; set; }
 
-        public int userTransactionLogID { get; set; }
+        public int? userTransactionLogID { get; set; }
     }
 }

@@ -1,24 +1,95 @@
 ﻿@model Your_Ride.ViewModels.BookViewModel.BookVM
 
-<h2>📄 Booking Details</h2>
+<h2 class="text-center">🚌 Your Booking Details</h2>
 
-<table class="table">
-    <tr>
-        <th>Booking ID</th>
-        <td>@Model.Id</td>
-    </tr>
-    <tr>
-        <th>Time ⏰</th>
-        <td>@Model.Time?.TimeOnly.ToString("hh:mm tt")</td>
-    </tr>
-    <tr>
-        <th>Seat No. 🪑</th>
-        <td>@Model.SeatId</td>
-    </tr>
-    <tr>
-        <th>Booking Date 📅</th>
-        <td>@Model.BookeDateTime.ToShortDateString()</td>
-    </tr>
-</table>
+<div class="card shadow-lg p-4">
+    <div class="row">
+        <!-- Seat Information -->
+        <div class="col-md-6">
+            <h4>📍 Seat: <strong>@(Model.Seat != null ? Model.Seat.SeatLabel : "No Seat Assigned")</strong></h4>
+            <p>🎟️ Booking ID: <strong>@Model.Id</strong></p>
+            <p>📅 Appointment Date: <strong>@(Model.Time?.Appointment?.Date.ToString("dddd, MMMM dd, yyyy") ?? "Not Set")</strong></p>
+            <p>💰 Fee: <strong>$@(Model.Time?.Fee ?? 0.00)</strong></p>
+        </div>
 
-<a asp-action="GetAllBooks" class="btn btn-primary">🔙 Back</a>
+        <!-- Time Information -->
+        <div class="col-md-6">
+            <h4>🕒 Trip Time: <strong>@(Model.Time?.TimeOnly.ToString("hh:mm tt") ?? "No Time Assigned")</strong></h4>
+            <p>🚍 Category: <strong>@(Model.Time?.Category == Your_Ride.Models.Time.TripCategory.Arrival ? "Arrival 🏡" : "Departure ✈️")</strong></p>
+
+            <!-- Show only one due date -->
+            @if (Model.Time?.DueDateDepartureSubmission != null && Model.Time.DueDateArrivalSubmission == null)
+            {
+                <p>⏳ Due Date To Change Departure: <strong>@Model.Time.DueDateDepartureSubmission?.ToString("hh:mm tt")</strong></p>
+            }
+            else if (Model.Time?.DueDateArrivalSubmission != null && Model.Time.DueDateDepartureSubmission == null)
+            {
+                <p>🏁 Due Date To Change Arrival: <strong>@Model.Time.DueDateArrivalSubmission?.ToString("hh:mm tt")</strong></p>
+            }
+        </div>
+    </div>
+    
+    <!-- User Information -->
+    <div class="row mt-3">
+        <div class="col-md-6">
+            <h4>👤 Passenger: <strong>@(Model.User?.UserName ?? "No User Found")</strong></h4>
+            <p>📧 Email: <strong>@(Model.User?.Email ?? "Not Provided")</strong></p>
+        </div>
+
+        <div class="col-md-6">
+            <h4>🧑‍✈️ Bus Guide: <strong>@(Model.Time?.BusGuide?.UserName ?? "No Guide Assigned")</strong></h4>
+        </div>
+    </div>
+
+    <!-- Location Images -->
+    @if (Model.Time?.LocationsWithPics != null && Model.Time.LocationsWithPics.Any())
+    {
+        <div class="mt-4">
+            <h4>🗺️ Trip Locations</h4>
+            <div class="row">
+                @foreach (var location in Model.Time.LocationsWithPics.OrderBy(l => l.LocationOrder))
+                {
+                    <div class="col-md-4 mb-3">
+                        <div class="card shadow-sm border-0">
+                            <img src="@location.ImagePath" class="card-img-top img-fluid" alt="@location.Location" style="height: 200px; object-fit: cover;">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">📌 @location.Location</h5>
+                                <p class="text-muted">🚏 Stop # @location.LocationOrder</p>
+                            </div>
+                            <div class="card-footer text-center bg-light">
+                                @if (!string.IsNullOrEmpty(location.PathURL))
+                                {
+                                    <a href="@location.PathURL" class="btn btn-primary" target="_blank">
+                                        📍 View GPS Location
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span class="text-danger">⚠️ GPS Not Available</span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+
+    <!-- Action Buttons -->
+    <div class="mt-4 text-center">
+        <input readonly name="UserTransactionLogID" value="@ViewBag.UserTransactionLogID" hidden />
+
+        <!-- Show Edit button only if DueDate is still valid -->
+        @if ((Model.Time?.DueDateDepartureSubmission != null && Model.Time.DueDateDepartureSubmission <= DateTime.Now) ||
+        (Model.Time?.DueDateArrivalSubmission != null && Model.Time.DueDateArrivalSubmission <= DateTime.Now))
+        {
+            <a asp-action="EditBook" asp-route-id="@Model.Id" asp-route-UserTransactionLogID="@ViewBag.UserTransactionLogID" class="btn btn-warning">
+                ✏️ Edit Booking
+            </a>
+        }
+
+        <a asp-action="GetAllBooksOfUser" asp-route-id="@Model.User.Id" class="btn btn-secondary">
+            🔙 Back to Bookings
+        </a>
+    </div>
+</div>

@@ -52,6 +52,8 @@ namespace Your_Ride.Models
         // Mark as completed when the Time Arrives
         public bool HasCompleted { get; set; } = false;
 
+        //public int? userTransactionLogID { get; set; }
+
 
     }
 }

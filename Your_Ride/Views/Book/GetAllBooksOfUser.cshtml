@@ -1,32 +1,90 @@
-﻿@model IEnumerable<Your_Ride.ViewModels.BookViewModel.BookVM>
+﻿@model Your_Ride.Helper.PaginatedList<Your_Ride.ViewModels.BookViewModel.BookVM>
 
 @{
-    ViewData["Title"] = "My Bookings";
+    ViewData["Title"] = "📖 My Bookings";
+    var userTransactionLogs = ViewBag.userTransactionLogVMs as List<Your_Ride.ViewModels.UserTransactionLogViewModel.UserTransactionLogVM>;
 }
 
-<h2>📖 My Bookings</h2>
+<h2 class="text-center">📖 My Bookings</h2>
 
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>🚌 Time</th>
-            <th>💺 Seat</th>
-            <th>💰 Fee</th>
-            <th>📝 Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var book in Model)
-        {
-            <tr>
-                <td>@book.Time?.TimeOnly.ToString("hh:mm tt")</td>
-                <td>@book.SeatId</td>
-                <td>$@book.Time?.Fee</td>
-                <td>
-                    <a asp-action="EditBook" asp-route-id="@book.Id" class="btn btn-warning">✏ Edit</a>
-                    <a asp-action="DeleteBook" asp-route-id="@book.Id" class="btn btn-danger">❌ Cancel</a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+<!-- Search by Date -->
+<form asp-action="GetAllBooksOfUser" method="get" class="mb-4">
+    <div class="input-group">
+        <input type="date" name="searchDate" class="form-control" value="@ViewBag.SearchDate?.ToString("yyyy-MM-dd")" />
+        <input type="hidden" name="id" value="@ViewBag.UserId" />
+        <button type="submit" class="btn btn-primary">🔍 Search</button>
+    </div>
+</form>
+
+<!-- Display Bookings in Cards -->
+<div class="row">
+    @foreach (var book in Model.Items)
+    {
+        var userTransactionLog = userTransactionLogs?.FirstOrDefault(ut => ut.TimeId == book.timeId);
+
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-primary text-white">
+                    🚌 Booking ID: <strong>@book.Id</strong>
+                </div>
+                <div class="card-body">
+                    <h5>💺 Seat: <strong>@(book.Seat?.SeatLabel ?? "No Seat Assigned")</strong></h5>
+                    <p>📅 Appointment Date: <strong>@(book.Time?.Appointment?.Date.ToString("dddd, MMMM dd, yyyy") ?? "Not Set")</strong></p>
+                    <p>🕒 Time: <strong>@(book.Time?.TimeOnly.ToString("hh:mm tt") ?? "No Time")</strong></p>
+                    <p>🚍 Category: <strong>@(book.Time?.Category == Your_Ride.Models.Time.TripCategory.Arrival ? "Arrival 🏡" : "Departure ✈️")</strong></p>
+                    <p>💰 Fee: <strong>$@(book.Time?.Fee ?? 0.00)</strong></p>
+
+                    @if (book.Time?.DueDateArrivalSubmission != null)
+                    {
+                        <p>⏳ Due Date To Change Arrival: <strong>@book.Time.DueDateArrivalSubmission.Value.ToString("hh:mm tt")</strong></p>
+                    }
+
+                    @if (book.Time?.DueDateDepartureSubmission != null)
+                    {
+                        <p>⏳ Due Date To Change Departure: <strong>@book.Time.DueDateDepartureSubmission.Value.ToString("hh:mm tt")</strong></p>
+                    }
+                </div>
+                <div class="card-footer text-center">
+                    <!-- Show Edit button only if DueDate is still valid -->
+                    @if ((book.Time?.DueDateDepartureSubmission != null && book.Time.DueDateDepartureSubmission <= DateTime.Now) ||
+                         (book.Time?.DueDateArrivalSubmission != null && book.Time.DueDateArrivalSubmission <= DateTime.Now))
+                    {
+                        <a asp-action="EditBook" asp-route-id="@book.Id" asp-route-UserTransactionLogID="@userTransactionLog?.Id" class="btn btn-warning">✏ Edit</a>
+                        <a asp-action="DeleteBook" asp-route-id="@book.Id" class="btn btn-danger">❌ Cancel</a>
+                    }
+                    
+                    <a asp-action="GetAllTimesToBook" class="btn btn-secondary">🔄 Available Times</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<!-- Pagination Controls -->
+@if (Model.TotalPages > 1)
+{
+    <nav>
+        <ul class="pagination justify-content-center">
+            @if (Model.HasPrevious)
+            {
+                <li class="page-item">
+                    <a class="page-link" asp-action="GetAllBooksOfUser" asp-route-id="@ViewBag.UserId" asp-route-pageNumber="@(Model.PageNumber - 1)" asp-route-pageSize="@Model.PageSize">⬅ Previous</a>
+                </li>
+            }
+
+            @for (var i = 1; i <= Model.TotalPages; i++)
+            {
+                <li class="page-item @(i == Model.PageNumber ? "active" : "")">
+                    <a class="page-link" asp-action="GetAllBooksOfUser" asp-route-id="@ViewBag.UserId" asp-route-pageNumber="@i" asp-route-pageSize="@Model.PageSize">@i</a>
+                </li>
+            }
+
+            @if (Model.HasNext)
+            {
+                <li class="page-item">
+                    <a class="page-link" asp-action="GetAllBooksOfUser" asp-route-id="@ViewBag.UserId" asp-route-pageNumber="@(Model.PageNumber + 1)" asp-route-pageSize="@Model.PageSize">Next ➡</a>
+                </li>
+            }
+        </ul>
+    </nav>
+}
