@@ -13,8 +13,10 @@ namespace Your_Ride.Services.BusServ
         public Task<int> DeleteBus(int id);
 
         public  Task<string> GenerateNextBusIdentifier();
+        public Task<List<BusVM>> GetAllAvailableBus();
 
 
+        public Task<List<BusVM>> GetAllAvailableBus(int id);
 
     }
 }

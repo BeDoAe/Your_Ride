@@ -10,7 +10,12 @@
 <form asp-action="EditBook" method="post">
     <input type="hidden" asp-for="Id" />
     <input type="hidden" asp-for="UserID" />
-    <input type="hidden" id="selectedTimeId" name="NewtimeVM.Id" />
+    <input type="hidden" asp-for="timeId" />
+    <input type="hidden" asp-for="SeatId" />
+
+
+    <input type="hidden" id="selectedTimeId" name="NewTimeId" />
+    <input type="hidden" id="transactionLogId" name="UserTransactionLogID" value="@ViewBag.UserTransactionLogID" />
 
     <div class="form-group">
         <label>🔑 Transaction Log ID:</label>
@@ -40,11 +45,17 @@
         <p>🕒 Time: <span id="previewTime"></span></p>
         <p>💰 Fee: <span id="previewFee"></span></p>
         <p>📍 Location: <span id="previewLocation"></span></p>
+        <p>📌 Order: <span id="previewLocationOrder"></span></p>
         <div id="previewImages"></div>
     </div>
 
     <button type="submit" class="btn btn-primary">💾 Save Changes</button>
 </form>
+
+@if (availableTimes == null || !availableTimes.Any())
+{
+    <p>No available times found.</p>
+}
 
 <!-- Load FullCalendar -->
 <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
@@ -53,32 +64,36 @@
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         var calendarEl = document.getElementById('calendar');
+
+    var eventsArray = @Html.Raw(Json.Serialize(availableTimes?.Select(time => new
+        {
+            id = time.Id,
+            title = $"🚌{time.TimeOnly:hh:mm tt}-{time.Category}",
+            start = time.Appointment != null
+                ? time.Appointment.Date.ToString("yyyy-MM-dd") + "T00:00:00"  // ✅ Corrected C# formatting
+                : DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss"), // Fallback
+            fee = time.Fee,
+            location = time.LocationImages?.OrderBy(l => l.LocationOrder).FirstOrDefault()?.Location ?? "Unknown",
+            locationOrder = time.LocationImages?.OrderBy(l => l.LocationOrder).FirstOrDefault()?.LocationOrder ?? 0,
+            images = time.LocationImages?.Select(img => img.ImagePath)
+        })));
+
+
+
+        console.log("Events Array JSON:", JSON.stringify(eventsArray, null, 2)); // Debugging
+
         var calendar = new FullCalendar.Calendar(calendarEl, {
             initialView: 'dayGridMonth',
-            events: [
-    @for (int i = 0; i < availableTimes.Count; i++)
-    {
-        var time = availableTimes[i];
-        <text>
-                            {
-                                title: "🚌 @time.TimeOnly.ToString("hh:mm tt")",
-                                start: "@time.DueDateArrivalSubmission?.ToString("yyyy-MM-dd")",
-                                end: "@time.DueDateDepartureSubmission?.ToString("yyyy-MM-dd")",
-                                description: "Fee: $@time.Fee",
-                                id: "@time.Id",
-                                location: "@(time.LocationImages.FirstOrDefault()?.Location ?? "Unknown")",
-                                images: @Json.Serialize(time.LocationImages.OrderBy(img => img.Id).Select(img => img.ImagePath))
-                            }
-        </text>
-        @(i < availableTimes.Count - 1 ? "," : "")
-        // Prevents trailing comma
-    }
-            ],
+            events: eventsArray,
             eventClick: function(info) {
+                console.log("Clicked Event:", info.event);
+                // alert("You clicked: " + info.event.title); // Debugging
+
                 document.getElementById("selectedTimeId").value = info.event.id;
                 document.getElementById("previewTime").innerText = info.event.title;
-                document.getElementById("previewFee").innerText = info.event.extendedProps.description;
+                document.getElementById("previewFee").innerText = "$" + info.event.extendedProps.fee;
                 document.getElementById("previewLocation").innerText = info.event.extendedProps.location;
+                document.getElementById("previewLocationOrder").innerText = info.event.extendedProps.locationOrder;
 
                 var imagesContainer = document.getElementById("previewImages");
                 imagesContainer.innerHTML = "";
@@ -93,9 +108,17 @@
                 }
 
                 document.getElementById("timeDetails").classList.remove("hidden");
+            },
+            eventDidMount: function(info) {
+                console.log("Rendered Event:", info.event);
             }
         });
+
         calendar.render();
+
+        setTimeout(() => {
+            console.log("Loaded Events:", calendar.getEvents());
+        }, 3000);
     });
 </script>
 

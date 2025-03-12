@@ -80,13 +80,21 @@
         <input readonly name="UserTransactionLogID" value="@ViewBag.UserTransactionLogID" hidden />
 
         <!-- Show Edit button only if DueDate is still valid -->
-        @if ((Model.Time?.DueDateDepartureSubmission != null && Model.Time.DueDateDepartureSubmission <= DateTime.Now) ||
-        (Model.Time?.DueDateArrivalSubmission != null && Model.Time.DueDateArrivalSubmission <= DateTime.Now))
+        @if (Model.Time != null &&
+        (
+        (Model.Time.Category == Your_Ride.Models.Time.TripCategory.Departure &&
+        (Model.Time.DueDateDepartureSubmission == null || Model.Time.DueDateDepartureSubmission >= DateTime.Now))
+        ||
+        (Model.Time.Category == Your_Ride.Models.Time.TripCategory.Arrival &&
+        (Model.Time.DueDateArrivalSubmission == null || Model.Time.DueDateArrivalSubmission >= DateTime.Now))
+        )
+        )
         {
             <a asp-action="EditBook" asp-route-id="@Model.Id" asp-route-UserTransactionLogID="@ViewBag.UserTransactionLogID" class="btn btn-warning">
                 ✏️ Edit Booking
             </a>
         }
+
 
         <a asp-action="GetAllBooksOfUser" asp-route-id="@Model.User.Id" class="btn btn-secondary">
             🔙 Back to Bookings

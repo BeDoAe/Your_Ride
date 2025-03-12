@@ -1,15 +1,72 @@
 ﻿@model Your_Ride.Helper.PaginatedList<Your_Ride.ViewModels.TimeViewModel.TimeVM>
+
 <style>
-    th, td {
+    th {
         text-align: center;
         vertical-align: middle;
+        white-space: nowrap; /* Keep all headers in one line by default */
     }
 
         th span {
             display: block;
             font-size: 28px; /* Adjust size if needed */
+            margin: 5px;
         }
+        td{
+        margin-block-start: 5px;
+    }
+    /* Stack text for specific headers */
+    .stack-text {
+        white-space: normal; /* Allow wrapping */
+        line-height: 1.2; /* Adjust line spacing */
+    }
+
+
+    /* Styling for action buttons */
+    .action-buttons a,
+    .action-buttons form {
+        display: inline-block;
+        margin: 2px; /* Adjust spacing between buttons */
+    }
+
+    .action-buttons .btn {
+        padding: 6px 12px;
+        font-size: 14px;
+        border-radius: 5px;
+        transition: all 0.3s ease-in-out;
+        margin-top:5px;
+    }
+
+        .action-buttons .btn:hover {
+            transform: scale(1.1);
+        }
+
+    /* Specific colors for different actions */
+    .btn-info {
+        background-color: #17a2b8;
+        border-color: #17a2b8;
+        color: white;
+    }
+
+    .btn-warning {
+        background-color: #ffc107;
+        border-color: #ffc107;
+        color: black;
+    }
+
+    .btn-danger {
+        background-color: #dc3545;
+        border-color: #dc3545;
+        color: white;
+    }
+
+    .btn-success {
+        background-color: #28a745;
+        border-color: #28a745;
+        color: white;
+    }
 </style>
+
 <div class="container mt-4">
     <h2 class="mb-4 text-center">🚌 All Time Appointments</h2>
 
@@ -23,27 +80,34 @@
 
     <!-- Sorting Links -->
     <div class="d-flex justify-content-center mb-3">
-        <a asp-action="GetAllTimes" asp-route-sortOrder="@ViewBag.TimeSortParam" class="btn btn-outline-dark me-2">Sort by Time</a>
-        <a asp-action="GetAllTimes" asp-route-sortOrder="@ViewBag.DriverSortParam" class="btn btn-outline-dark">Sort by Driver</a>
+        <a style="margin:5px" asp-action="GetAllTimes" asp-route-sortOrder="@ViewBag.AppointmentDateSortParam" class="btn btn-outline-dark">Sort by Date</a>
+
+        <a style="margin:5px" asp-action="GetAllTimes" asp-route-sortOrder="@ViewBag.TimeSortParam" class="btn btn-outline-dark me-2">Sort by Time</a>
+        
+        <a style="margin:5px" asp-action="GetAllTimes" asp-route-sortOrder="@ViewBag.DriverSortParam" class="btn btn-outline-dark me-2">Sort by Driver</a>
     </div>
+
 
     <!-- Responsive Table -->
     <div class="table-responsive">
         <table class="table table-striped table-hover">
             <thead class="table-dark">
                 <tr>
-                    <th class="text-center"><span>🕒</span><br>Time</th>
-                    <th class="text-center"><span>📂</span><br>Category</th>
-                    <th class="text-center"><span>👤</span><br>Bus Guide</th>
-                    <th class="text-center"><span>🚏</span><br>Bus Tag</th>
-                    <th class="text-center"><span>👨‍✈️</span><br>Driver</th>
-                    <th class="text-center"><span>🚗</span><br>Plate</th>
-                    <th class="text-center"><span>💺</span><br>Seat Number</th>
-                    <th class="text-center"><span>📅</span><br>Appointment Date</th>
-                    <th class="text-center"><span>✅</span><br>Completed</th>
-                    <th class="text-center"><span>⚙️</span><br>Actions</th>
+                    <th class="text-center"><span>🕒</span>Time</th>
+                    <th class="text-center"><span>📂</span>Category</th>
+                    <th class="text-center"><span>👤</span>Bus Guide</th>
+                    <th class="text-center stack-text"><span>🚏</span> Bus Tag  </th>
+                    <th class="text-center"><span>👨‍✈️</span>Driver</th>
+                    <th class="text-center"><span>🚗</span>Plate</th>
+                    <th class="text-center stack-text"><span>💺</span> Seat Number  </th>
+                    <th class="text-center"><span>📅</span>Appointment Date</th>
+                    <th class="text-center"><span>✅</span>Completed</th>
+                    <th class="text-center"><span>🚍</span>Category</th>
+                    <th class="text-center stack-text"><span>⏳</span> Due Date  </th>
+                    <th class="text-center"><span>⚙️</span>Actions</th>
                 </tr>
             </thead>
+
 
             <tbody>
                 @foreach (var time in Model.Items)
@@ -59,14 +123,31 @@
                         <td>@time.Appointment.Date.ToShortDateString()</td>
                         <td>@(time.HasCompleted ? "Yes" : "No")</td>
                         <td>
-                            <a asp-action="GetTimeByID" asp-route-id="@time.Id" class="btn btn-info btn-sm">View</a>
-                            <a asp-action="EditTime" asp-route-id="@time.Id" class="btn btn-warning btn-sm">Edit</a>
-                            <a asp-action="DeleteTime" asp-route-id="@time.Id" class="btn btn-danger btn-sm">Delete</a>
-                            @if (time.HasCompleted != true)
+                            @(time.Category == (Your_Ride.ViewModels.TimeViewModel.TimeVM.TripCategory)Your_Ride.ViewModels.TimeViewModel.TimeVM.TripCategory.Arrival
+                                ? "Arrival 🏡"
+                                : "Departure ✈️")
+                        </td>
+                        <td>
+                            @if (time.Category == Your_Ride.ViewModels.TimeViewModel.TimeVM.TripCategory.Arrival)
+                            {
+                                @(time.DueDateArrivalSubmission?.ToString("hh:mm tt") ?? "N/A")
+                            }
+                            else
+                            {
+                                @(time.DueDateDepartureSubmission?.ToString("hh:mm tt") ?? "N/A")
+                            }
+                        </td>
+
+
+                        <td class="action-buttons">
+                            <a asp-action="GetTimeByID" asp-route-id="@time.Id" class="btn btn-info btn-sm">👁 View</a>
+                            <a asp-action="EditTime" asp-route-id="@time.Id" class="btn btn-warning btn-sm">✏️ Edit</a>
+                            <a asp-action="DeleteTime" asp-route-id="@time.Id" class="btn btn-danger btn-sm">🗑 Delete</a>
+                            @if (!time.HasCompleted)
                             {
                                 <form asp-action="CompleteTime" method="post" style="display:inline;">
                                     <input type="hidden" name="id" value="@time.Id" />
-                                    <button type="submit" class="btn btn-warning">Complete</button>
+                                    <button type="submit" class="btn btn-success btn-sm">✅ Complete</button>
                                 </form>
                             }
                         </td>
@@ -75,7 +156,6 @@
             </tbody>
         </table>
     </div>
-
     <!-- Pagination -->
     <div class="d-flex justify-content-center mt-4">
         @if (Model.HasPrevious)

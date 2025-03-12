@@ -12,6 +12,8 @@ namespace Your_Ride.Repository.BusRepo
         public Task<Bus> GetBusByID(int id);
 
         public Task<List<string>> GetAllBusIdentifier();
+        public Task<List<Bus>> GetAllAvailableBus();
+        public Task<List<Bus>> GetAllAvailableBus(int id);
 
         public Task<Bus> GetBusByIdentifier(char c);
 

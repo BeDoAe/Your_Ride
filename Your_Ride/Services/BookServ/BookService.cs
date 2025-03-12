@@ -131,12 +131,19 @@ namespace Your_Ride.Services.BookServ
                     UserTransactionLogVM userTransactionLogVMFromDB = await userTransactionLogService.GetUserTransactioLogById(UserTransactionLogID);
                     if (userTransactionLogVMFromDB == null) return null;
 
-                    userTransactionLogVMFromDB.AppointmentId = newTimeVM.AppointmentId;
-                    userTransactionLogVMFromDB.TimeId = newTimeVM.Id;
-                    userTransactionLogVMFromDB.UserId = bookVM.UserID;
-                    userTransactionLogVMFromDB.WithdrawalAmount = newTimeVM.Fee;
+                    //userTransactionLogVMFromDB.AppointmentId = newTimeVM.AppointmentId;
+                    //userTransactionLogVMFromDB.TimeId = newTimeVM.Id;
+                    //userTransactionLogVMFromDB.UserId = bookVM.UserID;
+                    //userTransactionLogVMFromDB.WithdrawalAmount = newTimeVM.Fee;
+                  
+                    UserTransactionLogVM userTransactionVM = automapper.Map<UserTransactionLogVM>(userTransactionLogVMFromDB);
 
-                    UserTransactionLogVM userTransactionLogVMAfterUpdate = await userTransactionLogService.EditUserTransactionLog(userTransactionLogVMFromDB);
+                    userTransactionVM.AppointmentId = newTimeVM.AppointmentId;
+                    userTransactionVM.TimeId = newTimeVM.Id;
+                    userTransactionVM.UserId = bookVM.UserID;
+                    userTransactionVM.WithdrawalAmount = newTimeVM.Fee;
+
+                    UserTransactionLogVM userTransactionLogVMAfterUpdate = await userTransactionLogService.EditUserTransactionLog(userTransactionVM);
                     if (userTransactionLogVMAfterUpdate == null) return null;
 
                     await bookRepository.UpdateBook(bookFromDB);

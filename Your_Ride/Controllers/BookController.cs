@@ -56,9 +56,20 @@ namespace Your_Ride.Controllers
 
         //         /Book/GetAllTimesToBook
         [HttpGet]
-        public async Task<IActionResult> GetAllTimesToBook()
+        public async Task<IActionResult> GetAllAvailableTimesToBook()
         {
             List<TimeVM> timeVMs = await timeService.GetAllAvailableTimes();
+
+
+            // ✅ Convert DateTime to DateOnly safely
+            DateOnly today = DateOnly.FromDateTime(DateTime.Now);
+
+            // ✅ Ensure we exclude already booked times
+            timeVMs = timeVMs
+                .Where(t =>
+                    t.Appointment != null &&
+                    t.Appointment.Date >= today ) 
+                .ToList();
             return View("GetAllTimesToBook",timeVMs);
         }
         [HttpGet]
@@ -130,24 +141,35 @@ namespace Your_Ride.Controllers
         [HttpGet]
         public async Task<IActionResult> EditBook(int id, int UserTransactionLogID)
         {
+            BookVM bookVM = await bookService.GetBookByID(id);
+            if (bookVM == null) return NotFound("Book isn't Found");
+
             List<TimeVM> timeVMs = await timeService.GetAllAvailableTimes();
+
+            var user = await userManager.GetUserAsync(User);
+            if (user == null) return Unauthorized("Should Login");
+
+            List<BookVM> bookVMs = await bookService.GetAllBooksOfUser(user.Id);
 
             // ✅ Convert DateTime to DateOnly safely
             DateOnly today = DateOnly.FromDateTime(DateTime.Now);
 
-            // ✅ Ensure t.Appointment is not null before accessing t.Appointment.Date
+            // ✅ Ensure we exclude already booked times
             timeVMs = timeVMs
-                .Where(t => t.Appointment != null && t.Appointment.Date >= today)
+                .Where(t =>
+                    t.Appointment != null &&
+                    t.Appointment.Date >= today &&
+                    t.Id != bookVM.timeId &&
+                    !bookVMs.Any(b => b.timeId == t.Id)) // Exclude booked times
                 .ToList();
-
-            BookVM bookVM = await bookService.GetBookByID(id);
-            if (bookVM == null) return NotFound("Book isn't Found");
 
             ViewBag.UserTransactionLogID = UserTransactionLogID;
             ViewBag.AvaiableTimes = timeVMs;
 
             return View("EditBook", bookVM);
         }
+
+
 
 
 

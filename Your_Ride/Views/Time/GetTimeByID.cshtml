@@ -8,6 +8,8 @@
             <div class="card-header bg-primary text-white">Time Details</div>
             <div class="card-body">
                 <p><strong>Time:</strong> @Model.TimeOnly.ToString("hh:mm tt")</p>
+                <p><strong> Fee:</strong> @Model.Fee</p>
+
                 <p><strong>Appointment Date:</strong> @Model.Appointment.Date.ToString("MM/dd/yyyy")</p>
                 <p><strong>Completed:</strong> @(Model.HasCompleted ? "Yes" : "No")</p>
                 <p><strong>Locations:</strong></p>

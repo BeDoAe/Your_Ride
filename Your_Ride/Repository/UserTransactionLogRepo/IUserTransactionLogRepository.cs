@@ -11,6 +11,8 @@ namespace Your_Ride.Repository.UserTransactionLogRepo
         public Task<List<UserTransactionLog>> GetAllUserTransactionLogsByTimeID(int id);
         public Task<List<UserTransactionLog>> GetAllUserTransactionLogsByAppointmentID(int id);
         public Task<UserTransactionLog> CreateUserTransactionLog(UserTransactionLog userTransactionLog);
+        public Task<UserTransactionLog> EditUserTransactionLog(UserTransactionLog userTransactionLog);
+
         public Task<int> DeleteUserTransactionLog(int id);
         public Task<bool> CheckUserLogTransactionLog(UserTransactionLog userTransactionLog);
         public Task<UserTransactionLog> GetUserTransactionLogsByTimeIdandUserId(int id, string userId);

@@ -112,5 +112,21 @@ namespace Your_Ride.Services.BusServ
             // If all characters were 'Z', add another character in front
             return 'A'+ new string(chars) ;
         }
+        public async Task<List<BusVM>> GetAllAvailableBus()
+        {
+            List<Bus> buses = await busRepository.GetAllAvailableBus();
+
+            List<BusVM> busVMs = automapper.Map<List<BusVM>>(buses);
+
+            return busVMs;
+        }
+        public async Task<List<BusVM>> GetAllAvailableBus(int id)
+        {
+            List<Bus> buses = await busRepository.GetAllAvailableBus(id);
+
+            List<BusVM> busVMs = automapper.Map<List<BusVM>>(buses);
+
+            return busVMs;
+        }
     }
 }

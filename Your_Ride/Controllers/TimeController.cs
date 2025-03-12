@@ -58,17 +58,21 @@ namespace Your_Ride.Controllers
                 ).ToList();
             }
 
-            // **Sorting**
+            // **Sorting Parameters**
             ViewBag.CurrentSort = sortOrder;
             ViewBag.TimeSortParam = sortOrder == "time_asc" ? "time_desc" : "time_asc";
             ViewBag.DriverSortParam = sortOrder == "driver_asc" ? "driver_desc" : "driver_asc";
+            ViewBag.AppointmentDateSortParam = sortOrder == "date_asc" ? "date_desc" : "date_asc"; // New sorting for appointment date
 
+            // **Sorting Logic**
             timeVMs = sortOrder switch
             {
                 "time_asc" => timeVMs.OrderBy(t => t.TimeOnly).ToList(),
                 "time_desc" => timeVMs.OrderByDescending(t => t.TimeOnly).ToList(),
                 "driver_asc" => timeVMs.OrderBy(t => t.Bus.DriverName).ToList(),
                 "driver_desc" => timeVMs.OrderByDescending(t => t.Bus.DriverName).ToList(),
+                "date_asc" => timeVMs.OrderBy(t => t.Appointment.Date).ToList(), // Sort by appointment date (earliest first)
+                "date_desc" => timeVMs.OrderByDescending(t => t.Appointment.Date).ToList(), // Sort by appointment date (latest first)
                 _ => timeVMs
             };
 
@@ -80,6 +84,7 @@ namespace Your_Ride.Controllers
 
             return View("GetAllTimes", paginatedList);
         }
+
 
         [HttpGet]
         public async Task<IActionResult> GetTimeByID(int id)
@@ -110,7 +115,7 @@ namespace Your_Ride.Controllers
         
         
         {
-            List<BusVM> busVMs = await busService.GetAllBuses();
+            List<BusVM> busVMs = await busService.GetAllAvailableBus();
             List<AppointmentVM> appointmentVMs = await appointmentService.GetAllAppointments();
             ViewBag.Buses = busVMs;
             ViewBag.Appointments = appointmentVMs;
@@ -129,7 +134,7 @@ namespace Your_Ride.Controllers
         {
             if (!ModelState.IsValid)
             {
-                List<BusVM> busVMs = await busService.GetAllBuses();
+                List<BusVM> busVMs = await busService.GetAllAvailableBus();
                 List<AppointmentVM> appointmentVMs = await appointmentService.GetAllAppointments();
                 List<ApplicationUser> AdminBusGuides = (await userManager.GetUsersInRoleAsync("Admin")).ToList();
                 ViewBag.Buses = busVMs;
@@ -146,19 +151,24 @@ namespace Your_Ride.Controllers
         [HttpGet]
         public async Task<IActionResult> EditTime(int id)
         {
-            List<BusVM> busVMs = await busService.GetAllBuses();
-            List<AppointmentVM> appointmentVMs = await appointmentService.GetAllAppointments();
-            List<ApplicationUser> AdminBusGuides = (await userManager.GetUsersInRoleAsync("Admin")).ToList();
-            ViewBag.Buses = busVMs;
-            ViewBag.Appointments = appointmentVMs;
-            ViewBag.BusGuides = AdminBusGuides;
-
+          
 
             TimeVM timeVM = await timeService.GetTimeByID(id);
             if (timeVM == null)
             {
                 return NotFound("Time");
             }
+
+            List<BusVM> busVMs = await busService.GetAllAvailableBus(timeVM.Bus.Id);
+            List<AppointmentVM> appointmentVMs = await appointmentService.GetAllAppointments();
+            List<ApplicationUser> AdminBusGuides = (await userManager.GetUsersInRoleAsync("Admin")).ToList();
+
+            ViewBag.Buses = busVMs;
+            ViewBag.Appointments = appointmentVMs;
+            ViewBag.BusGuides = AdminBusGuides;
+
+
+
             IFormFileTimeVM formFileTimeVM = timeService.MappingToFormFile(timeVM);
             
 
@@ -171,7 +181,7 @@ namespace Your_Ride.Controllers
             if (!ModelState.IsValid)
             {
 
-                List<BusVM> busVMs = await busService.GetAllBuses();
+                List<BusVM> busVMs = await busService.GetAllAvailableBus();
                 List<AppointmentVM> appointmentVMs = await appointmentService.GetAllAppointments();
                 List<ApplicationUser> AdminBusGuides = (await userManager.GetUsersInRoleAsync("Admin")).ToList();
                 ViewBag.Buses = busVMs;

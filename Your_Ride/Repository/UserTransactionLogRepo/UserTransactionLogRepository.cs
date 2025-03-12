@@ -91,6 +91,68 @@ namespace Your_Ride.Repository.UserTransactionLogRepo
 
             return userTransactionLog; // Successfully created transaction
         }
+        public async Task<UserTransactionLog> EditUserTransactionLog(UserTransactionLog userTransactionLog)
+        {
+            // Get the user's wallet
+            Wallet wallet = await context.Wallets.FirstOrDefaultAsync(x => x.UserId == userTransactionLog.UserId);
+
+            // Get the appointment
+            Appointment appointment = await context.Appointments.FirstOrDefaultAsync(x => x.Id == userTransactionLog.AppointmentId);
+
+            // Get the existing transaction log from DB
+            UserTransactionLog userTransactionLogFromDB = await context.userTransactionLogs
+                .FirstOrDefaultAsync(x => x.Id == userTransactionLog.Id);
+
+            if (wallet == null || appointment == null || userTransactionLogFromDB == null)
+            {
+                return null; // Return null if any required data is missing
+            }
+
+            userTransactionLogFromDB.AppointmentId = userTransactionLog.AppointmentId;
+            userTransactionLogFromDB.TimeId = userTransactionLog.TimeId;
+            userTransactionLogFromDB.UserId = userTransactionLog.UserId;
+            //userTransactionLogFromDB.WithdrawalAmount = userTransactionVM.WithdrawalAmount;
+
+
+
+            double currentWithdraw = userTransactionLogFromDB.WithdrawalAmount; // Old withdrawal
+            double newWithdraw = userTransactionLog.WithdrawalAmount; // New withdrawal
+
+            double withdrawDifference = newWithdraw - currentWithdraw; // Change in withdrawal amount
+
+            // Calculate total withdrawn amount excluding the current transaction
+            double totalUserWithdrawals = await context.userTransactionLogs
+                .Where(x => x.AppointmentId == userTransactionLog.AppointmentId && x.UserId == userTransactionLog.UserId && x.Id != userTransactionLog.Id)
+                .SumAsync(x => x.WithdrawalAmount);
+
+            // Calculate the new total if we apply the new withdrawal amount
+            double newTotalWithdrawals = totalUserWithdrawals + newWithdraw;
+
+            // Ensure wallet has enough funds to cover only the difference
+            if (wallet.Amount < withdrawDifference)
+            {
+                return null; // Not enough funds in wallet
+            }
+
+            // Ensure the new total withdrawals do not exceed the appointment max amount
+            if (newTotalWithdrawals > appointment.MaxAmount)
+            {
+                return null; // Exceeds max allowed withdrawal
+            }
+
+            // Update wallet balance
+            wallet.Amount -= withdrawDifference; // Adjust only the difference
+
+            // Update transaction log with new withdrawal amount
+            userTransactionLogFromDB.WithdrawalAmount = newWithdraw;
+            context.Update(userTransactionLogFromDB);
+
+            await context.SaveChangesAsync();
+
+            return userTransactionLogFromDB; // Successfully updated transaction
+        }
+
+
         public async Task<int> DeleteUserTransactionLog(int id)
         {
             UserTransactionLog userTransactionLog = await context.userTransactionLogs.FirstOrDefaultAsync(x => x.Id == id);

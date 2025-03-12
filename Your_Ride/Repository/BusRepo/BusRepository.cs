@@ -52,6 +52,32 @@ namespace Your_Ride.Repository.BusRepo
             return busIdentifiers;
         }
 
+        public async Task<List<Bus>> GetAllAvailableBus()
+        {
+            List<int> usedBusIds = await context.Times.Where(x=>x.IsDeleted ==false).Select(t => t.BusID).Distinct().ToListAsync();
+
+            List<Bus> availableBuses = await context.Buses
+                .Include(b => b.Seats)
+                .Where(b => !usedBusIds.Contains(b.Id))
+                .ToListAsync();
+
+            return availableBuses;
+        }
+        public async Task<List<Bus>> GetAllAvailableBus(int id)
+        {
+            List<int> usedBusIds = await context.Times
+                .Where(x => x.IsDeleted == false)
+                .Select(t => t.BusID)
+                .Distinct().ToListAsync();
+
+            List<Bus> availableBuses = await context.Buses
+                .Include(b => b.Seats)
+                .Where(b => !usedBusIds.Contains(b.Id) || b.Id == id)
+                .ToListAsync();
+
+            return availableBuses;
+        }
+
         public async Task<Bus> GetBusByIdentifier(char c)
         {
            string busIdentifier = c.ToString();

@@ -100,7 +100,7 @@
 </script> *@
 @model Your_Ride.ViewModels.TimeViewModel.IFormFileTimeVM
 
-<h2>Create / Edit Time</h2>
+<h2>Create Time</h2>
 
 <form asp-action="CreateTime" method="post" enctype="multipart/form-data">
     @Html.AntiForgeryToken()
@@ -112,8 +112,9 @@
 
     <div class="mb-3">
         <label class="form-label">Fee:</label>
-        <input asp-for="Fee" class="form-control" type="number" step="0.01" required placeholder="Enter fee amount" />
+        <input name="Fee" class="form-control" type="number" step="0.01" required placeholder="Enter fee amount" />
     </div>
+
 
 
     <div class="mb-3">

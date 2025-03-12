@@ -20,7 +20,7 @@
 <div class="row">
     @foreach (var book in Model.Items)
     {
-        var userTransactionLog = userTransactionLogs?.FirstOrDefault(ut => ut.TimeId == book.timeId);
+        var userTransactionLog = userTransactionLogs?.FirstOrDefault(ut => ut.TimeId == book.timeId && ut.AppointmentId == book.Time.AppointmentId);
 
         <div class="col-md-4 mb-4">
             <div class="card shadow-lg border-0">
@@ -46,12 +46,21 @@
                 </div>
                 <div class="card-footer text-center">
                     <!-- Show Edit button only if DueDate is still valid -->
-                    @if ((book.Time?.DueDateDepartureSubmission != null && book.Time.DueDateDepartureSubmission <= DateTime.Now) ||
-                         (book.Time?.DueDateArrivalSubmission != null && book.Time.DueDateArrivalSubmission <= DateTime.Now))
+                    <!-- Show Edit button only if DueDate is still valid -->
+                    @if (book.Time != null &&
+                   (
+                   (book.Time.Category == Your_Ride.Models.Time.TripCategory.Departure &&
+                   (book.Time.DueDateDepartureSubmission == null || book.Time.DueDateDepartureSubmission <= DateTime.Now))
+                   ||
+                   (book.Time.Category == Your_Ride.Models.Time.TripCategory.Arrival &&
+                   (book.Time.DueDateArrivalSubmission == null || book.Time.DueDateArrivalSubmission <= DateTime.Now))
+                   )
+                   )
                     {
                         <a asp-action="EditBook" asp-route-id="@book.Id" asp-route-UserTransactionLogID="@userTransactionLog?.Id" class="btn btn-warning">✏ Edit</a>
                         <a asp-action="DeleteBook" asp-route-id="@book.Id" class="btn btn-danger">❌ Cancel</a>
                     }
+
                     
                     <a asp-action="GetAllTimesToBook" class="btn btn-secondary">🔄 Available Times</a>
                 </div>

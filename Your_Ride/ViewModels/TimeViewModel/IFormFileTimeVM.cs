@@ -21,7 +21,8 @@ namespace Your_Ride.ViewModels.TimeViewModel
         public DateTime? DueDateArrivalSubmission { get; set; }
         public DateTime? DueDateDepartureSubmission { get; set; }
 
-
+        [Required]
+        [Range(0.01, double.MaxValue, ErrorMessage = "Amount must be greater than zero.")]
         public double Fee { get; set; }
 
 

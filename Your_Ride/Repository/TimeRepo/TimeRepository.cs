@@ -22,7 +22,7 @@ namespace Your_Ride.Repository.TimeRepo
             List<Time> times = await context.Times.Include(x => x.LocationsWithPics).Include(x => x.BusGuide)
                 .Include(x => x.Bus)
                 .Include(x => x.Appointment)
-                .Where(x => x.HasCompleted != true &&
+                .Where(x => x.HasCompleted != true && 
                      (x.DueDateArrivalSubmission == null || x.DueDateArrivalSubmission <= DateTime.Now ||
                       x.DueDateDepartureSubmission == null || x.DueDateDepartureSubmission <= DateTime.Now))
         .       ToListAsync();            
@@ -66,12 +66,12 @@ namespace Your_Ride.Repository.TimeRepo
             Appointment? existingAppointment = await context.Appointments
                 .Include(x => x.Times)
                 .ThenInclude(x => x.LocationsWithPics)
-                .FirstOrDefaultAsync(x => x.Date == time.Appointment.Date);
+                .FirstOrDefaultAsync(x => x.Date == time.Appointment.Date && x.IsDeleted == false);
 
             // If an appointment exists, check if the time already exists with same category !
             if (existingAppointment != null)
             {
-                bool timeExists = existingAppointment.Times.Any(t => t.TimeOnly == time.TimeOnly && t.Category==time.Category);
+                bool timeExists = existingAppointment.Times.Any(t => t.BusID == time.BusID && t.IsDeleted ==false);
 
                 // Fix: Corrected condition
                 if (timeExists)  // No need to check `!= null`, it's always true/false
@@ -90,6 +90,23 @@ namespace Your_Ride.Repository.TimeRepo
             if (timeFromDB == null) return null;
             else
             {
+                // Check if an appointment exists on the same date
+                Appointment? existingAppointment = await context.Appointments
+                    .Include(x => x.Times)
+                    .FirstOrDefaultAsync(x => x.Date == time.Appointment.Date  && x.IsDeleted == false);
+
+                if (existingAppointment != null)
+                {
+                    // Check if another time exists with the same BusID in the appointment
+                    bool timeExists = existingAppointment.Times
+                          .Any(t => t.BusID == time.BusID && t.IsDeleted == false && t.Id != time.Id);
+
+                    if (timeExists)
+                    {
+                        return null; // Another Time with the same BusID exists on this appointment date
+                    }
+                }
+
                 await context.SaveChangesAsync();
 
                 //context.Times.Update(time);
