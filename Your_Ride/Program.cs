@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
+
 using Microsoft.EntityFrameworkCore;
 using Your_Ride.Helper;
 using Your_Ride.Models;
@@ -6,6 +8,7 @@ using Your_Ride.Repository.AppointmentRepo;
 using Your_Ride.Repository.BookRepo;
 using Your_Ride.Repository.BusRepo;
 using Your_Ride.Repository.CollegeRepo;
+using Your_Ride.Repository.ForgetPasswordRepo;
 using Your_Ride.Repository.Generic;
 using Your_Ride.Repository.TimeRepo;
 using Your_Ride.Repository.TransactionRepo;
@@ -40,11 +43,15 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
     options.Password.RequireUppercase = true;
     options.Password.RequireNonAlphanumeric = true;
     options.Password.RequiredLength = 8;
-    options.Password.RequireDigit = true;
 })
    .AddEntityFrameworkStores<Context>()
    .AddDefaultTokenProviders();
 
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.ExpireTimeSpan = TimeSpan.FromDays(30); 
+    options.SlidingExpiration = true;
+});
 // Add services to the container.
 
 builder.Services.AddRazorPages();
@@ -87,6 +94,12 @@ builder.Services.AddScoped<ITimeService, TimeService>();
 builder.Services.AddScoped<IUserTransactionLogRepository, UserTransactionLogRepository>();
 builder.Services.AddScoped<IUserTransactionLogService, UserTransactionLogService>();
 
+// Register Email and SMS services
+//builder.Services.AddScoped<Your_Ride.Repository.ForgetPasswordRepo.IEmailSender, EmailSender>();
+// Use the Identity Email Sender for password reset
+//builder.Services.AddScoped<Microsoft.AspNetCore.Identity.UI.Services.IEmailSender, IdentityEmailSender>();
+builder.Services.AddScoped<ISmsSender, TwilioSmsSender>();
+
 
 
 //////////////////////////////////////////////////////////////////
@@ -95,10 +108,22 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+    app.UseExceptionHandler("/Home/Error"); // Handles 500 Internal Server Errors
+    app.UseStatusCodePagesWithReExecute("/Home/Error", "?statusCode={0}");
     app.UseHsts();
 }
+app.Use(async (context, next) =>
+{
+    await next();
+
+    if (context.Response.StatusCode == 404 && !context.Response.HasStarted)
+    {
+        // Re-execute the request to the error handling path
+        context.Request.Path = "/Home/Error";
+        await next();
+    }
+});
+
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();

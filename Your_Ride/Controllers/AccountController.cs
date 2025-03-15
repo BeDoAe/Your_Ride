@@ -10,6 +10,19 @@ using Microsoft.Identity.Client;
 using Your_Ride.ViewModels.University;
 using Your_Ride.ViewModels.College;
 using Your_Ride.ViewModels.Account;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using Your_Ride.Repository.ForgetPasswordRepo;
+using System.Net.Mail;
+using System.Net;
+using Twilio;
+using Twilio.Rest.Api.V2010.Account;
+using Your_Ride.Services.WalletServ;
+using Your_Ride.Services.BookServ;
+using Your_Ride.Services.UserTransactionLogServ;
+using Your_Ride.ViewModels.UserTransactionLogViewModel;
+using Your_Ride.ViewModels.BookViewModel;
+using Your_Ride.ViewModels.WalletViewModel;
+using AutoMapper;
 
 namespace Your_Ride.Controllers
 {
@@ -20,19 +33,66 @@ namespace Your_Ride.Controllers
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IUniversityService universityService;
         private readonly ICollegeService collegeService;
+        private readonly IConfiguration configuration;
+        private readonly IWalletService walletService;
+        private readonly IBookService bookService;
+        private readonly IUserTransactionLogService transactionLogService;
+        private readonly IMapper automapper;
 
         public AccountController(UserManager<ApplicationUser> userManager,
                                  RoleManager<IdentityRole> roleManager,
                                  SignInManager<ApplicationUser> signInManager,
-                                 IUniversityService universityService ,
-                                 ICollegeService collegeService)
+                                 IUniversityService universityService,
+                                 ICollegeService collegeService ,
+                                 IConfiguration configuration , 
+                                 IWalletService walletService ,
+                                 IBookService bookService ,
+                                 IUserTransactionLogService transactionLogService,
+                                 IMapper automapper )
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _signInManager = signInManager;
             this.universityService = universityService;
             this.collegeService = collegeService;
+            this.configuration = configuration;
+            this.walletService = walletService;
+            this.bookService = bookService;
+            this.transactionLogService = transactionLogService;
+            this.automapper = automapper;
         }
+
+
+        [HttpGet]
+        public async Task<IActionResult> Profile(string id)
+        {
+            // Get the user from the database
+            ApplicationUser user = await _userManager.FindByIdAsync(id);
+            if (user == null)
+                return RedirectToAction("Error", "Home");
+
+            // Retrieve user booking data
+            List<BookVM> bookVMs = await bookService.GetAllBooksOfUser(id);
+            Wallet wallet = await walletService.getWalletByUserID(id);
+
+            // Ensure Bookings is never null
+            if (bookVMs == null || bookVMs.Count == 0)
+                bookVMs = new List<BookVM>();  // Initialize if null or empty
+
+            // Map the BookVM list to Book entities
+            List<Book> books = automapper.Map<List<Book>>(bookVMs);
+            user.Bookings = books ?? new List<Book>();  // Safeguard to ensure Bookings is always a list
+
+            // Set Wallet (ensure it is not null)
+            user.Wallet = wallet ?? new Wallet();
+
+            return View("Profile" , user);
+        }
+
+
+
+
+
 
         // /Account/Register
         // GET: Register View
@@ -56,22 +116,49 @@ namespace Your_Ride.Controllers
             {
                 List<UniversityVM> universitiesVM = await universityService.GetAllUniversity();
 
-                AccountCollegeUniversityVM  AccountCollegeUniversityVM = new AccountCollegeUniversityVM
+                AccountCollegeUniversityVM AccountCollegeUniversityVM = new AccountCollegeUniversityVM
                 {
                     UniversitiesVM = universitiesVM.Select(u => new UniversityVM { Id = u.Id, Name = u.Name }).ToList(),
-                    RegisterVM= model.RegisterVM
+                    RegisterVM = model.RegisterVM
                 };
                 return View(AccountCollegeUniversityVM);
             }
+            var existingUser = await _userManager.FindByNameAsync(model.RegisterVM.UserName);
+            if (existingUser != null)
+            {
+                ModelState.AddModelError("RegisterVM.UserName", "This Username is already taken.");
 
+                var universitiesVM = await universityService.GetAllUniversity();
+                AccountCollegeUniversityVM CollegeUniversityVM = new AccountCollegeUniversityVM
+                {
+                    UniversitiesVM = universitiesVM.Select(u => new UniversityVM { Id = u.Id, Name = u.Name }).ToList(),
+                    RegisterVM = model.RegisterVM
+                };
+                return View(CollegeUniversityVM);
+            }
+            // Check if email already exists
+            var existingEmail = await _userManager.FindByEmailAsync(model.RegisterVM.Email);
+            if (existingEmail != null)
+            {
+                ModelState.AddModelError("RegisterVM.Email", "This Email is already in use.");
+
+                var universitiesVM = await universityService.GetAllUniversity();
+                AccountCollegeUniversityVM CollegeUniversityVM = new AccountCollegeUniversityVM
+                {
+                    UniversitiesVM = universitiesVM.Select(u => new UniversityVM { Id = u.Id, Name = u.Name }).ToList(),
+                    RegisterVM = model.RegisterVM
+                };
+                return View(CollegeUniversityVM);
+            }
             var user = new ApplicationUser
             {
                 UserName = model.RegisterVM.UserName,
                 FirstName = model.RegisterVM.FirstName,
                 LastName = model.RegisterVM.LastName,
                 Email = model.RegisterVM.Email,
-                MobileNumber = model.RegisterVM.MobileNumber,
+                PhoneNumber = model.RegisterVM.PhoneNumber,
                 NationalID = model.RegisterVM.NationalID,
+                FavoriteColor = model.RegisterVM.FavoriteColor ,
                 CollegeID = model.RegisterVM.CollegeID,
                 batch = model.RegisterVM.Batch,
                 Wallet = new Wallet { Amount = 0.0 }
@@ -81,6 +168,8 @@ namespace Your_Ride.Controllers
 
             if (result.Succeeded)
             {
+                TempData["SuccessMessage"] = "Registration successful! You can now log in.";
+
                 // Check if the Admin role exists, create if not
                 var adminRoleExists = await _roleManager.RoleExistsAsync("Admin");
                 if (!adminRoleExists)
@@ -144,7 +233,7 @@ namespace Your_Ride.Controllers
         // Login an existing user
         // /Account/Login
         public IActionResult Login()
-        
+
         {
             return View("Login");
         }
@@ -228,13 +317,13 @@ namespace Your_Ride.Controllers
                 {
                     UserId = user.Id,
                     Email = user.Email,
-                    UserName=user.UserName,
+                    UserName = user.UserName,
                     Roles = _userManager.GetRolesAsync(user).Result
                 }).ToList(),
                 Roles = roles
             };
 
-            return View("UserRoles",model);
+            return View("UserRoles", model);
         }
 
         // Assign a role to a user
@@ -302,7 +391,8 @@ namespace Your_Ride.Controllers
             {
                 var role = new IdentityRole(model.RoleName);
                 await _roleManager.CreateAsync(role);
-            }else
+            }
+            else
             {
                 return Content("Already Existed");
             }
@@ -364,7 +454,195 @@ namespace Your_Ride.Controllers
 
             return RedirectToAction(nameof(UserRoles));
         }
+        [HttpGet]
+        // Show Forgot Password View
+        public IActionResult ForgotPassword()
+        {
+            return View("ForgotPassword");
+        }
+        [HttpGet]
+        public async Task<IActionResult> GetUserMaskedDetails(string username)
+        {
+            if (string.IsNullOrEmpty(username))
+                return Json(new { success = false });
+
+            var user = await _userManager.FindByNameAsync(username);
+            if (user == null)
+                return Json(new { success = false });
+
+            // Masking Email
+            string maskedEmail = null;
+            if (!string.IsNullOrEmpty(user.Email))
+            {
+                int atIndex = user.Email.IndexOf('@');
+                if (atIndex > 4)
+                {
+                    maskedEmail = "****" + user.Email.Substring(atIndex - 4);
+                }
+                else
+                {
+                    maskedEmail = "****" + user.Email;
+                }
+            }
+
+            // Masking Phone
+            string maskedPhone = null;
+            if (!string.IsNullOrEmpty(user.PhoneNumber) && user.PhoneNumber.Length > 4)
+            {
+                maskedPhone = "****" + user.PhoneNumber[^4..];
+            }
+
+            return Json(new { success = true, maskedEmail, maskedPhone });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordVM model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var user = await _userManager.FindByNameAsync(model.UserName);
+            if (user == null || user.FavoriteColor.ToLower() != model.FavoriteColor.ToLower())
+            {
+                ModelState.AddModelError("", "Invalid username or favorite color.");
+                return View(model);
+            }
+
+            return RedirectToAction("ResetPassword", new { userId = user.Id });
+        }
 
 
+        #region Old Forget Password
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> ForgotPassword(ForgotPasswordVM model)
+        //{
+        //    // Remove errors related to MaskedEmail and MaskedPhone
+        //    ModelState.Remove(nameof(model.MaskedEmail));
+        //    ModelState.Remove(nameof(model.MaskedPhone));
+        //    ModelState.Remove(nameof(model.OTP));
+
+
+        //    if (!ModelState.IsValid) return View(model);
+
+        //    // Find User by Username
+        //    var user = await _userManager.FindByNameAsync(model.UserName);
+        //    if (user == null)
+        //    {
+        //        ModelState.AddModelError("", "User not found.");
+        //        return View(model);
+        //    }
+
+        //    // Generate OTP & Expiry
+        //    var otp = new Random().Next(100000, 999999).ToString();
+        //    user.OTPCode = otp;
+        //    user.OTPExpiry = DateTime.UtcNow.AddMinutes(5);
+        //    await _userManager.UpdateAsync(user);
+
+        //    // Masked Details
+        //    model.MaskedEmail = "****" + user.Email.Substring(4);
+        //    model.MaskedPhone = "+****" + user.PhoneNumber.Substring(user.PhoneNumber.Length - 4);
+
+        //    // Send OTP via Email or SMS
+        //    if (model.SelectedMethod == "Email")
+        //    {
+        //        SendEmail(user.Email, "Your OTP Code", $"Your OTP Code is: {otp}");
+        //    }
+        //    else
+        //    {
+        //        SendSMS(user.PhoneNumber, $"Your OTP Code is: {otp}");
+        //    }
+
+        //    // Redirect to Verify OTP Page
+        //    return RedirectToAction("VerifyOTP", new { userId = user.Id, method = model.SelectedMethod });
+        //} 
+        #endregion
+
+        // Verify OTP View
+        public IActionResult VerifyOTP(string userId, string method)
+        {
+            return View("VerifyOTP", new ResetPasswordVM { UserId = userId });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> VerifyOTP(ResetPasswordVM model)
+        {
+            var user = await _userManager.FindByIdAsync(model.UserId);
+            if (user == null || user.OTPCode != model.OTP || user.OTPExpiry < DateTime.UtcNow)
+            {
+                ModelState.AddModelError("", "Invalid or expired OTP.");
+                return View(model);
+            }
+
+            // OTP is correct → Redirect to Reset Password
+            return RedirectToAction("ResetPassword", new { userId = user.Id });
+        }
+
+        // Show Reset Password View
+        public IActionResult ResetPassword(string userId)
+        {
+            return View("ResetPassword", new ResetPasswordVM { UserId = userId });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ResetPassword(ResetPasswordVM model)
+        {
+
+            ModelState.Remove(nameof(model.OTP));
+            if (!ModelState.IsValid) return View(model);
+
+            var user = await _userManager.FindByIdAsync(model.UserId);
+            if (user == null)
+            {
+                ModelState.AddModelError("", "User not found.");
+                return View(model);
+            }
+
+            // Reset Password
+            var resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var result = await _userManager.ResetPasswordAsync(user, resetToken, model.NewPassword);
+
+            if (!result.Succeeded)
+            {
+                ModelState.AddModelError("", "Error resetting password.");
+                return View(model);
+            }
+
+            return RedirectToAction("Index", "Home");
+        }
+
+        // Send OTP via Email
+        private void SendEmail(string toEmail, string subject, string body)
+        {
+            var smtpClient = new SmtpClient("smtp.gmail.com")
+            {
+                Port = 587,
+                Credentials = new NetworkCredential("your-email@gmail.com", "your-app-password"),
+                EnableSsl = true,
+            };
+
+            smtpClient.Send("your-email@gmail.com", toEmail, subject, body);
+        }
+
+        // Send OTP via Twilio SMS
+        private void SendSMS(string phoneNumber, string message)
+        {
+            var accountSid = configuration["Twilio:AccountSid"];
+            var authToken = configuration["Twilio:AuthToken"];
+            var fromNumber = configuration["Twilio:FromNumber"];
+
+            TwilioClient.Init(accountSid, authToken);
+
+            MessageResource.Create(
+                body: message,
+                from: new Twilio.Types.PhoneNumber(fromNumber),
+                to: new Twilio.Types.PhoneNumber(phoneNumber)
+            );
+        }
     }
 }

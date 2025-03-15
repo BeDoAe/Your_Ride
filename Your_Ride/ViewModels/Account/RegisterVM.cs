@@ -14,11 +14,13 @@ namespace Your_Ride.ViewModels.Account
         public string UserName { get; set; }
 
         [Required(ErrorMessage = "Email is required")]
-        [EmailAddress(ErrorMessage = "Invalid email format")]
+        [RegularExpression("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$", ErrorMessage = "Invalid Email .")]
         public string Email { get; set; }
 
-        [Required(ErrorMessage = "Password is required")]
+        [Required(ErrorMessage = "Password is required.")]
         [DataType(DataType.Password)]
+        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$",
+             ErrorMessage = "Password must be at least 8 characters long and contain an uppercase letter, lowercase letter, number, and special character.")]
         public string Password { get; set; }
 
         [Required(ErrorMessage = "Confirm Password is required")]
@@ -27,11 +29,13 @@ namespace Your_Ride.ViewModels.Account
         public string ConfirmPassword { get; set; }
 
         [Required(ErrorMessage = "Mobile number is required")]
-        [Phone(ErrorMessage = "Invalid phone number")]
-        public string MobileNumber { get; set; }
+        [RegularExpression("^(010|011|012|015)\\d{8}$", ErrorMessage = "Invalid  mobile number. Must be 11 digits starting with 010, 011, 012, or 015.")]
+        public string PhoneNumber { get; set; } 
 
         [Required(ErrorMessage = "National ID is required")]
+        [RegularExpression("^(2|3)\\d{13}$", ErrorMessage = "Invalid  National ID. Must be 14 digits and start with 2 or 3.")]
         public string NationalID { get; set; }
+
 
         [Required(ErrorMessage = "University selection is required")]
         public int UniversityID { get; set; }
@@ -41,5 +45,8 @@ namespace Your_Ride.ViewModels.Account
 
         [Required(ErrorMessage = "Batch selection is required")]
         public string Batch { get; set; }
+
+        [Required(ErrorMessage = "Favorite Color is required")] 
+        public string FavoriteColor { get; set; }
     }
 }

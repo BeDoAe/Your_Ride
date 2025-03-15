@@ -7,7 +7,7 @@ namespace Your_Ride.Models
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string? Pic_URL { get; set; }
-        public string MobileNumber { get; set; } 
+        //public string MobileNumber { get; set; } 
         public string NationalID { get; set; }
 
         public bool IsDeleted { get; set; }=false;
@@ -25,10 +25,18 @@ namespace Your_Ride.Models
         public List<Book> Bookings { get; set; } = new List<Book>();
 
         // Many-to-Many with Notifications
+
         public List<UserNotification> UserNotifications { get; set; } = new List<UserNotification>();
 
         // One-to-Many with UserTransactionLog
         public List<UserTransactionLog> userTransactions { get; set; } = new List<UserTransactionLog>();
-        
+
+
+        // OTP Fields
+        public string? OTPCode { get; set; }
+        public DateTime? OTPExpiry { get; set; }
+
+        //  Add Favorite Color Field
+        public string? FavoriteColor { get; set; }
     }
 }

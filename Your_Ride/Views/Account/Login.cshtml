@@ -11,7 +11,10 @@
 
     <div class="mb-3">
         <label asp-for="Password" class="form-label">Password</label>
-        <input asp-for="Password" type="password" class="form-control" required />
+        <div class="input-group">
+            <input asp-for="Password" type="password" class="form-control" id="passwordField" required />
+            <button type="button" class="btn btn-secondary" onclick="togglePassword()">👁</button>
+        </div>
         <span asp-validation-for="Password" class="text-danger"></span>
     </div>
 
@@ -22,6 +25,18 @@
 
     <button type="submit" class="btn btn-primary">Login</button>
 </form>
+<a asp-action="ForgotPassword" class="btn btn-secondary">Forget Password</a>
+
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 }
+<script>
+    function togglePassword() {
+        var passwordField = document.getElementById("passwordField");
+        if (passwordField.type === "password") {
+            passwordField.type = "text";
+        } else {
+            passwordField.type = "password";
+        }
+    }
+</script>

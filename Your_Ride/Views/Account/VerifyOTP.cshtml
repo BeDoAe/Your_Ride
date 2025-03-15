@@ -1,0 +1,10 @@
+﻿@model Your_Ride.ViewModels.Account.ResetPasswordVM
+
+<h2>Verify OTP</h2>
+
+<form asp-action="VerifyOTP" method="post">
+    <input type="hidden" asp-for="UserId" />
+    <label>Enter OTP:</label>
+    <input asp-for="OTP" class="form-control" required />
+    <button type="submit" class="btn btn-success">Verify</button>
+</form>

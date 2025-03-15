@@ -58,13 +58,16 @@ namespace Your_Ride.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllAvailableTimesToBook()
         {
+            var user = await userManager.GetUserAsync(User);
+            if (user == null) return Unauthorized("No User Found , Please Login First");
+
             List<TimeVM> timeVMs = await timeService.GetAllAvailableTimes();
 
 
-            // ✅ Convert DateTime to DateOnly safely
+            //  DateTime to DateOnly safely
             DateOnly today = DateOnly.FromDateTime(DateTime.Now);
 
-            // ✅ Ensure we exclude already booked times
+            //  exclude already booked times
             timeVMs = timeVMs
                 .Where(t =>
                     t.Appointment != null &&
@@ -75,6 +78,9 @@ namespace Your_Ride.Controllers
         [HttpGet]
         public async Task<IActionResult> GetBookTimeByID(int id)
         {
+            var user = await userManager.GetUserAsync(User);
+            if (user == null) return Unauthorized("No User Found , Please Login First");
+
             TimeVM timeVM = await timeService.GetTimeByID(id);
             if (timeVM == null) return NotFound("No Time Found !!");
 
@@ -141,6 +147,8 @@ namespace Your_Ride.Controllers
         [HttpGet]
         public async Task<IActionResult> EditBook(int id, int UserTransactionLogID)
         {
+         
+
             BookVM bookVM = await bookService.GetBookByID(id);
             if (bookVM == null) return NotFound("Book isn't Found");
 
@@ -177,6 +185,9 @@ namespace Your_Ride.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditBook(BookVM bookVM, int NewTimeId, int UserTransactionLogID)
         {
+            var user = await userManager.GetUserAsync(User);
+            if (user == null) return Unauthorized("No User Found , Please Login First");
+
             if (ModelState.IsValid)
             {
                 TimeVM NewtimeVM = await timeService.GetTimeByID(NewTimeId);
@@ -185,7 +196,7 @@ namespace Your_Ride.Controllers
                 BookVM bookVMFromDB = await bookService.EditBook(bookVM, NewtimeVM, UserTransactionLogID);
                 if (bookVMFromDB == null) return RedirectToAction("EditBook", bookVM);
 
-                return RedirectToAction("GetAllBooks");
+                return RedirectToAction("GetAllBooksOfUser", new {id= user.Id});
             }
             else
             {
@@ -197,6 +208,9 @@ namespace Your_Ride.Controllers
         [HttpGet]
         public async Task<IActionResult> DeleteBook(int id)
         {
+            var user = await userManager.GetUserAsync(User);
+            if (user == null) return Unauthorized("No User Found , Please Login First");
+
             BookVM bookVM = await bookService.GetBookByID(id);
             if (bookVM == null) return NotFound("Book isn't Found");
 
@@ -207,6 +221,9 @@ namespace Your_Ride.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ConfirmDelete(int id)
         {
+            var user = await userManager.GetUserAsync(User);
+            if (user == null) return Unauthorized("No User Found , Please Login First");
+
             if (ModelState.IsValid)
             {
                 int result = await bookService.DeleteBook(id);
@@ -220,7 +237,7 @@ namespace Your_Ride.Controllers
                 }
                 else
                 {
-                    return RedirectToAction("GetAllBooks");
+                    return RedirectToAction("GetAllBooksOfUser", new { id = user.Id });
                 }
             }
             return RedirectToAction("EditBook", new { id = id });

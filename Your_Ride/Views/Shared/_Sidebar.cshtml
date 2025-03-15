@@ -1,0 +1,40 @@
+﻿<div class="dashboard-wrapper">
+    <div class="dashboard-nav sticky-sidebar">
+        <header>
+            <!-- New Hamburger Toggle Button -->
+            <label class="hamburger">
+                <input type="checkbox" id="sidebarToggle">
+                <svg viewBox="0 0 32 32">
+                    <path class="line line-top-bottom" d="M27 10 13 10C10.8 10 9 6 9 6 9 3.5 10.8 2 13 2 15.2 2 17 3.8 17 6L17 26C17 28.2 18.8 30 21 30 23.2 30 25 28.2 25 26 25 23.8 23.2 22 21 22L7 22"></path>
+                    <path class="line" d="M7 16 27 16"></path>
+                </svg>
+            </label>
+
+            <a asp-controller="Home" asp-action="Index" class="brand-logo"><i class="fas fa-anchor"></i> <span>Admin Panel</span></a>
+        </header>
+
+        <nav class="dashboard-nav-list">
+            <a asp-controller="Home" asp-action="Index" class="dashboard-nav-item"><i class="fas fa-home"></i> Home</a>
+            <div class="dashboard-nav-dropdown">
+                <a href="#!" class="dashboard-nav-item dashboard-nav-dropdown-toggle"><i class="fas fa-users"></i> Users</a>
+                <div class='dashboard-nav-dropdown-menu'>
+                    <a asp-controller="Account" asp-action="UserRoles" class="dashboard-nav-dropdown-item">Roles</a>
+                </div>
+            </div>
+            <div class="dashboard-nav-dropdown">
+                <a href="#!" class="dashboard-nav-item dashboard-nav-dropdown-toggle"><i class="fas fa-calendar-alt"></i> Bookings</a>
+                <div class='dashboard-nav-dropdown-menu'>
+                    <a asp-controller="Appointment" asp-action="GetAllAppointments" class="dashboard-nav-dropdown-item">Appointments</a>
+                    <a asp-controller="Book" asp-action="GetAllBooks" class="dashboard-nav-dropdown-item">Books</a>
+                </div>
+            </div>
+            <a asp-controller="Wallet" asp-action="GetAllWallets" class="dashboard-nav-item"><i class="fas fa-wallet"></i> Wallet</a>
+            <a asp-controller="Transaction" asp-action="GetAllTransactions" class="dashboard-nav-item"><i class="fas fa-exchange-alt"></i> Transactions</a>
+            <div class="nav-item-divider"></div>
+            <a asp-controller="Account" asp-action="Logout" class="dashboard-nav-item"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </nav>
+    </div>
+    <div class="main-content">
+        <!-- Your main content goes here -->
+    </div>
+</div>

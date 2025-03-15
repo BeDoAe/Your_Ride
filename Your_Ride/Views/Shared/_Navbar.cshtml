@@ -1,0 +1,94 @@
+﻿@* @using System.Security.Claims
+
+<!-- Navbar Start -->
+<nav class="navbar navbar-expand-lg bg-white navbar-light shadow border-top border-5 border-primary sticky-top p-0">
+    <a asp-controller="Home" asp-action="Index" class="navbar-brand bg-primary d-flex align-items-center px-4 px-lg-5">
+        <h2 class="mb-2 text-white">Your Ride</h2>
+    </a>
+    <button type="button" class="navbar-toggler me-4" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+        <div class="navbar-nav ms-auto p-4 p-lg-0">
+            <a asp-controller="Home" asp-action="Index" class="nav-item nav-link active">Home</a>
+            <a asp-controller="Home" asp-action="Privacy" class="nav-item nav-link">Privacy</a>
+
+            @if (User.Identity.IsAuthenticated)
+            {
+                <a class="nav-item nav-link">Welcome @User.Identity.Name</a>
+                <a asp-controller="Book" asp-action="GetAllAvailableTimesToBook" class="nav-item nav-link">Available Times To Book</a>
+                <a asp-controller="UserTransactionLog" asp-action="GetAllUserTransactioLogsByUserId" asp-route-id="@User.FindFirstValue(ClaimTypes.NameIdentifier)" class="nav-item nav-link">
+                    My Transactions
+                </a>
+
+                <a asp-controller="Account" asp-action="Logout" class="nav-item nav-link">Logout</a>
+
+                @if (User.IsInRole("Admin"))
+                {
+                    <a asp-controller="Account" asp-action="UserRoles" class="nav-item nav-link">Roles</a>
+                    <a asp-controller="Appointment" asp-action="GetAllAppointments" class="nav-item nav-link">Appointments</a>
+                    <a asp-controller="Book" asp-action="GetAllBooks" class="nav-item nav-link">Books</a>
+                    <a asp-controller="Bus" asp-action="GetAllBuses" class="nav-item nav-link">Bus</a>
+                    <a asp-controller="College" asp-action="GetAllCollege" class="nav-item nav-link">College</a>
+                    <a asp-controller="University" asp-action="GetAllUniversity" class="nav-item nav-link">University</a>
+                    <a asp-controller="Time" asp-action="GetAllTimes" class="nav-item nav-link">Time</a>
+                    <a asp-controller="Wallet" asp-action="GetAllWallets" class="nav-item nav-link">Wallet</a>
+                    <a asp-controller="Transaction" asp-action="GetAllTransactions" class="nav-item nav-link">Transaction</a>
+                }
+            }
+            else
+            {
+                <a asp-controller="Account" asp-action="Register" class="nav-item nav-link">Register</a>
+                <a asp-controller="Account" asp-action="Login" class="nav-item nav-link">Login</a>
+            }
+        </div>
+    </div>
+</nav>
+<!-- Navbar End -->
+ *@
+
+
+
+
+<!-- Navbar Start -->
+@using System.Security.Claims
+
+<nav class="navbar navbar-expand-lg bg-white navbar-light shadow border-top border-5 border-primary sticky-top p-0">
+    <a asp-controller="Home" asp-action="Index" class="navbar-brand bg-primary d-flex align-items-center px-4 px-lg-5">
+        <h2 class="mb-2 text-white">Your Ride</h2>
+    </a>
+    <button type="button" class="navbar-toggler me-4" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+        <div class="navbar-nav ms-auto p-4 p-lg-0">
+            <a asp-controller="Home" asp-action="Index" class="nav-item nav-link">Home</a>
+
+            @if (User.Identity.IsAuthenticated)
+            {
+                <div class="nav-item dropdown">
+                    <a href="#" class="nav-link dropdown-toggle">My Services <span class="custom-arrow"></span></a>
+                    <ul class="dropdown-menu fade-up m-0">
+                        <li><a asp-controller="Book" asp-action="GetAllAvailableTimesToBook" class="dropdown-item">Available Times To Book</a></li>
+                        <li><a asp-controller="UserTransactionLog" asp-action="GetAllUserTransactioLogsByUserId" asp-route-id="@User.FindFirstValue(ClaimTypes.NameIdentifier)" class="dropdown-item">My Transactions</a></li>
+                        <li><a asp-controller="Account" asp-action="Profile" asp-route-id="@User.FindFirstValue(ClaimTypes.NameIdentifier)" class="dropdown-item">Profile</a></li>
+@*                         <li><a asp-controller="Account" asp-action="Logout" class="dropdown-item">Logout</a></li>
+ *@
+                    </ul>
+                </div>
+            }
+            else
+            {
+                <a asp-controller="Account" asp-action="Register" class="nav-item nav-link">Register</a>
+                <a asp-controller="Account" asp-action="Login" class="nav-item nav-link">Login</a>
+            }
+            <a asp-controller="Home" asp-action="Privacy" class="nav-item nav-link">Privacy</a>
+            <a asp-controller="Home" asp-action="ContactUs" class="nav-item nav-link">Contact Us</a>
+            <a asp-controller="Home" asp-action="Team" class="nav-item nav-link">Team</a>
+            <a asp-controller="Account" asp-action="Logout" class="nav-item nav-link">Logout</a>
+
+
+        </div>
+    </div>
+</nav>
+<!-- Navbar Ends -->

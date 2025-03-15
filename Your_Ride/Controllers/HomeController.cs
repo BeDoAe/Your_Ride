@@ -15,7 +15,7 @@ namespace Your_Ride.Controllers
 
         public IActionResult Index()
         {
-            return View();
+            return View("Index");
         }
 
         public IActionResult Privacy()
@@ -24,9 +24,16 @@ namespace Your_Ride.Controllers
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
+        public IActionResult Error(int? statusCode = null)
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            if (statusCode == 404)
+            {
+                return View("NotFound"); 
+            }
+
+            return View("NotFound"); // Default error page
         }
+
+
     }
 }

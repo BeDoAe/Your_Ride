@@ -1,0 +1,427 @@
+﻿@* @model ApplicationUser
+
+<div class="container d-flex justify-content-center">
+    <div class="card">
+        <!-- User Profile Picture -->
+        <div class="image" style="background-image: url('@Model.Pic_URL ?? " /img/default-profile.png"');"></div>
+
+        <div class="card-info">
+            <!-- User Name -->
+            <span>@Model.FirstName @Model.LastName</span>
+            <p>@Model.UserName</p>
+
+            <!-- Wallet Amount -->
+            <p>Wallet Balance: $@Model.Wallet.Amount</p>
+
+            <!-- Last 3 Bookings -->
+            <h5>Last 3 Bookings:</h5>
+            @if (Model.Bookings == null || !Model.Bookings.Any())
+            {
+                <p>No Booking Committed Yet</p>
+            }
+            else
+            {
+                <ul>
+                    @foreach (var booking in Model.Bookings.Take(3))
+                    {
+                        <li>
+                            <p>Booking ID: @booking.Id - Seat: @booking.SeatId - Time: @booking.Time?.TimeOnly</p>
+                        </li>
+                    }
+                </ul>
+            }
+        </div>
+
+        <a href="@Url.Action("Edit", "Profile", new { id = Model.Id })" class="button">Edit Profile</a>
+    </div>
+</div>
+
+
+<style>
+    .card {
+        width: 350px;
+        height: auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        gap: 10px;
+        background-color: #fffffe;
+        border-radius: 15px;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .card::before {
+            content: "";
+            width: 350px;
+            height: 100px;
+            position: absolute;
+            top: 0;
+            border-top-left-radius: 15px;
+            border-top-right-radius: 15px;
+            border-bottom: 3px solid #fefefe;
+            background: linear-gradient(40deg, rgba(131,58,180,1) 0%, rgba(253,29,29,1) 50%, rgba(252,176,69,1) 100%);
+            transition: all 0.5s ease;
+        }
+
+    .image {
+        width: 90px;
+        height: 90px;
+        background-color: #1468BF;
+        border-radius: 50%;
+        border: 4px solid #fefefe;
+        margin-top: 30px;
+        background-size: cover;
+        background-position: center;
+        transition: all 0.5s ease;
+    }
+
+    .card-info {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+        transition: all 0.5s ease;
+    }
+
+        .card-info span {
+            font-weight: 600;
+            font-size: 24px;
+            color: #161A42;
+            margin-top: 15px;
+            line-height: 5px;
+        }
+
+        .card-info p {
+            color: rgba(0, 0, 0, 0.5);
+        }
+
+    .button {
+        text-decoration: none;
+        background-color: #1468BF;
+        color: white;
+        padding: 5px 20px;
+        border-radius: 5px;
+        border: 1px solid white;
+        transition: all 0.5s ease;
+    }
+
+    .card:hover::before {
+        width: 350px;
+        height: 300px;
+        border-bottom: none;
+        border-bottom-left-radius: 15px;
+        border-bottom-right-radius: 15px;
+        transform: scale(0.95);
+    }
+
+    .card:hover .card-info {
+        transform: translate(0%,-25%);
+    }
+
+    .card:hover .image {
+        transform: scale(2) translate(-60%,-40%);
+    }
+
+    .button:hover {
+        background-color: #FF6844;
+        transform: scale(1.1);
+    }
+</style>
+ *@
+
+
+@model Your_Ride.Models.ApplicationUser
+
+<!-- From Uiverse.io by ZeroKaarma -->
+<div class="container d-flex justify-content-center">
+    <!-- Bootstrap Row to hold the grid of 3 divs -->
+    <div class="row justify-content-center">
+        <!-- Left Empty Column -->
+        <div class="col-md-4"></div>
+
+        <div class="main">
+            <!-- Contact Card -->
+            <div id="c2" class="card">
+                <div class="card-info">
+                    <div class="contact-title">Contact</div>
+                    <div class="card-contact">
+                        <ul>
+                            <!-- Phone -->
+                            <li class="icon-contact">
+                                <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M280 0C408.1 0 512 103.9 512 232c0 13.3-10.7 24-24 24s-24-10.7-24-24c0-101.6-82.4-184-184-184c-13.3 0-24-10.7-24-24s10.7-24 24-24zm8 192a32 32 0 1 1 0 64 32 32 0 1 1 0-64zm-32-72c0-13.3 10.7-24 24-24c75.1 0 136 60.9 136 136c0 13.3-10.7 24-24 24s-24-10.7-24-24c0-48.6-39.4-88-88-88c-13.3 0-24-10.7-24-24zM117.5 1.4c19.4-5.3 39.7 4.6 47.4 23.2l40 96c6.8 16.3 2.1 35.2-11.6 46.3L144 207.3c33.3 70.4 90.3 127.4 160.7 160.7L345 318.7c11.2-13.7 30-18.4 46.3-11.6l96 40c18.6 7.7 28.5 28 23.2 47.4l-24 88C481.8 499.9 466 512 448 512C200.6 512 0 311.4 0 64C0 46 12.1 30.2 29.5 25.4l88-24z"></path>
+                                </svg>
+                                Tel: (+00) 000 99999-0000
+                            </li>
+                            <!-- Email -->
+                            <li class="icon-contact">
+                                <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M48 64C21.5 64 0 85.5 0 112c0 15.1 7.1 29.3 19.2 38.4L236.8 313.6c11.4 8.5 27 8.5 38.4 0L492.8 150.4c12.1-9.1 19.2-23.3 19.2-38.4c0-26.5-21.5-48-48-48H48zM0 176V384c0 35.3 28.7 64 64 64H448c35.3 0 64-28.7 64-64V176L294.4 339.2c-22.8 17.1-54 17.1-76.8 0L0 176z"></path>
+                                </svg>
+                                Email: contact@mail.com
+                            </li>
+                            <!-- National ID -->
+                            <li class="icon-contact">
+                                <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M128 32h256c35.3 0 64 28.7 64 64v320c0 35.3-28.7 64-64 64H128c-35.3 0-64-28.7-64-64V96c0-35.3 28.7-64 64-64zm256 32H128c-17.7 0-32 14.3-32 32v320c0 17.7 14.3 32 32 32h256c17.7 0 32-14.3 32-32V64c0-17.7-14.3-32-32-32z"></path>
+                                </svg>
+                                National ID: XXXXXXXXXXXXX
+                            </li>
+                            <!-- Wallet Amount -->
+                            <li class="icon-contact">
+                                <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M496 0H16C7.2 0 0 7.2 0 16v432c0 8.8 7.2 16 16 16h480c8.8 0 16-7.2 16-16V16c0-8.8-7.2-16-16-16zm-16 432H32V48h448v384z"></path>
+                                </svg>
+                                Wallet: $1000.00
+                            </li>
+                            <!-- Last 3 Bookings -->
+                            <li class="icon-contact">
+                                <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M152 0H360C400 0 440 40 440 80V432C440 472 400 512 360 512H152C112 512 72 472 72 432V80C72 40 112 0 152 0zM160 32C155.7 32 152 35.7 152 40V472C152 476.3 155.7 480 160 480H352C356.3 480 360 476.3 360 472V40C360 35.7 356.3 32 352 32H160z"></path>
+                                </svg>
+                                Last Booking: 2025-03-10 14:00 | Fee: $50.00
+                            </li>
+                            <li class="icon-contact">
+                                Last Booking: 2025-03-08 16:30 | Fee: $45.00
+                            </li>
+                            <li class="icon-contact">
+                                Last Booking: 2025-03-06 09:00 | Fee: $40.00
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Address Card -->
+            <div id="c3" class="card">
+                <div class="card-info">
+                    <ul>
+                        <!-- College Name -->
+                        <li class="address-icon">
+                            <svg viewBox="0 0 576 512" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M575.8 255.5c0 18-15 32.1-32 32.1h-32l.7 160.2c0 2.7-.2 5.4-.5 8.1V472c0 22.1-17.9 40-40 40H456c-1.1 0-2.2 0-3.3-.1c-1.4 .1-2.8 .1-4.2 .1H416 392c-22.1 0-40-17.9-40-40V448 384c0-17.7-14.3-32-32-32H256c-17.7 0-32 14.3-32 32v64 24c0 22.1-17.9 40-40 40H160 128.1c-1.5 0-3-.1-4.5-.2c-1.2 .1-2.4 .2-3.6 .2H104c-22.1 0-40-17.9-40-40V360c0-.9 0-1.9 .1-2.8V287.6H32c-18 0-32-14-32-32.1c0-9 3-17 10-24L266.4 8c7-7 15-8 22-8s15 2 21 7L564.8 231.5c8 7 12 15 11 24z"></path>
+                            </svg>
+                        </li>
+                        <li class="address-title">College:</li>
+                        <li class="address">ABC College</li>
+                        <!-- University Name -->
+                        <li class="address-title">University:</li>
+                        <li class="address">XYZ University</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Profile Card -->
+            <div id="c1" class="card">
+                <div class="card-info">
+                    <div class="profile-title">Profile</div>
+                    <div class="profile-content">
+                        <ul>
+                            <li>
+                                <span class="profile-label">Name:</span>
+                                <span class="profile-text">@Model.FirstName @Model.LastName</span>
+                            </li>
+                            <li>
+                                <span class="profile-label">Date of Birth:</span>
+                                <span class="profile-text">1990-03-15</span>
+                            </li>
+                            <li>
+                                <span class="profile-label">Gender:</span>
+                                <span class="profile-text">Male</span>
+                            </li>
+                            <li>
+                                <span class="profile-label">Nationality:</span>
+                                <span class="profile-text">American</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Empty Column -->
+        <div class="col-md-4"></div>
+    </div>
+</div>
+
+
+
+
+<style>
+    /* From Uiverse.io by ZeroKaarma */
+    .main {
+        justify-content: center;
+/*         display: grid;
+ */        place-items: center;
+        width: 190px;
+        height: 300px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 50vh;
+        flex-wrap: wrap;
+    }
+
+    .card {
+        width: 190px;
+        height: 300px;
+        background: #FAF1F6;
+        padding: 2rem 1.5rem;
+        transition: box-shadow .3s ease, transform .2s ease;
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+    }
+
+    .card-info {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .card-avatar {
+        background: radial-gradient(#A8A6B6,#B3B1BF,#BDBBC7,#C5C4CE,#E2E2E7);
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        transition: transform .2s ease;
+    }
+
+        .card-avatar svg {
+            padding-top: 5px;
+            height: 80px;
+            width: 100px;
+            fill: #515F65;
+           
+        }
+
+    .card-social {
+        display: flex;
+        justify-content: space-around;
+        width: 190px;
+        margin-top: 10%;
+        text-align: center;
+    }
+
+    .card-social-icon {
+        list-style: none;
+        color: #515F65;
+        font-size: 0.5em;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-right: 50px;
+    }
+
+        .card-social-icon svg {
+            display: block;
+            height: 20px;
+            width: 20px;
+            fill: #515F65;
+            cursor: pointer;
+        }
+
+    .card-title {
+        color: #1b1b1b;
+        font-size: 1.5em;
+        font-weight: 600;
+        line-height: 2rem;
+        margin-top: 5px;
+    }
+
+    .card-subtitle {
+        color: #7e93a0;
+        font-size: 1.0em;
+    }
+
+    .address-icon {
+        fill: #515F65;
+        height: 150px;
+        width: 100px;
+        list-style: none;
+        justify-content:space-evenly;
+        margin-right:26px;
+    }
+
+    .address-title {
+        color: #333;
+        font-size: 1.0em;
+        font-weight: 600;
+        list-style: none;
+    }
+
+    .address {
+        color: #859ba8;
+        font-size: 0.8em;
+        list-style: none;
+        padding-left: 20px;
+        
+    }
+
+    .contact-title {
+        color: #333;
+        font-size: 1.5em;
+        font-weight: 600;
+        margin-top: 45%;
+        padding-bottom: 5px;
+    }
+
+    .card-contact {
+        color: #859ba8;
+        font-size: 0.8em;
+    }
+
+    .icon-contact {
+        list-style: none;
+        display: flex;
+        align-items: center;
+    }
+
+        .icon-contact svg {
+            display: block;
+            height: 18px;
+            width: 18px;
+            fill: #515F65;
+            padding-right: 5px;
+        }
+
+    .card:hover {
+        box-shadow: 0 10px 50px #23232333;
+    }
+
+        .card:hover .card-info {
+            transform: translateY(-5%);
+        }
+
+    .card-avatar:hover {
+        transform: scale(1.1);
+    }
+
+    #cs1:hover {
+        transform: scale(2.0);
+    }
+
+    #cs2:hover {
+        transform: scale(2.0);
+    }
+
+    #cs3:hover {
+        transform: scale(2.0);
+    }
+
+    .main:hover #c1 {
+        transform: translateX(0px);
+    }
+
+    .main:hover #c2 {
+        transform: translateX(200px);
+    }
+
+    .main:hover #c3 {
+        transform: translateX(-200px);
+    }
+</style>

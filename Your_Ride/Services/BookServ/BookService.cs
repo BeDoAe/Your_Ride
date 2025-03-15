@@ -50,7 +50,8 @@ namespace Your_Ride.Services.BookServ
             if (applicationUser == null) return null;
 
             List<Book> books = await bookRepository.GetAllBooksOfUser(id);
-
+            if (books == null || books.Count == 0)
+                return null;
             List<BookVM> bookVMs = automapper.Map<List<BookVM>>(books);
 
             return bookVMs;
