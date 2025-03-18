@@ -85,5 +85,12 @@ namespace Your_Ride.Repository.BusRepo
 
             return bus;
         }
+
+        public async Task<List<Seat>> GetAllSeatsByBus(int id)
+        {
+            List<Seat> seats = await context.Seats.Where(b => b.BusId == id).ToListAsync();
+            return seats;
+        }
+
     }
 }

@@ -1,0 +1,83 @@
+﻿@model  Your_Ride.ViewModels.Account.ChangeFavoriteColorViewModel
+@{
+    ViewData["Title"] = "Change Favorite Color";
+}
+
+<h2>Change Favorite Color</h2>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+
+<form asp-action="ChangeFavoriteColor" method="post" id="changeColorForm">
+    <div class="mb-3">
+        <label asp-for="OldColor" class="form-label">Old Color</label>
+        <input asp-for="OldColor" class="form-control" id="oldColorInput" />
+        <span asp-validation-for="OldColor" class="text-danger"></span>
+        <div id="oldColorError" class="text-danger"></div>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="NewColor" class="form-label">New Color</label>
+        <input asp-for="NewColor" class="form-control" />
+        <span asp-validation-for="NewColor" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Change Color</button>
+@*     <a asp-action="Profile" class="btn btn-secondary">Back to Profile</a>
+ *@</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $("#oldColorInput").on("keyup", function () {
+                var oldColor = $(this).val();
+
+                // Check if the old color is empty
+                if (oldColor.trim() === "") {
+                    $("#oldColorError").text("Old color is required.");
+                    return;
+                }
+
+                // Prepare the model to send to the server
+                var model = {
+                    OldColor: oldColor,  // Send the OldColor value from the input field
+                    NewColor: ""         // Set an empty value for NewColor, since it's not being used
+                };
+
+                // Send the model as part of a JSON object in the request body
+                $.ajax({
+                    url: '@Url.Action("CheckOldColor", "Account")',  // Ensure the controller and action are correct
+                    type: 'POST',
+                    data: JSON.stringify(model),  // Send the model as JSON
+                    contentType: "application/json",  // Set the content type to JSON
+                    headers: {
+                        'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val() // Include CSRF token
+                    },
+                    success: function (response) {
+                        if (!response.success) {
+                            $("#oldColorError").text("Old color is incorrect.");
+                        } else {
+                            $("#oldColorError").text("");  // Clear the error message if the old color is correct
+                        }
+                    },
+                    error: function () {
+                        $("#oldColorError").text("An error occurred while verifying the color.");
+                    }
+                });
+            });
+
+            // Prevent form submission if there's an error
+            $("#changeColorForm").on("submit", function (e) {
+                if ($("#oldColorError").text() !== "") {
+                    e.preventDefault();  // Prevent form submission if there's an error with old color
+                }
+            });
+        });
+
+    </script>
+}

@@ -1,4 +1,5 @@
-﻿using Your_Ride.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using Your_Ride.Models;
 using Your_Ride.Repository.Generic;
 
 namespace Your_Ride.Repository.UniversityRepo
@@ -32,6 +33,19 @@ namespace Your_Ride.Repository.UniversityRepo
         public University AssignUniversity(int  universityId)
         {
             return null;
+        }
+        public async Task<bool> CheckUniversityExisted(string name)
+        {
+            University UniversityFromDB = await context.Universities.FirstOrDefaultAsync(c => c.Name.ToLower() == name.ToLower() );
+            if (UniversityFromDB == null)
+            {
+                return false;
+            }
+
+            else
+            {
+                return true;
+            }
         }
     }
 }

@@ -11,6 +11,7 @@ using Your_Ride.Models.Your_Ride.Models;
 using Your_Ride.ViewModels.AppointmentviewModel;
 using Your_Ride.ViewModels.TimeViewModel;
 using Your_Ride.ViewModels.UserTransactionLogViewModel;
+using Your_Ride.ViewModels.Account;
 
 namespace Your_Ride.Helper
 {
@@ -80,6 +81,8 @@ namespace Your_Ride.Helper
                 .ReverseMap();
 
             CreateMap<UserTransactionLog, UserTransactionLogVM>().ReverseMap();
+
+            CreateMap<ApplicationUser, EditProfileViewModel>().ReverseMap();
 
             // Use the corrected value converter
             //CreateMap<AddProductVM, Product>()

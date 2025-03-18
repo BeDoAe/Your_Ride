@@ -4,31 +4,91 @@
     ViewData["Title"] = "Create College";
 }
 
-<h2>Create College</h2>
+<!-- Page Title -->
+<div class="text-center mb-4">
+    <h2 class="text-primary">
+        <i class="fas fa-university"></i> Create College
+    </h2>
+</div>
 
-<form asp-action="Create" method="post">
-    <div class="form-group">
-        <label asp-for="CreateCollege.Name"></label>
-        <input asp-for="CreateCollege.Name" class="form-control" />
-        <span asp-validation-for="CreateCollege.Name" class="text-danger"></span>
+<!-- Centered Form -->
+<div class="d-flex justify-content-center">
+    <div class="card shadow-lg p-4" style="width: 40rem;">
+        <form asp-action="Create" method="post">
+            <!-- College Name -->
+            <div class="form-group mb-3">
+                <label class="fw-bold"><i class="fas fa-building"></i> College Name</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-pencil-alt"></i></span>
+                    <input asp-for="CreateCollege.Name" class="form-control" placeholder="Enter college name" />
+                </div>
+                <span asp-validation-for="CreateCollege.Name" class="text-danger"></span>
+            </div>
+
+            <!-- University Selection -->
+            <div class="form-group mb-3">
+                <label class="fw-bold"><i class="fas fa-graduation-cap"></i> Select University</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-university"></i></span>
+                    <select asp-for="CreateCollege.UniversityID" class="form-control">
+                        <option value="">-- Select University --</option>
+                        @foreach (var university in Model.Universities)
+                        {
+                            <option value="@university.Id">@university.Name</option>
+                        }
+                    </select>
+                </div>
+                <span asp-validation-for="CreateCollege.UniversityID" class="text-danger"></span>
+            </div>
+
+            <!-- Batches Section -->
+            <div class="form-group mb-3">
+                <label class="fw-bold"><i class="fas fa-users"></i> Batches</label>
+                <div id="batch-container">
+                    <!-- Dynamic batch inputs will be added here -->
+                </div>
+                <button type="button" id="addBatchBtn" class="btn btn-outline-primary mt-2">
+                    <i class="fas fa-plus"></i> Add Batch
+                </button>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="d-flex justify-content-end gap-2">
+                <button type="submit" class="btn btn-success">
+                    <i class="fas fa-save"></i> Create
+                </button>
+                <a asp-action="GetAllCollege" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Cancel
+                </a>
+            </div>
+        </form>
     </div>
-
-    <div class="form-group">
-        <label asp-for="CreateCollege.UniversityID">University</label>
-        <select asp-for="CreateCollege.UniversityID" class="form-control">
-            <option value="">-- Select University --</option>
-            @foreach (var university in Model.Universities)
-            {
-                <option value="@university.Id">@university.Name</option>
-            }
-        </select>
-        <span asp-validation-for="CreateCollege.UniversityID" class="text-danger"></span>
-    </div>
-
-    <button type="submit" class="btn btn-primary">Create</button>
-    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
-</form>
+</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        $(document).ready(function () {
+            $("#addBatchBtn").click(function () {
+                var inputHtml = `<div class="input-group mb-2 animate__animated animate__fadeIn">
+                                    <span class="input-group-text"><i class="fas fa-list"></i></span>
+                                    <input type="text" name="CreateCollege.Batches[]" class="form-control batch-input" placeholder="Enter batch name">
+                                    <button type="button" class="btn btn-danger removeBatchBtn">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                 </div>`;
+                $("#batch-container").append(inputHtml);
+            });
+
+            $(document).on("click", ".removeBatchBtn", function () {
+                $(this).closest(".input-group").addClass("animate__animated animate__fadeOut");
+                setTimeout(() => {
+                    $(this).closest(".input-group").remove();
+                }, 500);
+            });
+        });
+    </script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
 }

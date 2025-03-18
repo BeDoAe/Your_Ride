@@ -1,4 +1,6 @@
-﻿<div class="dashboard-wrapper">
+﻿@using System.Security.Claims
+
+<div class="dashboard-wrapper">
     <div class="dashboard-nav sticky-sidebar">
         <header>
             <!-- New Hamburger Toggle Button -->
@@ -25,13 +27,37 @@
                 <a href="#!" class="dashboard-nav-item dashboard-nav-dropdown-toggle"><i class="fas fa-calendar-alt"></i> Bookings</a>
                 <div class='dashboard-nav-dropdown-menu'>
                     <a asp-controller="Appointment" asp-action="GetAllAppointments" class="dashboard-nav-dropdown-item">Appointments</a>
+                    <a asp-controller="Time" asp-action="GetAllTimes" class="dashboard-nav-dropdown-item">Times</a>
                     <a asp-controller="Book" asp-action="GetAllBooks" class="dashboard-nav-dropdown-item">Books</a>
+                    <a asp-controller="Bus" asp-action="GetAllBuses" class="dashboard-nav-dropdown-item">Bus</a>
                 </div>
             </div>
+
+            <div class="dashboard-nav-dropdown">
+                <a href="#!" class="dashboard-nav-item dashboard-nav-dropdown-toggle"><i class="fas fa-calendar-alt"></i> Education </a>
+                <div class='dashboard-nav-dropdown-menu'>
+                    <a asp-controller="University" asp-action="GetAllUniversity" class="dashboard-nav-item"><i class="fas fa-wallet"></i> University</a>
+                    <a asp-controller="College" asp-action="GetAllCollege" class="dashboard-nav-item"><i class="fas fa-exchange-alt"></i>College</a>
+                </div>
+            </div>
+
+
+            <div class="dashboard-nav-dropdown">
+                <a href="#!" class="dashboard-nav-item dashboard-nav-dropdown-toggle"><i class="fas fa-calendar-alt"></i> Money </a>
+                <div class='dashboard-nav-dropdown-menu'>
             <a asp-controller="Wallet" asp-action="GetAllWallets" class="dashboard-nav-item"><i class="fas fa-wallet"></i> Wallet</a>
-            <a asp-controller="Transaction" asp-action="GetAllTransactions" class="dashboard-nav-item"><i class="fas fa-exchange-alt"></i> Transactions</a>
-            <div class="nav-item-divider"></div>
-            <a asp-controller="Account" asp-action="Logout" class="dashboard-nav-item"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            <a asp-controller="Transaction" asp-action="GetAllTransactions" class="dashboard-nav-item"><i class="fas fa-exchange-alt"></i>Admin Transactions</a>
+            <a asp-controller="UserTransactionLog" asp-action="GetAllUserTransactionsLogs" class="dashboard-nav-item"><i class="fas fa-exchange-alt"></i>User Transactions Logs</a>
+                </div>
+            </div>
+
+            <div class="dashboard-nav-dropdown">
+                <a href="#!" class="dashboard-nav-item dashboard-nav-dropdown-toggle"><i class="fas fa-calendar-alt"></i> My Account </a>
+                <div class='dashboard-nav-dropdown-menu'>
+                    <a asp-controller="Account" asp-action="Profile" asp-route-id="@User.FindFirstValue(ClaimTypes.NameIdentifier)" class="dashboard-nav-item">Profile</a>
+                    <a asp-controller="Account" asp-action="Logout" class="dashboard-nav-item"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                </div>
+            </div>
         </nav>
     </div>
     <div class="main-content">

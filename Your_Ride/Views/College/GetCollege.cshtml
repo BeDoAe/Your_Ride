@@ -1,20 +1,63 @@
 ﻿@model Your_Ride.ViewModels.College.CollegeVM
-<h1>@Model.Name</h1>
-<h2>
-    @if (Model?.Batches != null && Model.Batches.Any())
-    {
-        <ul>
-            @foreach (var batch in Model.Batches)
+
+@{
+    ViewData["Title"] = Model?.Name ?? "College Details";
+}
+
+<!-- Page Title (Centered) -->
+<div class="text-center mb-4">
+    <h2 class="text-primary">
+        <i class="fa-solid fa-graduation-cap"></i> @Model?.Name
+    </h2>
+</div>
+
+<!-- Details Container (Centered) -->
+<div class="d-flex justify-content-center">
+    <div class="card shadow-lg p-4 w-50">
+        <div class="mb-3 text-center">
+            <h4 class="text-secondary">
+                <i class="fa fa-university" aria-hidden="true"></i> @Model?.University?.Name
+            </h4>
+        </div>
+
+        <!-- Batches Section -->
+        <div class="mb-3">
+            <h5 class="fw-bold">
+                <i class="fas fa-users"></i> Batches
+            </h5>
+            @if (Model?.Batches != null && Model.Batches.Any())
             {
-                <li>@batch</li>
+                <ul class="list-group">
+                    @foreach (var batch in Model.Batches)
+                    {
+                        <li class="list-group-item">
+                            <i class="fas fa-calendar-alt"></i> @batch
+                        </li>
+                    }
+                </ul>
             }
-        </ul>
-    }
-    else
-    {
-        <span>No batches available</span>
-    }
-</h2>
-<h3>@Model?.University.Name</h3>
-<a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Edit</a>
-<a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger">Delete</a>
+            else
+            {
+                <p class="text-muted">No batches available</p>
+            }
+        </div>
+
+        <!-- Action Buttons (Centered) -->
+        <div class="text-center mt-4">
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
+                <i class="fas fa-edit"></i> Edit
+            </a>
+            <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger">
+                <i class="fas fa-trash-alt"></i> Delete
+            </a>
+            <a asp-action="GetAllCollege" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- FontAwesome CDN (If not already included) -->
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/js/all.min.js"></script>
+}

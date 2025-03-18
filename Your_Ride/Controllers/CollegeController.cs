@@ -53,7 +53,7 @@ namespace Your_Ride.Controllers
             if (ModelState.IsValid)
             {
                 await collegeService.CreateUniversity(createCollege);
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("GetAllCollege");
             }
             return View(createCollege);
         }

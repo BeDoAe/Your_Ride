@@ -95,6 +95,13 @@ namespace Your_Ride.Controllers
 
             var allBookings = await bookService.GetAllBooksOfUser(id);
 
+            // Check if allBookings is null or empty
+            if (allBookings == null || allBookings.Count == 0)
+            {
+                // Handle the case where there are no bookings
+                return View("GetAllBooksOfUser", new PaginatedList<BookVM>(new List<BookVM>(), 0, pageNumber, pageSize));
+            }
+
             // Filter by date if searchDate is provided
             if (searchDate.HasValue)
             {
@@ -105,7 +112,7 @@ namespace Your_Ride.Controllers
             var userTransactionLogVMs = await userTransactionLogService.GetAllUserTransactioLogsByUserId(id);
             ViewBag.userTransactionLogVMs = userTransactionLogVMs;
 
-            // Apply pagination
+            // Apply pagination safely
             var paginatedList = new PaginatedList<BookVM>(
                 allBookings.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList(),
                 allBookings.Count,
@@ -115,6 +122,7 @@ namespace Your_Ride.Controllers
 
             return View("GetAllBooksOfUser", paginatedList);
         }
+
         //         /Book/CreateBook
         //[HttpGet]
         //public async Task<IActionResult> CreateBook()

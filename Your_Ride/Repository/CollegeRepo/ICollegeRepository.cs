@@ -13,6 +13,7 @@ namespace Your_Ride.Repository.CollegeRepo
 
         public Task<List<College>> GetCollegesByUniversityId(int universityID);
 
+        public Task<bool> CheckCollegeExisted(string name, int UniversityID);
 
 
 

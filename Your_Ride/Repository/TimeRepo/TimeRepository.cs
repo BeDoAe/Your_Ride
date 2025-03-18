@@ -1,7 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Your_Ride.Models;
 using Your_Ride.Models.Your_Ride.Models;
+using Your_Ride.Repository.BusRepo;
 using Your_Ride.Repository.Generic;
+using Your_Ride.ViewModels.TimeViewModel;
 
 namespace Your_Ride.Repository.TimeRepo
 {
@@ -132,6 +134,13 @@ namespace Your_Ride.Repository.TimeRepo
             }
             else
             {
+                List<Seat> seats = await context.Seats.Where(b => b.BusId == time.BusID).ToListAsync();
+
+                    foreach (Seat s in seats)
+                    {
+                        s.IsAvailable = true;
+
+                    }
                 time.IsDeleted = true;
                 await SaveDB();
                 return 1;

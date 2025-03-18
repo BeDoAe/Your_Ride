@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Your_Ride.Models;
 using Your_Ride.Repository.Generic;
+using Your_Ride.ViewModels.College;
 
 namespace Your_Ride.Repository.CollegeRepo
 {
@@ -66,6 +67,19 @@ namespace Your_Ride.Repository.CollegeRepo
         //        return college;
         //    }
         //}
+        public async Task<bool> CheckCollegeExisted(string name , int UniversityID)
+        {
+            College collegeFromDB = await context.Colleges.FirstOrDefaultAsync(c => c.Name.ToLower() == name.ToLower() && c.UniversityID== UniversityID);
+            if (collegeFromDB == null)
+            {
+                return false;
+            }
+           
+            else
+            {
+                return true;
+            }
+        }
 
     }
 }

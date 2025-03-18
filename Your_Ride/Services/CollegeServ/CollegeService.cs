@@ -47,8 +47,17 @@ namespace Your_Ride.Services.CollegeServ
         public async Task<CollegeVM> CreateUniversity(CreateCollege createCollege)
         {
             var college = autoMapper.Map<College>(createCollege);
-            await collegeRepository.AddAsync(college);
-            return autoMapper.Map<CollegeVM>(college);
+            bool CollegeExist = await collegeRepository.CheckCollegeExisted(createCollege.Name, createCollege.UniversityID);
+           if (CollegeExist == false)
+            { 
+                await collegeRepository.AddAsync(college);
+                return autoMapper.Map<CollegeVM>(college);
+
+            }
+            else
+            {
+                return null;
+            }
         }
 
         // Update an existing College

@@ -1,5 +1,100 @@
 ﻿@model Your_Ride.ViewModels.University.UniversityVM
 
-<h1>@Model.Name</h1>
-    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Edit</a>
-    <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger">Delete</a>
+@{
+    ViewData["Title"] = Model.Name;
+}
+
+<!-- University Name with Icon -->
+<h1 class="text-center mt-3">
+    <i class="fa fa-university"></i> @Model.Name
+</h1>
+
+<!-- Actions (Centered) -->
+<div class="d-flex justify-content-center mt-4">
+    <!-- Edit Button -->
+    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning mx-2">
+        <i class="fa-solid fa-pen"></i> Edit
+    </a>
+
+    <!-- Delete Button -->
+    <form asp-action="Delete" asp-route-id="@Model.Id" method="post" class="d-inline mx-2">
+        <button type="submit" class="delete-button">
+            <svg class="delete-svgIcon" viewBox="0 0 448 512">
+                <path d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z"></path>
+            </svg>
+        </button>
+    </form>
+
+    <!-- Back Button -->
+    <a asp-action="GetAllUniversity" class="btn btn-secondary mx-2">
+        <i class="fa-solid fa-arrow-left"></i> Back
+    </a>
+</div>
+
+<!-- FontAwesome (If not included in layout) -->
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/js/all.min.js"></script>
+}
+
+<!-- Custom Styling -->
+<style>
+    h1 {
+        font-size: 2.2rem;
+        color: #333;
+    }
+
+    .btn {
+        font-size: 1rem;
+    }
+
+    /* Custom Delete Button */
+    .delete-button {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: rgb(20, 20, 20);
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.164);
+        cursor: pointer;
+        transition: 0.3s;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .delete-svgIcon {
+        width: 15px;
+        transition: 0.3s;
+    }
+
+        .delete-svgIcon path {
+            fill: white;
+        }
+
+    .delete-button:hover {
+        width: 90px;
+        border-radius: 50px;
+        background-color: rgb(255, 69, 69);
+    }
+
+        .delete-button:hover .delete-svgIcon {
+            width: 20px;
+            transform: rotate(360deg);
+        }
+
+    .delete-button::before {
+        display: none;
+        content: "Delete";
+        color: white;
+        font-size: 2px;
+    }
+
+    .delete-button:hover::before {
+        display: block;
+        padding-right: 10px;
+        font-size: 13px;
+        opacity: 1;
+    }
+</style>

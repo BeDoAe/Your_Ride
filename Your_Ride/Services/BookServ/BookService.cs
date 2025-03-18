@@ -47,15 +47,16 @@ namespace Your_Ride.Services.BookServ
         public async Task<List<BookVM>> GetAllBooksOfUser(string id)
         {
             ApplicationUser applicationUser = await userManager.FindByIdAsync(id);
-            if (applicationUser == null) return null;
+            if (applicationUser == null) return new List<BookVM>(); // Return an empty list if no user is found
 
             List<Book> books = await bookRepository.GetAllBooksOfUser(id);
             if (books == null || books.Count == 0)
-                return null;
-            List<BookVM> bookVMs = automapper.Map<List<BookVM>>(books);
+                return new List<BookVM>(); // Return an empty list if no books are found
 
+            List<BookVM> bookVMs = automapper.Map<List<BookVM>>(books);
             return bookVMs;
         }
+
 
 
         public async Task<BookUserTransactionVM> CreateBook(BookVM bookVM)

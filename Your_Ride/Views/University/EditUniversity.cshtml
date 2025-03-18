@@ -1,14 +1,66 @@
 ﻿@model Your_Ride.ViewModels.University.UniversityVM
 
-<h2>Edit University</h2>
+@{
+    ViewData["Title"] = "Edit University";
+}
 
-<form asp-action="Edit" method="post">
-    <input type="hidden" asp-for="Id" />
-    <div class="form-group">
-        <label asp-for="Name"></label>
-        <input asp-for="Name" class="form-control" />
-        <span asp-validation-for="Name" class="text-danger"></span>
-    </div>
-    <button type="submit" class="btn btn-primary">Update</button>
-    <a asp-action="Index" class="btn btn-secondary">Back</a>
-</form>
+<!-- Title with University Icon -->
+<h2 class="text-center mt-3">
+    <i class="fa fa-university"></i> Edit University
+</h2>
+
+<!-- Edit Form -->
+<div class="d-flex justify-content-center mt-4">
+    <form asp-action="Edit" method="post" class="w-50 p-4 border rounded shadow bg-white">
+        <input type="hidden" asp-for="Id" />
+
+        <!-- Name Input -->
+        <div class="form-group mb-3">
+            <label asp-for="Name" class="form-label"><i class="fa-solid fa-graduation-cap"></i> University Name</label>
+            <input asp-for="Name" class="form-control" />
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+
+        <!-- Buttons -->
+        <div class="text-center mt-4">
+            <button type="submit" class="btn btn-primary mx-2">
+                <i class="fa-solid fa-floppy-disk"></i> Update
+            </button>
+            <a asp-action="GetAllUniversity" class="btn btn-secondary mx-2">
+                <i class="fa-solid fa-arrow-left"></i> Back
+            </a>
+        </div>
+    </form>
+</div>
+
+<!-- FontAwesome (If not included in layout) -->
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/js/all.min.js"></script>
+}
+
+<!-- Custom Styling -->
+<style>
+    h2 {
+        font-size: 2rem;
+        color: #333;
+    }
+
+    .form-label {
+        font-weight: 600;
+    }
+
+    .form-control {
+        border-radius: 8px;
+        padding: 10px;
+    }
+
+    .btn {
+        font-size: 1rem;
+        padding: 10px 20px;
+        border-radius: 8px;
+    }
+
+    .w-50 {
+        max-width: 500px;
+    }
+</style>

@@ -2,14 +2,12 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using Your_Ride.Models;
-using Your_Ride.ViewModels;
 using Your_Ride.ViewModels.Account;
 using Your_Ride.Services.UniversityServ;
 using Your_Ride.Services.CollegeServ;
 using Microsoft.Identity.Client;
 using Your_Ride.ViewModels.University;
 using Your_Ride.ViewModels.College;
-using Your_Ride.ViewModels.Account;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Your_Ride.Repository.ForgetPasswordRepo;
 using System.Net.Mail;
@@ -23,6 +21,9 @@ using Your_Ride.ViewModels.UserTransactionLogViewModel;
 using Your_Ride.ViewModels.BookViewModel;
 using Your_Ride.ViewModels.WalletViewModel;
 using AutoMapper;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
+using Your_Ride.Helper;
 
 namespace Your_Ride.Controllers
 {
@@ -38,6 +39,7 @@ namespace Your_Ride.Controllers
         private readonly IBookService bookService;
         private readonly IUserTransactionLogService transactionLogService;
         private readonly IMapper automapper;
+        private readonly Context context;
 
         public AccountController(UserManager<ApplicationUser> userManager,
                                  RoleManager<IdentityRole> roleManager,
@@ -48,7 +50,8 @@ namespace Your_Ride.Controllers
                                  IWalletService walletService ,
                                  IBookService bookService ,
                                  IUserTransactionLogService transactionLogService,
-                                 IMapper automapper )
+                                 IMapper automapper ,
+                                 Context context)
         {
             _userManager = userManager;
             _roleManager = roleManager;
@@ -60,6 +63,7 @@ namespace Your_Ride.Controllers
             this.bookService = bookService;
             this.transactionLogService = transactionLogService;
             this.automapper = automapper;
+            this.context = context;
         }
 
 
@@ -67,27 +71,277 @@ namespace Your_Ride.Controllers
         public async Task<IActionResult> Profile(string id)
         {
             // Get the user from the database
-            ApplicationUser user = await _userManager.FindByIdAsync(id);
+            ApplicationUser? user = await _userManager.Users
+                .Include(u => u.Wallet)
+                .Include(u => u.college)
+                    .ThenInclude(c=>c.university)
+                .Include(u => u.Bookings)
+                    .ThenInclude(b=>b.Time)
+                        .ThenInclude(t=>t.Appointment)
+                 .Include(u=>u.Bookings)
+                       .ThenInclude(b=>b.Seat)
+                .FirstOrDefaultAsync(u => u.Id == id);
+
             if (user == null)
                 return RedirectToAction("Error", "Home");
 
             // Retrieve user booking data
-            List<BookVM> bookVMs = await bookService.GetAllBooksOfUser(id);
-            Wallet wallet = await walletService.getWalletByUserID(id);
+            //List<BookVM> bookVMs = await bookService.GetAllBooksOfUser(id);
+            //Wallet wallet = await walletService.getWalletByUserID(id);
 
             // Ensure Bookings is never null
-            if (bookVMs == null || bookVMs.Count == 0)
-                bookVMs = new List<BookVM>();  // Initialize if null or empty
+            //if (bookVMs == null || bookVMs.Count == 0)
+            //bookVMs = new List<BookVM>();  // Initialize if null or empty
 
             // Map the BookVM list to Book entities
-            List<Book> books = automapper.Map<List<Book>>(bookVMs);
-            user.Bookings = books ?? new List<Book>();  // Safeguard to ensure Bookings is always a list
+            //List<Book> books = automapper.Map<List<Book>>(bookVMs);
+            if (user.Bookings == null || user.Bookings.Count == 0)
+                user.Bookings =  new List<Book>();  // Safeguard to ensure Bookings is always a list
 
             // Set Wallet (ensure it is not null)
-            user.Wallet = wallet ?? new Wallet();
+            //user.Wallet = wallet ?? new Wallet();
+
+            //CollegeVM collegeVM = await collegeService.GetCollegeById((int)user.CollegeID);
+            //user.college = automapper.Map<College>(collegeVM);
 
             return View("Profile" , user);
         }
+
+        [HttpGet]
+        public async Task<JsonResult> GetColleges(int universityId)
+        {
+            var colleges = await collegeService.GetCollegesByUniversityId(universityId);
+            return Json(colleges);
+        }
+
+        [HttpGet]
+        public async Task<JsonResult> GetBatches(int collegeId)
+        {
+            var college = await collegeService.GetCollegeById(collegeId);
+            return Json(college?.Batches ?? new List<string>());
+        }
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> EditProfile()
+        {
+            var loggedInUser = await _userManager.GetUserAsync(User);
+            if (loggedInUser == null) return RedirectToAction("Error", "Home");
+
+            ApplicationUser user = await _userManager.Users
+                .Include(u=>u.Wallet)
+                .Include(u => u.college)
+                .ThenInclude(c => c.university)
+                .FirstOrDefaultAsync(u => u.Id == loggedInUser.Id);
+
+            if (user == null) return RedirectToAction("Error", "Home");
+
+            ViewBag.Universities = await universityService.GetAllUniversity();
+
+            EditProfileViewModel model = new EditProfileViewModel
+            {
+                Id = user.Id,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Email = user.Email,
+                PhoneNumber = user.PhoneNumber,
+                gender = (EditProfileViewModel.Gender?)user.gender,
+                DateOfBirth = user.DateOfBirth,
+                Pic_URL = user.Pic_URL,
+                UniversityID = user.college?.university?.Id ?? 0,
+                CollegeID = user.college?.Id ?? 0,
+                college = user.college,
+                university=user.college.university,
+                batch = user.batch
+            };
+            ViewBag.UniversityName = user.college.university.Name;
+            ViewBag.CollegeName = user.college.Name;
+            var college = await collegeService.GetCollegeById(user.college.Id);
+            ViewBag.Batches = college?.Batches?.ToList(); // Get the list of batches
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditProfile(EditProfileViewModel model)
+        {
+            
+            //if(model.UniversityID==null || model.CollegeID==null || model.batch == null)
+            //{
+            //    var loggedInUser = await _userManager.GetUserAsync(User);
+            //    model.UniversityID = loggedInUser.college.UniversityID;
+            //    model.CollegeID = (int)loggedInUser.CollegeID;
+            //    model.batch = loggedInUser.batch;
+            //    model.Wallet = loggedInUser.Wallet;
+
+
+            //}
+
+
+            if (!ModelState.IsValid)
+            {
+                ViewBag.Universities = await universityService.GetAllUniversity();
+                return View(model);
+            }
+
+            var user = await _userManager.FindByIdAsync(model.Id);
+            if (user == null) return RedirectToAction("Error", "Home");
+
+            user.FirstName = model.FirstName;
+            user.LastName = model.LastName;
+            user.Email = model.Email;
+            user.PhoneNumber = model.PhoneNumber;
+            user.gender = (ApplicationUser.Gender?)model.gender;
+            user.DateOfBirth = model.DateOfBirth;
+            user.batch = model. batch;
+            user.CollegeID = model.CollegeID;
+            user.batch = model.batch;
+           
+
+            //if (model.ImgFile != null)
+            //{
+            //    if (!string.IsNullOrEmpty(user.Pic_URL))
+            //        FileHelper.Delete(user.Pic_URL);
+
+            //    user.Pic_URL = await FileHelper.SaveFileAsync(model.ImgFile);
+            //}
+            if (model.ImgFile != null)
+            {
+                if (!string.IsNullOrEmpty(user.Pic_URL))
+                {
+                    FileHelper.Delete(user.Pic_URL);
+                }
+                user.Pic_URL = await FileHelper.SaveFileAsync(model.ImgFile);
+            }
+
+            var result = await _userManager.UpdateAsync(user);
+            if (result.Succeeded)
+                return RedirectToAction("Profile" , new {id=user.Id});
+
+            foreach (var error in result.Errors)
+                ModelState.AddModelError("", error.Description);
+
+            ViewBag.Universities = await universityService.GetAllUniversity();
+            return View(model);
+        }
+
+
+
+
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> ChangePassword()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return RedirectToAction("Error", "Home");
+
+            return View("ChangePassword", new ChangePasswordViewModel());
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
+        {
+            if (!ModelState.IsValid) return View(model);
+
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return RedirectToAction("Error", "Home");
+
+            var result = await _userManager.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
+            if (result.Succeeded)
+            {
+                await _signInManager.RefreshSignInAsync(user); // Keeps the user logged in
+                TempData["SuccessMessage"] = "Password changed successfully!";
+                return RedirectToAction("Profile", new { id = user.Id });
+            }
+
+            foreach (var error in result.Errors)
+                ModelState.AddModelError("", error.Description);
+
+            return View(model);
+        }
+
+        //[HttpGet]
+        //public async Task<JsonResult> CheckOldPassword(string oldPassword)
+        //{
+        //    var user = await _userManager.GetUserAsync(User);
+        //    if (user == null)
+        //        return Json(new { success = false, message = "User not found" });
+
+        //    var result = await _userManager.CheckPasswordAsync(user, oldPassword);
+        //    return Json(new { success = result });
+        //}
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<JsonResult> CheckOldPassword([FromBody] ChangePasswordViewModel model)
+        {
+           
+
+            if (string.IsNullOrWhiteSpace(model.OldPassword))
+            {
+                return Json(new { success = false, message = "Old password is required" });
+            }
+
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+                return Json(new { success = false, message = "User not found" });
+
+            var result = await _userManager.CheckPasswordAsync(user, model.OldPassword);
+            return Json(new { success = result });
+        }
+
+
+
+
+
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> ChangeFavoriteColor()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return RedirectToAction("Error", "Home");
+
+            return View("ChangeFavoriteColor", new ChangeFavoriteColorViewModel());
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ChangeFavoriteColor(ChangeFavoriteColorViewModel model)
+        {
+            if (!ModelState.IsValid) return View(model);
+
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return RedirectToAction("Error", "Home");
+
+            if (user.FavoriteColor.ToLower() != model.OldColor .ToLower())
+            {
+                ModelState.AddModelError("OldColor", "Old color does not match our records.");
+                return View(model);
+            }
+
+            user.FavoriteColor = model.NewColor;
+            await _userManager.UpdateAsync(user);
+
+            TempData["SuccessMessage"] = "Favorite color changed successfully!";
+            return RedirectToAction("Profile", new { id = user.Id });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<JsonResult> CheckOldColor([FromBody] ChangeFavoriteColorViewModel model)
+        {
+            if (string.IsNullOrWhiteSpace(model.OldColor))
+            {
+                return Json(new { success = false, message = "Old Color is required" });
+            }
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Json(new { success = false, message = "User not found" });
+
+            // Compare the color from the model with the user's stored favorite color
+            var isCorrect = user.FavoriteColor.Equals(model.OldColor, StringComparison.OrdinalIgnoreCase);
+
+            // Return result
+            return Json(new { success = isCorrect });
+        }
+
 
 
 
@@ -215,19 +469,7 @@ namespace Your_Ride.Controllers
             return View(accountCollegeUniversityVM);
         }
 
-        [HttpGet]
-        public async Task<JsonResult> GetColleges(int universityId)
-        {
-            var colleges = await collegeService.GetCollegesByUniversityId(universityId);
-            return Json(colleges);
-        }
-
-        [HttpGet]
-        public async Task<JsonResult> GetBatches(int collegeId)
-        {
-            var college = await collegeService.GetCollegeById(collegeId);
-            return Json(college?.Batches ?? new List<string>());
-        }
+     
 
 
         // Login an existing user

@@ -43,9 +43,17 @@ namespace Your_Ride.Repository.BookRepo
         }
         public async Task<List<Book>> GetAllBooksOfUser(string id)
         {
-            List<Book> books = await context.Books.Include(x => x.User).Include(x => x.Seat).Include(x => x.Time).ThenInclude(x => x.Appointment).Where(x => x.UserID == id).ToListAsync();
-            return books;
+            var books = await context.Books
+                                     .Include(x => x.User)
+                                     .Include(x => x.Seat)
+                                     .Include(x => x.Time)
+                                     .ThenInclude(x => x.Appointment)
+                                     .Where(x => x.UserID == id)
+                                     .ToListAsync();
+
+            return books ?? new List<Book>(); // Return an empty list if books is null
         }
+
         public async Task<Book> CreateBook(Book book)
         {
             bool AlreadyBooked = await CheckAlreadyBooked(book);

@@ -1,4 +1,4 @@
-﻿@model Your_Ride.ViewModels.Account.AccountCollegeUniversityVM
+﻿@* @model Your_Ride.ViewModels.Account.AccountCollegeUniversityVM
 
 @{
     ViewData["Title"] = "Register";
@@ -135,3 +135,239 @@
         });
     </script>
 }
+ *@
+
+@model Your_Ride.ViewModels.Account.AccountCollegeUniversityVM
+
+@{
+    ViewData["Title"] = "Register";
+}
+
+<!-- Centered Form -->
+<div class="form-container">
+    <form class="form" asp-action="Register" method="post">
+        <p class="title">Create an Account</p>
+        <p class="message">Signup now and get full access to our app.</p>
+
+        <div class="flex">
+            <label class="half-width">
+                <input asp-for="RegisterVM.FirstName" class="input" required />
+                <span>First Name</span>
+                <span class="text-danger" asp-validation-for="RegisterVM.FirstName"></span>
+            </label>
+
+            <label class="half-width">
+                <input asp-for="RegisterVM.LastName" class="input" required />
+                <span>Last Name</span>
+                <span class="text-danger" asp-validation-for="RegisterVM.LastName"></span>
+            </label>
+        </div>
+
+        <div class="flex">
+            <label class="half-width">
+                <input asp-for="RegisterVM.UserName" class="input" required />
+                <span>Username</span>
+                <span class="text-danger" asp-validation-for="RegisterVM.UserName"></span>
+            </label>
+
+            <label class="half-width">
+                <input asp-for="RegisterVM.Email" type="email" class="input" required />
+                <span>Email</span>
+                <span class="text-danger" asp-validation-for="RegisterVM.Email"></span>
+            </label>
+        </div>
+
+        <div class="flex">
+            <label class="half-width">
+                <input asp-for="RegisterVM.Password" type="password" class="input" required />
+                <span>Password</span>
+                <span class="text-danger" asp-validation-for="RegisterVM.Password"></span>
+            </label>
+
+            <label class="half-width">
+                <input asp-for="RegisterVM.ConfirmPassword" type="password" class="input" required />
+                <span>Confirm Password</span>
+                <span class="text-danger" asp-validation-for="RegisterVM.ConfirmPassword"></span>
+            </label>
+        </div>
+
+        <div class="flex">
+            <label class="half-width">
+                <input asp-for="RegisterVM.PhoneNumber" class="input" required />
+                <span>Mobile Number</span>
+                <span class="text-danger" asp-validation-for="RegisterVM.PhoneNumber"></span>
+            </label>
+
+            <label class="half-width">
+                <input asp-for="RegisterVM.NationalID" class="input" required />
+                <span>National ID</span>
+                <span class="text-danger" asp-validation-for="RegisterVM.NationalID"></span>
+            </label>
+        </div>
+
+        <div class="flex">
+            <label class="half-width">
+                <input asp-for="RegisterVM.FavoriteColor" class="input" required />
+                <span>Favorite Color</span>
+                <span class="text-danger" asp-validation-for="RegisterVM.FavoriteColor"></span>
+            </label>
+
+            <label class="half-width">
+                <select asp-for="RegisterVM.UniversityID" class="input" id="universityDropdown">
+                    <option value="">-- Select University --</option>
+                    @foreach (var university in Model.UniversitiesVM)
+                    {
+                        <option value="@university.Id">@university.Name</option>
+                    }
+                </select>
+                <span>University</span>
+            </label>
+        </div>
+
+        <div class="flex">
+            <label class="half-width">
+                <select asp-for="RegisterVM.CollegeID" class="input" id="collegeDropdown">
+                    <option value="">-- Select College --</option>
+                </select>
+                <span>College</span>
+            </label>
+
+            <label class="half-width">
+                <select asp-for="RegisterVM.Batch" class="input" id="batchDropdown">
+                    <option value="">-- Select Batch --</option>
+                </select>
+                <span>Batch</span>
+            </label>
+        </div>
+
+        <button type="submit" class="submit">Register</button>
+        <p class="p">Already have an account? <a href="@Url.Action("Login", "Account")" class="span">Sign In</a></p>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        $(document).ready(function () {
+            $("#universityDropdown").change(function () {
+                var universityId = $(this).val();
+                if (universityId) {
+                    $.getJSON('/Account/GetColleges?universityId=' + universityId, function (data) {
+                        $("#collegeDropdown").empty().append('<option value="">-- Select College --</option>');
+                        $.each(data, function (i, college) {
+                            $("#collegeDropdown").append('<option value="' + college.id + '">' + college.name + '</option>');
+                        });
+                    });
+                }
+            });
+
+            $("#collegeDropdown").change(function () {
+                var collegeId = $(this).val();
+                if (collegeId) {
+                    $.getJSON('/Account/GetBatches?collegeId=' + collegeId, function (data) {
+                        $("#batchDropdown").empty().append('<option value="">-- Select Batch --</option>');
+                        $.each(data, function (i, batch) {
+                            $("#batchDropdown").append('<option value="' + batch + '">' + batch + '</option>');
+                        });
+                    });
+                }
+            });
+        });
+    </script>
+}
+
+<style>
+    .form-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background-color: #f4f4f4;
+    }
+
+    .form {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        max-width: 600px; /* Adjust width to allow for two fields per row */
+        background-color: #fff;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.1);
+        position: relative;
+        width: 100%;
+    }
+
+    .title {
+        font-size: 28px;
+        color: royalblue;
+        font-weight: 600;
+        letter-spacing: -1px;
+        position: relative;
+        display: flex;
+        align-items: center;
+        padding-left: 30px;
+    }
+
+    .flex {
+        display: flex;
+        width: 100%;
+        gap: 6px;
+        flex-wrap: wrap;
+    }
+
+    .form label {
+        position: relative;
+        width: 48%; /* Adjust label width to be half of the form */
+    }
+
+        .form label .input {
+            width: 100%;
+            padding: 10px 10px 20px 10px;
+            outline: 0;
+            border: 1px solid rgba(105, 105, 105, 0.397);
+            border-radius: 10px;
+        }
+
+            .form label .input + span {
+                position: absolute;
+                left: 10px;
+                top: 15px;
+                color: grey;
+                font-size: 0.9em;
+                cursor: text;
+                transition: 0.3s ease;
+            }
+
+            .form label .input:placeholder-shown + span {
+                top: 15px;
+                font-size: 0.9em;
+            }
+
+            .form label .input:focus + span, .form label .input:valid + span {
+                top: 30px;
+                font-size: 0.7em;
+                font-weight: 600;
+            }
+
+            .form label .input:valid + span {
+                color: green;
+            }
+
+    .submit {
+        border: none;
+        outline: none;
+        background-color: royalblue;
+        padding: 10px;
+        border-radius: 10px;
+        color: #fff;
+        font-size: 16px;
+        transform: .3s ease;
+    }
+
+        .submit:hover {
+            background-color: rgb(56, 90, 194);
+        }
+
+</style>
+

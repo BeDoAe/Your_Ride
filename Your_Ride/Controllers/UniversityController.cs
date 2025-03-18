@@ -68,7 +68,7 @@ namespace Your_Ride.Controllers
             if (ModelState.IsValid)
             {
                 await universityService.UpdateUniversity(id, model);
-                return RedirectToAction("EditUniversity", new {id=model.Id});
+                return RedirectToAction("GetAllUniversity");
             }
             return View(model);
         }

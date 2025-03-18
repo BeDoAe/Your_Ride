@@ -133,7 +133,7 @@
  *@
 
 
-@model Your_Ride.Models.ApplicationUser
+@* @model Your_Ride.Models.ApplicationUser
 
 <!-- From Uiverse.io by ZeroKaarma -->
 <div class="container d-flex justify-content-center">
@@ -152,44 +152,48 @@
                             <!-- Phone -->
                             <li class="icon-contact">
                                 <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M280 0C408.1 0 512 103.9 512 232c0 13.3-10.7 24-24 24s-24-10.7-24-24c0-101.6-82.4-184-184-184c-13.3 0-24-10.7-24-24s10.7-24 24-24zm8 192a32 32 0 1 1 0 64 32 32 0 1 1 0-64zm-32-72c0-13.3 10.7-24 24-24c75.1 0 136 60.9 136 136c0 13.3-10.7 24-24 24s-24-10.7-24-24c0-48.6-39.4-88-88-88c-13.3 0-24-10.7-24-24zM117.5 1.4c19.4-5.3 39.7 4.6 47.4 23.2l40 96c6.8 16.3 2.1 35.2-11.6 46.3L144 207.3c33.3 70.4 90.3 127.4 160.7 160.7L345 318.7c11.2-13.7 30-18.4 46.3-11.6l96 40c18.6 7.7 28.5 28 23.2 47.4l-24 88C481.8 499.9 466 512 448 512C200.6 512 0 311.4 0 64C0 46 12.1 30.2 29.5 25.4l88-24z"></path>
+                                    <path d="..."></path>
                                 </svg>
-                                Tel: (+00) 000 99999-0000
+                                Tel: @Model.PhoneNumber
                             </li>
                             <!-- Email -->
                             <li class="icon-contact">
                                 <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M48 64C21.5 64 0 85.5 0 112c0 15.1 7.1 29.3 19.2 38.4L236.8 313.6c11.4 8.5 27 8.5 38.4 0L492.8 150.4c12.1-9.1 19.2-23.3 19.2-38.4c0-26.5-21.5-48-48-48H48zM0 176V384c0 35.3 28.7 64 64 64H448c35.3 0 64-28.7 64-64V176L294.4 339.2c-22.8 17.1-54 17.1-76.8 0L0 176z"></path>
+                                    <path d="..."></path>
                                 </svg>
-                                Email: contact@mail.com
+                                Email: @Model.Email
                             </li>
                             <!-- National ID -->
                             <li class="icon-contact">
                                 <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M128 32h256c35.3 0 64 28.7 64 64v320c0 35.3-28.7 64-64 64H128c-35.3 0-64-28.7-64-64V96c0-35.3 28.7-64 64-64zm256 32H128c-17.7 0-32 14.3-32 32v320c0 17.7 14.3 32 32 32h256c17.7 0 32-14.3 32-32V64c0-17.7-14.3-32-32-32z"></path>
+                                    <path d="..."></path>
                                 </svg>
-                                National ID: XXXXXXXXXXXXX
+                                National ID: @Model.NationalID
                             </li>
                             <!-- Wallet Amount -->
                             <li class="icon-contact">
                                 <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M496 0H16C7.2 0 0 7.2 0 16v432c0 8.8 7.2 16 16 16h480c8.8 0 16-7.2 16-16V16c0-8.8-7.2-16-16-16zm-16 432H32V48h448v384z"></path>
+                                    <path d="..."></path>
                                 </svg>
-                                Wallet: $1000.00
+                                Wallet: @(Model.Wallet != null ? Model.Wallet.Amount.ToString("C") : "N/A")
                             </li>
                             <!-- Last 3 Bookings -->
-                            <li class="icon-contact">
-                                <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M152 0H360C400 0 440 40 440 80V432C440 472 400 512 360 512H152C112 512 72 472 72 432V80C72 40 112 0 152 0zM160 32C155.7 32 152 35.7 152 40V472C152 476.3 155.7 480 160 480H352C356.3 480 360 476.3 360 472V40C360 35.7 356.3 32 352 32H160z"></path>
-                                </svg>
-                                Last Booking: 2025-03-10 14:00 | Fee: $50.00
-                            </li>
-                            <li class="icon-contact">
-                                Last Booking: 2025-03-08 16:30 | Fee: $45.00
-                            </li>
-                            <li class="icon-contact">
-                                Last Booking: 2025-03-06 09:00 | Fee: $40.00
-                            </li>
+                            @if (Model.Bookings != null && Model.Bookings.Any())
+                            {
+                                @foreach (var booking in Model.Bookings.Take(3))
+                                {
+                                    <li class="icon-contact">
+                                        <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="..."></path>
+                                        </svg>
+                                        Last Booking: @booking.Time.TimeOnly.ToString("HH:mm") | Fee: @booking.Time.Fee.ToString("C")
+                                    </li>
+                                }
+                            }
+                            else
+                            {
+                                <li class="icon-contact">No recent bookings available.</li>
+                            }
                         </ul>
                     </div>
                 </div>
@@ -202,14 +206,13 @@
                         <!-- College Name -->
                         <li class="address-icon">
                             <svg viewBox="0 0 576 512" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M575.8 255.5c0 18-15 32.1-32 32.1h-32l.7 160.2c0 2.7-.2 5.4-.5 8.1V472c0 22.1-17.9 40-40 40H456c-1.1 0-2.2 0-3.3-.1c-1.4 .1-2.8 .1-4.2 .1H416 392c-22.1 0-40-17.9-40-40V448 384c0-17.7-14.3-32-32-32H256c-17.7 0-32 14.3-32 32v64 24c0 22.1-17.9 40-40 40H160 128.1c-1.5 0-3-.1-4.5-.2c-1.2 .1-2.4 .2-3.6 .2H104c-22.1 0-40-17.9-40-40V360c0-.9 0-1.9 .1-2.8V287.6H32c-18 0-32-14-32-32.1c0-9 3-17 10-24L266.4 8c7-7 15-8 22-8s15 2 21 7L564.8 231.5c8 7 12 15 11 24z"></path>
+                                <path d="..."></path>
                             </svg>
                         </li>
-                        <li class="address-title">College:</li>
-                        <li class="address">ABC College</li>
+                        <li class="address-title">College: @(Model.college?.Name ?? "N/A")</li>
+                        <li class="address">Batch: @(Model.batch ?? "N/A")</li>
                         <!-- University Name -->
-                        <li class="address-title">University:</li>
-                        <li class="address">XYZ University</li>
+                        <li class="address-title">University: @(Model.college?.university.Name ?? "N/A")</li>
                     </ul>
                 </div>
             </div>
@@ -226,16 +229,13 @@
                             </li>
                             <li>
                                 <span class="profile-label">Date of Birth:</span>
-                                <span class="profile-text">1990-03-15</span>
+                                <span class="profile-text">@Model.DateOfBirth?.ToString("yyyy-MM-dd")</span>
                             </li>
                             <li>
                                 <span class="profile-label">Gender:</span>
-                                <span class="profile-text">Male</span>
+                                <span class="profile-text">@(Model.gender.HasValue ? Model.gender.ToString() : "N/A")</span>
                             </li>
-                            <li>
-                                <span class="profile-label">Nationality:</span>
-                                <span class="profile-text">American</span>
-                            </li>
+
                         </ul>
                     </div>
                 </div>
@@ -424,4 +424,181 @@
     .main:hover #c3 {
         transform: translateX(-200px);
     }
-</style>
+</style> *@
+
+
+
+     @model Your_Ride.Models.ApplicationUser
+
+@{
+    ViewData["Title"] = "Profile";
+    var profileImg = string.IsNullOrEmpty(Model.Pic_URL) ? "/img/default-profile.png" : Model.Pic_URL;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>@Model.FirstName @Model.LastName - Profile</title>
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Roboto'>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        html, body, h1, h2, h3, h4, h5, h6 {
+            font-family: "Roboto", sans-serif;
+        }
+    </style>
+</head>
+<body class="w3-light-grey">
+
+    <div class="w3-content w3-margin-top" style="max-width:1400px;">
+        <div class="w3-row-padding">
+            <!-- Left Column -->
+            <div class="w3-third">
+                <div class="w3-white w3-text-grey w3-card-4">
+                    <div class="w3-display-container">
+                        <!-- Profile Image -->
+                        <img src="@profileImg" style="width:100%; height:400px; margin-bottom:15px;" alt="Profile Image">
+
+                        <!-- Profile Name -->
+                        <div class="w3-display-container w3-padding" style="text-align: center; margin-top: -50px;">
+                            <div class="w3-display-bottomleft w3-container w3-text-black" style="background-color: rgba(255, 255, 255, 0.7); padding: 10px; border-radius: 5px;">
+                                <h2>@Model.FirstName @Model.LastName</h2>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="w3-container">
+                        <p><i class="fa fa-id-card fa-fw w3-margin-right w3-large w3-text-teal"></i>@Model.NationalID</p>
+                        <p><i class="fa fa-envelope fa-fw w3-margin-right w3-large w3-text-teal"></i>@Model.Email</p>
+                        <p><i class="fa fa-graduation-cap fa-fw w3-margin-right w3-large w3-text-teal"></i>@(Model.college?.Name ?? "No College")</p>
+                        <p><i class="fa fa-users fa-fw w3-margin-right w3-large w3-text-teal"></i>@(Model.batch ?? "No Batch")</p>
+                        <p><i class="fa fa-university fa-fw w3-margin-right w3-large w3-text-teal"></i>@(Model.college?.university?.Name ?? "No University")</p>
+
+                        <hr>
+
+                        <p class="w3-large"><b><i class="fa fa-book fa-fw w3-margin-right w3-text-teal"></i>Recent Bookings</b></p>
+
+                        @if (Model.Bookings?.Any() ?? false)
+                        {
+                            foreach (var booking in Model.Bookings.OrderByDescending(b => b.BookeDateTime).Take(3))
+                            {
+                                <div class="w3-container w3-padding-small w3-border w3-round w3-light-gray">
+                                    <p>
+                                        <i class="fa fa-ticket fa-fw w3-margin-right w3-text-teal"></i>
+                                        <b>Booking Appointment:</b> @booking.Time?.Appointment?.Date.ToString("yyyy-MM-dd")
+                                    </p>
+                                    <p>
+                                        <i class="fa fa-chair fa-fw w3-margin-right w3-text-teal"></i>
+                                        <b>Seat:</b> @(booking.Seat?.SeatLabel ?? "N/A")
+                                    </p>
+                                    <p>
+                                        <i class="fa fa-clock-o fa-fw w3-margin-right w3-text-teal"></i>
+                                        <b>Time:</b> @(booking.Time?.TimeOnly.ToString() ?? "N/A")
+                                    </p>
+                                    <p>
+                                        <i class="fa fa-calendar fa-fw w3-margin-right w3-text-teal"></i>
+                                        <b>Date of The Book:</b> @booking.BookeDateTime.ToString("yyyy-MM-dd HH:mm")
+                                    </p>
+                                </div>
+                                <br />
+                            }
+                        }
+                        else
+                        {
+                            <p>No recent bookings found.</p>
+                        }
+
+                        <hr>
+                       
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column -->
+            <div class="w3-twothird">
+                <div class="w3-container w3-card w3-white w3-margin-bottom">
+                    <h2 class="w3-text-grey w3-padding-16"><i class="fa fa-credit-card fa-fw w3-margin-right w3-xxlarge w3-text-teal"></i>Wallet Balance</h2>
+                    <div class="w3-container">
+                        <h5 class="w3-opacity"><b>Current Balance:</b></h5>
+                        <h6 class="w3-text-teal">@($"${Model.Wallet?.Amount ?? 0.00}")</h6>
+                        <hr>
+                    </div>
+                </div>
+
+                <div class="w3-container w3-card w3-white w3-margin-bottom">
+                    <h2 class="w3-text-grey w3-padding-16">
+                        <i class="fa fa-credit-card fa-fw w3-margin-right w3-xxlarge w3-text-teal"></i>Additional Info:
+                    </h2>
+                    <div class="w3-container">
+                        <h5 class="w3-opacity"><b>Mobile :</b></h5>
+                        <h6 class="w3-text-teal">
+                            @if (Model.PhoneNumber != null)
+                            {
+                                <i class="fa fa-phone fa-fw w3-margin-right w3-large w3-text-teal"></i>
+
+                                @Model.PhoneNumber
+                            }
+                            else
+                            {
+                                <span class="w3-text-grey">N/A</span>
+                            }
+                        </h6>
+                        <hr>
+
+                        <h5 class="w3-opacity"><b>Gender :</b></h5>
+                        <h6 class="w3-text-teal">
+                            @if (Model.gender != null)
+                            {
+                                <i class="fa fa-genderless fa-fw w3-margin-right w3-large w3-text-teal"></i>
+
+                                @Model.gender
+                            }
+                            else
+                            {
+                                <span class="w3-text-grey">N/A</span>
+                            }
+                        </h6>
+                        <hr>
+
+                        <h5 class="w3-opacity"><b>Date of Birth :</b></h5>
+                        <h6>
+                            <p>
+                                <i class="fa fa-calendar fa-fw w3-margin-right w3-large w3-text-teal"></i>
+                                @if (Model.DateOfBirth.HasValue)
+                                {
+                                    @Model.DateOfBirth.Value.ToString("yyyy-MM-dd")
+                                }
+                                else
+                                {
+                                    <span class="w3-text-grey">N/A</span>
+                                }
+                            </p>
+                        </h6>
+                        <hr>
+                    </div>
+                </div>
+                <hr>
+                <a asp-action="EditProfile" asp-controller="Account" class="btn btn-warning">Edit Profile</a>
+                <br><br>
+                <a asp-action="ChangePassword" class="btn btn-warning">Change Password</a>
+                <br><br>
+                <a asp-action="ChangeFavoriteColor" class="btn btn-info">Change Favorite Color</a>
+            </div>
+        </div>
+    </div>
+
+    @* <footer class="w3-container w3-teal w3-center w3-margin-top">
+        <p>Find me on social media.</p>
+        <i class="fa fa-facebook-official w3-hover-opacity"></i>
+        <i class="fa fa-instagram w3-hover-opacity"></i>
+        <i class="fa fa-snapchat w3-hover-opacity"></i>
+        <i class="fa fa-twitter w3-hover-opacity"></i>
+        <i class="fa fa-linkedin w3-hover-opacity"></i>
+        <p>Powered by <a href="https://www.w3schools.com/w3css/default.asp" target="_blank">w3.css</a></p>
+    </footer> *@
+
+</body>
+</html>

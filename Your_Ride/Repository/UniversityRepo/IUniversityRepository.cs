@@ -7,6 +7,7 @@ namespace Your_Ride.Repository.UniversityRepo
     {
 
         public Task<int> DeleteUniversity(int id);
+        public Task<bool> CheckUniversityExisted(string name);
 
 
     }

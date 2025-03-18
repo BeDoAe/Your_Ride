@@ -36,8 +36,16 @@ namespace Your_Ride.Services.UniversityServ
         public async Task<UniversityVM> CreateUniversity(CreateUniversityVM universityVM)
         {
             var university = autoMapper.Map<University>(universityVM);
-            await universityRepository.AddAsync(university);
-            return autoMapper.Map<UniversityVM>(university);
+            bool UniversityExist = await universityRepository.CheckUniversityExisted(universityVM.Name);
+            if (UniversityExist == false)
+            {
+                await universityRepository.AddAsync(university);
+                return autoMapper.Map<UniversityVM>(university);
+            }
+            else
+            {
+                return null;
+            }
         }
 
         // Update an existing university

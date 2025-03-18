@@ -1,26 +1,91 @@
 ﻿@model List<Your_Ride.ViewModels.University.UniversityVM>
 
-<h2>Universities</h2>
+@{
+    ViewData["Title"] = "Universities";
+}
 
-<a asp-action="Create" class="btn btn-success">Add University</a>
+<!-- Page Title -->
+<div class="text-center mb-4">
+    <h2>
+        <i class="fa fa-university"></i> Universities
+    </h2>
+</div>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var university in Model)
-        {
+<!-- Add University Button -->
+<div class="text-center mb-3">
+    <a asp-action="Create" class="btn btn-success">
+        <i class="fas fa-plus"></i> Add University
+    </a>
+</div>
+
+<!-- Table Wrapper -->
+<div class="table-responsive">
+    <table class="table table-bordered text-center align-middle">
+        <thead class="table-dark">
             <tr>
-                <td>@university.Name</td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@university.Id" class="btn btn-warning">Edit</a>
-                    <a asp-action="Delete" asp-route-id="@university.Id" class="btn btn-danger">Delete</a>
-                </td>
+                <th class="w-75">University Name</th>
+                <th>Actions</th>
             </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Any())
+            {
+                @foreach (var university in Model)
+                {
+                    <tr>
+                        <td class="fs-5">@university.Name</td>
+                        <td>
+                            <a asp-action="Edit" asp-route-id="@university.Id" class="btn btn-warning btn-sm me-2">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                            <a asp-action="Delete" asp-route-id="@university.Id" class="btn btn-danger btn-sm">
+                                <i class="fas fa-trash"></i> Delete
+                            </a>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="2" class="text-muted">No universities available.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<!-- FontAwesome (If not included in layout) -->
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/js/all.min.js"></script>
+}
+
+<!-- Custom Styling -->
+<style>
+    h2 {
+        font-size: 2rem;
+        color: #333;
+    }
+
+    .btn {
+        font-size: 1rem;
+    }
+
+    .table {
+        width: 100%;
+        max-width: 90%;
+        margin: auto;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+        .table th,
+        .table td {
+            vertical-align: middle;
         }
-    </tbody>
-</table>
+
+    .table-dark {
+        background-color: #343a40;
+        color: white;
+    }
+</style>

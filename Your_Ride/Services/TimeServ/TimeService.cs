@@ -5,6 +5,7 @@ using Your_Ride.Helper;
 using Your_Ride.Models;
 using Your_Ride.Models.Your_Ride.Models;
 using Your_Ride.Repository.AppointmentRepo;
+using Your_Ride.Repository.BookRepo;
 using Your_Ride.Repository.BusRepo;
 using Your_Ride.Repository.TimeRepo;
 using Your_Ride.Services.Generic;
@@ -19,14 +20,21 @@ namespace Your_Ride.Services.TimeServ
         private readonly ITimeRepository timeRepository;
         private readonly IBusRepository busRepository;
         private readonly IAppointmentRepository appointmentRepository;
+        private readonly IBookRepository bookRepository;
         private readonly UserManager<ApplicationUser> userManager;
 
-        public TimeService(IMapper automapper , ITimeRepository timeRepository , IBusRepository busRepository , IAppointmentRepository appointmentRepository , UserManager<ApplicationUser> userManager)
+        public TimeService(IMapper automapper , 
+            ITimeRepository timeRepository ,
+            IBusRepository busRepository , 
+            IAppointmentRepository appointmentRepository ,
+            IBookRepository bookRepository ,
+            UserManager<ApplicationUser> userManager)
         {
             this.automapper = automapper;
             this.timeRepository = timeRepository;
             this.busRepository = busRepository;
             this.appointmentRepository = appointmentRepository;
+            this.bookRepository = bookRepository;
             this.userManager = userManager;
         }
 
@@ -403,9 +411,15 @@ namespace Your_Ride.Services.TimeServ
         public async Task<TimeVM> CompleteTime(int id)
         {
             Time timeFromDB = await timeRepository.GetTimeByID(id);
+            List<Seat> seats = await busRepository.GetAllSeatsByBus(timeFromDB.BusID);
             if (timeFromDB != null)
             {
                 timeFromDB.HasCompleted = true;
+                foreach(Seat s in seats)
+                {
+                    s.IsAvailable = true;
+
+                }
                 await timeRepository.SaveDB();
                 return automapper.Map<TimeVM>(timeFromDB);
             }

@@ -21,6 +21,16 @@ namespace Your_Ride.Models
         public int? CollegeID { get; set; }
         public College? college { get; set; }
 
+        public DateTime? DateOfBirth { get; set; }
+
+        public Gender? gender { get; set; }
+
+        [Flags]
+        public enum Gender
+        {
+            Male = 0,
+            Female = 1
+        }
         // Many-to-Many with Appointments
         public List<Book> Bookings { get; set; } = new List<Book>();
 
