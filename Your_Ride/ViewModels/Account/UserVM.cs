@@ -6,6 +6,8 @@
 
         public string UserName { get; set; }
         public string Email { get; set; }
+
+        public string? UserImg { get; set; }
         public IList<string> Roles { get; set; }=new List<string>();
     }
 }

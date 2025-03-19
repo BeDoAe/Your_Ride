@@ -28,11 +28,28 @@ namespace Your_Ride.Controllers
         }
         //         /Book/GetAllBooks
         [HttpGet]
-        public async Task<IActionResult> GetAllBooks()
+        public async Task<IActionResult> GetAllBooks(string search, int page = 1, int pageSize = 10)
         {
-            List<BookVM> bookVMs = await bookService.GetAllBooks();
-            return View("GetAllBooks", bookVMs);
+            var books = await bookService.GetAllBooks();
+
+            // Search filter
+            if (!string.IsNullOrEmpty(search))
+            {
+                books = books.Where(b =>
+                    (b.User?.UserName != null && b.User.UserName.Contains(search, StringComparison.OrdinalIgnoreCase)) ||
+                    (b.Time?.Appointment?.Date.ToString("yyyy-MM-dd") == search)
+                ).ToList();
+            }
+
+            // Pagination logic
+            int totalItems = books.Count();
+            var paginatedBooks = books.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+            var paginatedList = new PaginatedList<BookVM>(paginatedBooks, totalItems, page, pageSize);
+
+            ViewData["SearchQuery"] = search;
+            return View("GetAllBooks", paginatedList);
         }
+
 
         //         /Book/GetBookByID?id=
         [HttpGet]

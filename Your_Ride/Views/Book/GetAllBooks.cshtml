@@ -1,36 +1,174 @@
-﻿@model List<Your_Ride.ViewModels.BookViewModel.BookVM>
+﻿@model Your_Ride.Helper.PaginatedList<Your_Ride.ViewModels.BookViewModel.BookVM>
 
-<h2>📚 All Bookings</h2>
+<!-- Import FontAwesome for Icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>📖 Book ID</th>
-            <th>🕒 Time</th>
-            <th>🚌 Bus</th>
-            <th>💺 Seat</th>
-            <th>👤 User</th>
-            <th>🔧 Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var book in Model)
-        {
+<h2 class="text-center">📚 All Bookings</h2>
+
+<!-- Search Form -->
+<form asp-action="GetAllBooks" method="get" class="mb-3 d-flex gap-2 justify-content-center">
+    <input type="text" name="search" class="form-control w-25" placeholder="Search by Username or Date" value="@ViewData["SearchQuery"]">
+    <button type="submit" class="btn btn-primary">
+        <i class="fas fa-search"></i> Search
+    </button>
+</form>
+
+<div class="container">
+    <table class="table table-striped text-center">
+        <thead class="table-dark">
             <tr>
-                <td>@book.Id</td>
-                <td>@book.Time?.Appointment?.Date</td>
-                <td>@book.Time?.BusID</td>
-                <td>@book.SeatId</td>
-                <td>@book.UserID</td>
-                <td>
-                    <a asp-action="GetBookByID" asp-route-id="@book.Id" class="btn btn-info" title="View Details">👁</a>
-                    <a asp-action="EditBook" asp-route-id="@book.Id" class="btn btn-warning" title="Edit Booking">✏</a>
-                    <a asp-action="DeleteBook" class="btn btn-secondary" title="Return to Available Trips"> </a>
-                </td>
+                <th>📖 Book ID</th>
+                <th>🕒 Booking Time</th>
+                <th>📅 Booking Date</th>
+                <th>🚌 Bus</th>
+                <th>💺 Seat</th>
+                <th>👤 User</th>
+                <th>🔧 Actions</th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (var book in Model.Items)
+            {
+                <tr>
+                    <td>@book.Id</td>
+                    <td>@(book.Time?.TimeOnly != null ? book.Time.TimeOnly.ToString("hh\\:mm tt") : "N/A")</td>
+                    <td>@(book.Time?.Appointment?.Date.ToString("yyyy-MM-dd") ?? "N/A")</td>
+                    <td>@book.Time?.BusID</td>
+                    <td>@book.SeatId</td>
+                    <td>@book.User?.UserName</td>
+                    <td class="d-flex gap-2 justify-content-center">
+                        <a asp-action="GetBookByID" asp-route-id="@book.Id" class="btn btn-info" title="View">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        <a asp-action="EditBook" asp-route-id="@book.Id" class="btn btn-warning" title="Edit">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <form asp-action="DeleteBook" asp-route-id="@book.Id" method="get" class="d-inline">
+                            <button type="submit" class="delete-button" title="Delete">
+                                <svg class="delete-svgIcon" viewBox="0 0 448 512">
+                                    <path d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z"></path>
+                                </svg>
+                            </button>
+                        </form>
 
-@* <a asp-action="CreateBook" class="btn btn-success">➕ Create New Booking</a>
- *@
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <!-- Pagination -->
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+            @if (Model.HasPrevious)
+            {
+                <li class="page-item">
+                    <a class="page-link" asp-action="GetAllBooks" asp-route-page="@(Model.PageNumber - 1)" asp-route-search="@ViewData["SearchQuery"]">Previous</a>
+                </li>
+            }
+
+            @for (int i = 1; i <= Model.TotalPages; i++)
+            {
+                <li class="page-item @(Model.PageNumber == i ? "active" : "")">
+                    <a class="page-link" asp-action="GetAllBooks" asp-route-page="@i" asp-route-search="@ViewData["SearchQuery"]">@i</a>
+                </li>
+            }
+
+            @if (Model.HasNext)
+            {
+                <li class="page-item">
+                    <a class="page-link" asp-action="GetAllBooks" asp-route-page="@(Model.PageNumber + 1)" asp-route-search="@ViewData["SearchQuery"]">Next</a>
+                </li>
+            }
+        </ul>
+    </nav>
+</div>
+
+<!-- CSS Styles -->
+<style>
+    .container {
+        max-width: 90%;
+        margin: auto;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .table-striped tbody tr:nth-of-type(odd) {
+        background-color: #f8f9fa;
+    }
+
+    .text-center {
+        text-align: center;
+    }
+
+    .d-flex {
+        display: flex;
+        gap: 5px;
+    }
+
+    /* Delete Button Styles */
+    .delete-button {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: rgb(20, 20, 20);
+        border: none;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.164);
+        cursor: pointer;
+        transition-duration: 0.3s;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .delete-svgIcon {
+        width: 15px;
+        transition-duration: 0.3s;
+    }
+
+        .delete-svgIcon path {
+            fill: white;
+        }
+
+    .delete-button:hover {
+        width: 90px;
+        border-radius: 50px;
+        transition-duration: 0.3s;
+        background-color: rgb(255, 69, 69);
+        align-items: center;
+    }
+
+        .delete-button:hover .delete-svgIcon {
+            width: 20px;
+            transition-duration: 0.3s;
+            transform: translateY(60%);
+            -webkit-transform: rotate(360deg);
+            -moz-transform: rotate(360deg);
+            -o-transform: rotate(360deg);
+            -ms-transform: rotate(360deg);
+            transform: rotate(360deg);
+        }
+
+    .delete-button::before {
+        display: none;
+        content: "Delete";
+        color: white;
+        transition-duration: 0.3s;
+        font-size: 2px;
+    }
+
+    .delete-button:hover::before {
+        display: block;
+        padding-right: 10px;
+        font-size: 13px;
+        opacity: 1;
+        transform: translateY(0px);
+        transition-duration: 0.3s;
+    }
+</style>

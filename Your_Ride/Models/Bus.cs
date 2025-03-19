@@ -10,6 +10,8 @@ namespace Your_Ride.Models
         public string? DriverName { get; set; }
         public string? DriverPhone { get; set; }
 
+        //public bool IsAvailable { get; set; } = true;
+
         [Required]
         public string BusIdentifier { get; set; } 
 

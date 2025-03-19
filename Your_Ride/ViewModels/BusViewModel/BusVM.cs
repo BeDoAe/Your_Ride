@@ -22,6 +22,8 @@ namespace Your_Ride.ViewModels.BusViewModel
 
         public string? DriverName { get; set; }
         public string? DriverPhone { get; set; }
+        //public bool IsAvailable { get; set; } = true;
+
     }
     //public class PositiveNumberAttribute : ValidationAttribute
     //{

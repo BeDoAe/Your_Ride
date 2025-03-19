@@ -548,21 +548,65 @@ namespace Your_Ride.Controllers
         }
 
         // List users with roles
-        public async Task<IActionResult> UserRoles()
+        #region Old View UserRoles
+        //public async Task<IActionResult> UserRoles()
+        //{
+        //    var users = _userManager.Users.ToList();
+        //    var roles = _roleManager.Roles.Select(r => r.Name).ToList();
+
+        //    var model = new UserRolesVM
+        //    {
+        //        Users = users.Select(user => new UserVM
+        //        {
+        //            UserId = user.Id,
+        //            Email = user.Email,
+        //            UserName = user.UserName,
+        //            Roles = _userManager.GetRolesAsync(user).Result
+        //        }).ToList(),
+        //        Roles = roles
+        //    };
+
+        //    return View("UserRoles", model);
+        //} 
+        #endregion
+
+        [HttpGet]
+        public async Task<IActionResult> UserRoles(string search, int pageNumber = 1, int pageSize = 10)
         {
             var users = _userManager.Users.ToList();
             var roles = _roleManager.Roles.Select(r => r.Name).ToList();
 
+            var userVMList = users.Select(user => new UserVM
+            {
+                UserId = user.Id,
+                Email = user.Email,
+                UserName = user.UserName,
+                UserImg = user.Pic_URL ,
+                Roles = _userManager.GetRolesAsync(user).Result
+            }).ToList();
+
+            // Apply search filter
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                userVMList = userVMList
+                    .Where(u => u.UserName.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                                u.Email.Contains(search, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+            }
+
+            // Apply pagination
+            var paginatedUsers = new PaginatedList<UserVM>(
+                userVMList.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList(),
+                userVMList.Count,
+                pageNumber,
+                pageSize
+            );
+
             var model = new UserRolesVM
             {
-                Users = users.Select(user => new UserVM
-                {
-                    UserId = user.Id,
-                    Email = user.Email,
-                    UserName = user.UserName,
-                    Roles = _userManager.GetRolesAsync(user).Result
-                }).ToList(),
-                Roles = roles
+                Users = paginatedUsers.Items,
+                Roles = roles,
+                Pagination = paginatedUsers
             };
 
             return View("UserRoles", model);
