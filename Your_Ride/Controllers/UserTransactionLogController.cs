@@ -25,12 +25,31 @@ namespace Your_Ride.Controllers
             this.appointmentService = appointmentService;
         }
         //     /UserTransactionLog/GetAllUserTransactionsLogs
+        //[HttpGet]
+        //public async Task<IActionResult> GetAllUserTransactionsLogs()
+        //{
+        //    List<UserTransactionLogVM> userTransactionLogVMs = await userTransactionLogService.GetAllUserTransactioLogs();
+        //    return View("GetAllUserTransactionsLogs", userTransactionLogVMs);
+        //}
         [HttpGet]
-        public async Task<IActionResult> GetAllUserTransactionsLogs()
+        public async Task<IActionResult> GetAllUserTransactionsLogs(int page = 1, string searchQuery = "")
         {
-            List<UserTransactionLogVM> userTransactionLogVMs = await userTransactionLogService.GetAllUserTransactioLogs();
+            int pageSize = 10;
+            var userTransactionLogVMs = await userTransactionLogService.GetAllUserTransactioLogs(page, pageSize, searchQuery);
+
+            // Calculate total page count
+            int totalRecords = await userTransactionLogService.GetTotalRecordsCount(searchQuery); // Add this method in your service
+            int pageCount = (int)Math.Ceiling((double)totalRecords / pageSize);
+
+            // Pass pageCount and current page to the view
+            ViewData["CurrentPage"] = page;
+            ViewData["PageCount"] = pageCount;
+            ViewData["SearchQuery"] = searchQuery;
+
             return View("GetAllUserTransactionsLogs", userTransactionLogVMs);
         }
+
+
         [HttpGet]
         public async Task<IActionResult> GetUserTransactionsLogById(int id)
         {

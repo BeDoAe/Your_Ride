@@ -490,6 +490,22 @@ namespace Your_Ride.Controllers
 
                 if (applicationUser != null)
                 {
+                    // Check if user is locked
+                    if (applicationUser.IsLocked == true && applicationUser.LockoutEnd.HasValue)
+                    {
+                        if (applicationUser.LockoutEnd.Value > DateTime.UtcNow) // User is still locked
+                        {
+                            ModelState.AddModelError("", $"Your account is locked until {applicationUser.LockoutEnd.Value.ToLocalTime()}.");
+                            return View(loginUserVM);
+                        }
+                        else
+                        {
+                            // Unlock the user if lockout period has expired
+                            applicationUser.IsLocked = false;
+                            applicationUser.LockoutEnd = null;
+                            await _userManager.UpdateAsync(applicationUser);
+                        }
+                    }
                     // Check password
                     bool isCorrect = await _userManager.CheckPasswordAsync(applicationUser, loginUserVM.Password);
 
@@ -582,6 +598,8 @@ namespace Your_Ride.Controllers
                 Email = user.Email,
                 UserName = user.UserName,
                 UserImg = user.Pic_URL ,
+                IsLocked=user.IsLocked,
+                IsDeleted=user.IsDeleted,
                 Roles = _userManager.GetRolesAsync(user).Result
             }).ToList();
 
@@ -740,6 +758,56 @@ namespace Your_Ride.Controllers
 
             return RedirectToAction(nameof(UserRoles));
         }
+        [Authorize(Roles = "Admin")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+
+        public async Task<IActionResult> BlockUser(string userID)
+        {
+            var user = await _userManager.FindByIdAsync(userID);
+            if (user == null) return NotFound();
+
+            // Lock user out permanently
+            user.LockoutEnabled = true;
+            user.LockoutEnd = DateTimeOffset.MaxValue; // Effectively a permanent lockout
+            user.IsLocked = true;
+
+            // Invalidate all authentication sessions
+            await _userManager.UpdateSecurityStampAsync(user);
+
+            var result = await _userManager.UpdateAsync(user);
+            if (!result.Succeeded)
+            {
+                return BadRequest("Failed to block user.");
+            }
+
+            return RedirectToAction("UserRoles");
+        }
+        [Authorize(Roles = "Admin")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+
+        public async Task<IActionResult> UnblockUser(string userID)
+        {
+            var user = await _userManager.FindByIdAsync(userID);
+            if (user == null) return NotFound();
+
+            user.LockoutEnd = null; // Remove lockout
+            user.IsLocked = false;
+
+            await _userManager.UpdateSecurityStampAsync(user);
+
+            var result = await _userManager.UpdateAsync(user);
+            if (!result.Succeeded)
+            {
+                return BadRequest("Failed to unblock user.");
+            }
+
+            return RedirectToAction("UserRoles");
+        }
+
+
+
         [HttpGet]
         // Show Forgot Password View
         public IActionResult ForgotPassword()

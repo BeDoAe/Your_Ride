@@ -35,11 +35,18 @@ namespace Your_Ride.Controllers
         //}
 
         // GET:  /Transaction/GetAllTransactions
-        public async Task<IActionResult> GetAllTransactions(string search = "", int pageNumber = 1, int pageSize = 10, string sortColumn = "Date", bool ascending = false)
+        [HttpGet]
+        public async Task<IActionResult> GetAllTransactions(
+         string search = "",
+         int pageNumber = 1,
+         int pageSize = 10,
+         string sortColumn = "Date",
+         bool ascending = false)
         {
             var transactions = await transactionService.GetAllTransactions(search, pageNumber, pageSize, sortColumn, ascending);
             return View("GetAllTransactions", transactions);
         }
+
 
 
         // GET:      /Transaction/GetTransactionDetails/{id}

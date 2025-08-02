@@ -53,6 +53,12 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.SlidingExpiration = true;
 });
 // Add services to the container.
+builder.Services.Configure<IdentityOptions>(options =>
+{
+    options.Lockout.AllowedForNewUsers = true;
+    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromDays(36500); // Effectively permanent
+    options.Lockout.MaxFailedAccessAttempts = 5; // Optional: Lockout after 5 failed attempts
+});
 
 builder.Services.AddRazorPages();
 
@@ -131,6 +137,7 @@ app.UseStaticFiles();
 app.UseRouting();
 
 app.UseAuthentication();
+app.UseMiddleware<LockoutMiddleware>();
 app.UseAuthorization();
 
 app.MapControllerRoute(

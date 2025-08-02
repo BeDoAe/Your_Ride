@@ -20,6 +20,40 @@ namespace Your_Ride.Repository.UserTransactionLogRepo
             return userTransactionLogs;
 
         }
+        public async Task<List<UserTransactionLog>> GetUserTransactionLogsWithSearch(int page, int pageSize, string searchQuery)
+        {
+            var query = context.userTransactionLogs.Include(x => x.User)
+                                                   .Include(x => x.Appointment)
+                                                   .Include(x => x.Time)
+                                                   .AsQueryable();
+
+            if (!string.IsNullOrEmpty(searchQuery))
+            {
+                query = query.Where(x => x.User.UserName.Contains(searchQuery) ||
+                                         x.WithdrawalAmount.ToString().Contains(searchQuery) ||
+                                         x.TransactionTime.ToString().Contains(searchQuery) ||
+                                         x.Appointment.Date.ToString().Contains(searchQuery));
+            }
+
+            return await query.Skip((page - 1) * pageSize)
+                              .Take(pageSize)
+                              .ToListAsync();
+        }
+        public async Task<int> GetTotalRecordsCount(string searchQuery)
+        {
+            var query = context.userTransactionLogs.AsQueryable();
+
+            if (!string.IsNullOrEmpty(searchQuery))
+            {
+                query = query.Where(x => x.User.UserName.Contains(searchQuery) ||
+                                         x.WithdrawalAmount.ToString().Contains(searchQuery) ||
+                                         x.TransactionTime.ToString().Contains(searchQuery) ||
+                                         x.Appointment.Date.ToString().Contains(searchQuery));
+            }
+
+            return await query.CountAsync();
+        }
+
         public async Task<UserTransactionLog> GetUserTransactionLogsById(int id)
         {
 

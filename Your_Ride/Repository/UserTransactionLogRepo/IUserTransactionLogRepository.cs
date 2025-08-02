@@ -6,6 +6,9 @@ namespace Your_Ride.Repository.UserTransactionLogRepo
     public interface IUserTransactionLogRepository : IRepository<UserTransactionLog>
     {
         public Task<List<UserTransactionLog>> GetAllUserTransactionLogs();
+        public Task<List<UserTransactionLog>> GetUserTransactionLogsWithSearch(int page, int pageSize, string searchQuery);
+        public Task<int> GetTotalRecordsCount(string searchQuery);
+
         public Task<UserTransactionLog> GetUserTransactionLogsById(int id);
         public Task<List<UserTransactionLog>> GetAllUserTransactionLogsByUserID(string id);
         public Task<List<UserTransactionLog>> GetAllUserTransactionLogsByTimeID(int id);

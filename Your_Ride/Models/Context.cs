@@ -130,7 +130,7 @@ namespace Your_Ride.Models
 
 
             modelBuilder.Entity<ApplicationUser>()
-                .HasQueryFilter(x => x.IsLocked != true)
+                //.HasQueryFilter(x => x.IsLocked != true)
                 .HasQueryFilter(x => x.IsDeleted != true);  
 
             base.OnModelCreating(modelBuilder);

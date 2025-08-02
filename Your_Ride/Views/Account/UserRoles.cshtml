@@ -1,7 +1,7 @@
 ﻿@model Your_Ride.ViewModels.Account.UserRolesVM
 
 <h2 class="text-center">User & Role Management</h2>
-        <hr style="margin-bottom:10px" />
+<hr style="margin-bottom:10px" />
 
 <div class="row" style="margin-bottom:15px ; padding-block:10px">
     <!-- User Management -->
@@ -19,6 +19,7 @@
             </form>
         </div>
         <hr />
+
         <!-- User Cards -->
         <div class="user-cards-container">
             @foreach (var user in Model.Users)
@@ -33,6 +34,22 @@
                     </p>
 
                     <div class="user-actions">
+                                                 <!-- Block/Unblock User -->
+                        <form asp-controller="Account" asp-action="@(user.IsLocked ? "UnblockUser" : "BlockUser")" method="post">
+                            <input type="hidden" name="userID" value="@user.UserId" />
+                            <button type="submit" class="custom-btn @(user.IsLocked ? "unblock-btn" : "block-btn")">
+                                <span class="shadow"></span>
+                                <span class="edge"></span>
+                                <span class="front text">
+                                    <i class="fas @(user.IsLocked ? "fa-unlock" : "fa-lock")"></i>
+                                    @(user.IsLocked ? "Unblock" : "Block")
+                                </span>
+                            </button>
+                        </form>
+
+
+
+
                         <!-- Assign Role -->
                         <form asp-action="AssignRole" asp-controller="Account" method="post" class="role-form assign-role">
                             <input type="hidden" name="userId" value="@user.UserId" />
@@ -63,6 +80,36 @@
                     </div>
                 </div>
             }
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination-container text-center mt-4">
+            <ul class="pagination justify-content-center">
+                @if (Model.Pagination.HasPrevious)
+                {
+                    <li class="page-item">
+                        <a class="page-link" asp-action="UserRoles" asp-route-pageNumber="@(Model.Pagination.PageNumber - 1)" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                }
+
+                @for (var i = 1; i <= Model.Pagination.TotalPages; i++)
+                {
+                    <li class="page-item @(i == Model.Pagination.PageNumber ? "active" : "")">
+                        <a class="page-link" asp-action="UserRoles" asp-route-pageNumber="@i">@i</a>
+                    </li>
+                }
+
+                @if (Model.Pagination.HasNext)
+                {
+                    <li class="page-item">
+                        <a class="page-link" asp-action="UserRoles" asp-route-pageNumber="@(Model.Pagination.PageNumber + 1)" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                }
+            </ul>
         </div>
     </div>
 
@@ -158,7 +205,7 @@
         background-color: #d4edda;
         padding: 2px;
         border-radius: 1px;
-        margin-bottom:10px;
+        margin-bottom: 10px;
     }
 
     .remove-role {
@@ -228,4 +275,101 @@
         padding-right: 10px;
         font-size: 13px;
     }
+    /* Block/Unblock Button */
+  
+    /* Base button styles */
+    .custom-btn {
+        position: relative;
+        border: none;
+        background: transparent;
+        padding: 0;
+        cursor: pointer;
+        outline-offset: 4px;
+        transition: filter 250ms;
+        user-select: none;
+        touch-action: manipulation;
+        font-size: 1.1rem;
+    }
+
+        /* Default blue button */
+        .custom-btn .front {
+            display: block;
+            position: relative;
+            padding: 12px 27px;
+            border-radius: 12px;
+            color: white;
+            background: hsl(220deg 90% 55%);
+            will-change: transform;
+            transform: translateY(-4px);
+            transition: transform 600ms cubic-bezier(.3, .7, .4, 1);
+        }
+
+        /* Button shadow */
+        .custom-btn .shadow {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 12px;
+            background: hsl(0deg 0% 0% / 0.25);
+            will-change: transform;
+            transform: translateY(2px);
+            transition: transform 600ms cubic-bezier(.3, .7, .4, 1);
+        }
+
+        /* Edge effect */
+        .custom-btn .edge {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 12px;
+            background: linear-gradient(to left, hsl(220deg 100% 40%) 0%, hsl(220deg 100% 50%) 8%, hsl(220deg 100% 50%) 92%, hsl(220deg 100% 40%) 100%);
+        }
+
+        /* Hover effect */
+        .custom-btn:hover {
+            filter: brightness(110%);
+        }
+
+            .custom-btn:hover .front {
+                transform: translateY(-6px);
+                transition: transform 250ms cubic-bezier(.3, .7, .4, 1.5);
+            }
+
+        .custom-btn:active .front {
+            transform: translateY(-2px);
+            transition: transform 34ms;
+        }
+
+        .custom-btn:hover .shadow {
+            transform: translateY(4px);
+            transition: transform 250ms cubic-bezier(.3, .7, .4, 1.5);
+        }
+
+        .custom-btn:active .shadow {
+            transform: translateY(1px);
+            transition: transform 34ms;
+        }
+
+    /* Specific colors for block/unblock states */
+    .block-btn .front {
+        background: hsl(345deg 100% 47%);
+    }
+
+    .block-btn .edge {
+        background: linear-gradient(to left, hsl(340deg 100% 16%) 0%, hsl(340deg 100% 32%) 8%, hsl(340deg 100% 32%) 92%, hsl(340deg 100% 16%) 100%);
+    }
+
+    .unblock-btn .front {
+        background: hsl(140deg 80% 35%);
+    }
+
+    .unblock-btn .edge {
+        background: linear-gradient(to left, hsl(140deg 100% 20%) 0%, hsl(140deg 100% 40%) 8%, hsl(140deg 100% 40%) 92%, hsl(140deg 100% 20%) 100%);
+    }
+
+
 </style>

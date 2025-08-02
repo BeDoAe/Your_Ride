@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Your_Ride.Helper;
 using Your_Ride.Services.WalletServ;
 using Your_Ride.ViewModels.WalletViewModel;
 
@@ -14,10 +15,29 @@ namespace Your_Ride.Controllers
         }
         //  /Wallet/GetAllWallets
         [HttpGet]
-        public async Task<IActionResult> GetAllWallets()
+        public async Task<IActionResult> GetAllWallets(string search, int pageNumber = 1, int pageSize = 10)
         {
-            List<WalletVM> walletVMs= await walletService.GetAllWallets();
-            return View("GetAllWallets", walletVMs);
+            List<WalletVM> allWallets = await walletService.GetAllWallets();
+
+            // Filtering based on search query
+            if (!string.IsNullOrEmpty(search))
+            {
+                allWallets = allWallets
+                    .Where(w => w.User.UserName.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                                w.Amount.ToString().Contains(search))
+                    .ToList();
+            }
+
+            // Pagination logic
+            int totalItems = allWallets.Count();
+            List<WalletVM> paginatedWallets = allWallets
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            var paginatedList = new PaginatedList<WalletVM>(paginatedWallets, totalItems, pageNumber, pageSize);
+
+            return View("GetAllWallets", paginatedList);
         }
 
         [HttpGet]

@@ -1,4 +1,5 @@
 ﻿using Your_Ride.Models;
+using Your_Ride.Repository.UserTransactionLogRepo;
 using Your_Ride.Services.Generic;
 using Your_Ride.ViewModels.UserTransactionLogViewModel;
 
@@ -6,7 +7,15 @@ namespace Your_Ride.Services.UserTransactionLogServ
 {
     public  interface IUserTransactionLogService :IService<UserTransactionLog>
     {
-        public Task<List<UserTransactionLogVM>> GetAllUserTransactioLogs();
+        //public Task<List<UserTransactionLogVM>> GetAllUserTransactioLogs();
+        //public Task<List<UserTransactionLogVM>> GetAllUserTransactioLogs(int pageNumber, int pageSize, string searchQuery);
+
+        public Task<List<UserTransactionLogVM>> GetAllUserTransactioLogs(int page, int pageSize, string searchQuery);
+        public Task<int> GetTotalRecordsCount(string searchQuery);
+       
+
+
+
         public Task<UserTransactionLogVM> GetUserTransactioLogById(int id);
 
         public Task<List<UserTransactionLogVM>> GetAllUserTransactioLogsByUserId(string id);

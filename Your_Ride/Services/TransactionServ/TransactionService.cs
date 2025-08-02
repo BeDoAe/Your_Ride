@@ -22,13 +22,82 @@ namespace Your_Ride.Services.TransactionServ
             this.walletRepository = walletRepository;
             this.automapper = automapper;
         }
-        public async Task<List<TransactionvM>> GetAllTransactions()
+        //public async Task<List<TransactionvM>> GetAllTransactions()
+        //{
+        //    List<Transaction> transactions = await transactionRepository.GetAllAsync();
+
+        //    List<TransactionvM > transactionvMs = automapper.Map<List<TransactionvM>>(transactions);
+        //    return transactionvMs;
+        //}
+        public async Task<PaginatedList<TransactionvM>> GetAllTransactions(string search, int pageNumber, int pageSize, string sortColumn, bool ascending)
         {
-            List<Transaction> transactions = await transactionRepository.GetAllAsync();
-            
-            List<TransactionvM > transactionvMs = automapper.Map<List<TransactionvM>>(transactions);
-            return transactionvMs;
+            var transactions = await transactionRepository.GetAllTransaction(); // Fetch all transactions
+            if (transactions == null)
+            {
+                transactions = new List<Transaction>(); // Return an empty list if null
+            }
+            // 🔍 Search functionality
+            var filteredTransactions = transactions
+                .Where(t => (t.User != null && t.User.UserName.Contains(search, StringComparison.OrdinalIgnoreCase)) ||
+                            t.Amount.ToString().Contains(search) ||
+                            (t.Admin != null && t.Admin.UserName.Contains(search)) ||
+                            (t.TransactionDate != null && t.TransactionDate.ToString("yyyy-MM-dd").Contains(search))) // Filter by search terms
+                .ToList();
+
+            // 🔄 Sorting functionality
+            IOrderedEnumerable<Transaction> sortedTransactions;
+            switch (sortColumn)
+            {
+                case "Id":
+                    sortedTransactions = ascending
+                        ? filteredTransactions.OrderBy(t => t.Id)
+                        : filteredTransactions.OrderByDescending(t => t.Id);
+                    break;
+                case "Amount":
+                    sortedTransactions = ascending
+                        ? filteredTransactions.OrderBy(t => t.Amount)
+                        : filteredTransactions.OrderByDescending(t => t.Amount);
+                    break;
+                case "TransactionDate":
+                    sortedTransactions = ascending
+                        ? filteredTransactions.OrderBy(t => t.TransactionDate)
+                        : filteredTransactions.OrderByDescending(t => t.TransactionDate);
+                    break;
+                case "User":
+                    sortedTransactions = ascending
+                        ? filteredTransactions.OrderBy(t => t.User?.UserName)  // null check for User
+                        : filteredTransactions.OrderByDescending(t => t.User?.UserName);
+                    break;
+                case "Admin":
+                    sortedTransactions = ascending
+                        ? filteredTransactions.OrderBy(t => t.Admin?.UserName)  // null check for Admin
+                        : filteredTransactions.OrderByDescending(t => t.Admin?.UserName);
+                    break;
+                default:
+                    // Default sorting by TransactionDate
+                    sortedTransactions = ascending
+                        ? filteredTransactions.OrderBy(t => t.TransactionDate)
+                        : filteredTransactions.OrderByDescending(t => t.TransactionDate);
+                    break;
+            }
+
+            // 📄 Pagination functionality
+            var paginatedTransactions = sortedTransactions
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            // Mapping to view model
+            var transactionVms = automapper.Map<List<TransactionvM>>(paginatedTransactions);
+            if (transactionVms == null)
+            {
+                transactionVms = new List<TransactionvM>(); // Handle null data
+            }
+            return new PaginatedList<TransactionvM>(transactionVms, filteredTransactions.Count, pageNumber, pageSize);
         }
+
+
+
         public async Task<TransactionvM> GetTransactionByID(int TransactionID)
         {
           
@@ -131,53 +200,53 @@ namespace Your_Ride.Services.TransactionServ
 
 
         }
-        public async Task<PaginatedList<TransactionvM>> GetAllTransactions(string search, int pageNumber, int pageSize, string sortColumn, bool ascending)
-        {
-            IQueryable<Transaction> query = transactionRepository.GetAllQuery();
+        //public async Task<PaginatedList<TransactionvM>> GetAllTransactions(string search, int pageNumber, int pageSize, string sortColumn, bool ascending)
+        //{
+        //    IQueryable<Transaction> query = transactionRepository.GetAllQuery();
 
-            // 🔍 Search functionality
-            if (!string.IsNullOrEmpty(search))
-            {
-                query = query.Where(t =>
-                    t.User.FirstName.Contains(search) ||
-                    t.User.LastName.Contains(search) ||
-                    t.Admin.FirstName.Contains(search) ||
-                    t.Admin.LastName.Contains(search) ||
-                    t.Amount.ToString().Contains(search)
-                );
-            }
+        //    // 🔍 Search functionality
+        //    if (!string.IsNullOrEmpty(search))
+        //    {
+        //        query = query.Where(t =>
+        //            t.User.FirstName.Contains(search) ||
+        //            t.User.LastName.Contains(search) ||
+        //            t.Admin.FirstName.Contains(search) ||
+        //            t.Admin.LastName.Contains(search) ||
+        //            t.Amount.ToString().Contains(search)
+        //        );
+        //    }
 
-            // 🔄 Sorting
-            query = sortColumn switch
-            {
-                "Id" => ascending ? query.OrderBy(t => t.Id) : query.OrderByDescending(t => t.Id),
-                "Amount" => ascending ? query.OrderBy(t => t.Amount) : query.OrderByDescending(t => t.Amount),
-                "Date" => ascending ? query.OrderBy(t => t.TransactionDate) : query.OrderByDescending(t => t.TransactionDate),
-                "User" => ascending ? query.OrderBy(t => t.User.FirstName).ThenBy(t => t.User.LastName)
-                                    : query.OrderByDescending(t => t.User.FirstName).ThenByDescending(t => t.User.LastName),
-                "Admin" => ascending ? query.OrderBy(t => t.Admin.FirstName).ThenBy(t => t.Admin.LastName)
-                                     : query.OrderByDescending(t => t.Admin.FirstName).ThenByDescending(t => t.Admin.LastName),
-                _ => query.OrderByDescending(t => t.TransactionDate) // Default sorting by date descending
-            };
+        //    // 🔄 Sorting
+        //    query = sortColumn switch
+        //    {
+        //        "Id" => ascending ? query.OrderBy(t => t.Id) : query.OrderByDescending(t => t.Id),
+        //        "Amount" => ascending ? query.OrderBy(t => t.Amount) : query.OrderByDescending(t => t.Amount),
+        //        "Date" => ascending ? query.OrderBy(t => t.TransactionDate) : query.OrderByDescending(t => t.TransactionDate),
+        //        "User" => ascending ? query.OrderBy(t => t.User.FirstName).ThenBy(t => t.User.LastName)
+        //                            : query.OrderByDescending(t => t.User.FirstName).ThenByDescending(t => t.User.LastName),
+        //        "Admin" => ascending ? query.OrderBy(t => t.Admin.FirstName).ThenBy(t => t.Admin.LastName)
+        //                             : query.OrderByDescending(t => t.Admin.FirstName).ThenByDescending(t => t.Admin.LastName),
+        //        _ => query.OrderByDescending(t => t.TransactionDate) // Default sorting by date descending
+        //    };
 
-            // 📄 Pagination
-            var totalItems = await query.CountAsync();
-            var transactions = await query
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize)
-                .Select(t => new TransactionvM
-                {
-                    Id = t.Id,
-                    Amount = t.Amount,
-                    TransactionDate = t.TransactionDate,
-                    User = t.User,
-                    Admin = t.Admin,
-                    Wallet = t.Wallet
-                })
-                .ToListAsync();
+        //    // 📄 Pagination
+        //    var totalItems = await query.CountAsync();
+        //    var transactions = await query
+        //        .Skip((pageNumber - 1) * pageSize)
+        //        .Take(pageSize)
+        //        .Select(t => new TransactionvM
+        //        {
+        //            Id = t.Id,
+        //            Amount = t.Amount,
+        //            TransactionDate = t.TransactionDate,
+        //            User = t.User,
+        //            Admin = t.Admin,
+        //            Wallet = t.Wallet
+        //        })
+        //        .ToListAsync();
 
-            return new PaginatedList<TransactionvM>(transactions, totalItems, pageNumber, pageSize);
-        }
+        //    return new PaginatedList<TransactionvM>(transactions, totalItems, pageNumber, pageSize);
+        //}
 
     }
 }

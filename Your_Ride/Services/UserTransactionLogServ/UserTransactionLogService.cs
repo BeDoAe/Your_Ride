@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Your_Ride.Models;
 using Your_Ride.Models.Your_Ride.Models;
 using Your_Ride.Repository.AppointmentRepo;
@@ -27,14 +28,26 @@ namespace Your_Ride.Services.UserTransactionLogServ
             this.appointmentRepository = appointmentRepository;
         }
 
-        public async Task<List<UserTransactionLogVM>> GetAllUserTransactioLogs()
+        //public async Task<List<UserTransactionLogVM>> GetAllUserTransactioLogs()
+        //{
+        //    List<UserTransactionLog> userTransactionLogs = await userTransactionLogRepository.GetAllUserTransactionLogs();
+
+        //    List<UserTransactionLogVM> userTransactionLogVMs = autoMapper.Map <List<UserTransactionLogVM>> (userTransactionLogs );
+
+        //    return userTransactionLogVMs;
+        //}
+
+        public async Task<List<UserTransactionLogVM>> GetAllUserTransactioLogs(int page, int pageSize, string searchQuery)
         {
-            List<UserTransactionLog> userTransactionLogs = await userTransactionLogRepository.GetAllUserTransactionLogs();
-
-            List<UserTransactionLogVM> userTransactionLogVMs = autoMapper.Map <List<UserTransactionLogVM>> (userTransactionLogs );
-
-            return userTransactionLogVMs;
+            var userTransactionLogs = await userTransactionLogRepository.GetUserTransactionLogsWithSearch(page, pageSize, searchQuery);
+            return autoMapper.Map<List<UserTransactionLogVM>>(userTransactionLogs);
         }
+        public async Task<int> GetTotalRecordsCount(string searchQuery)
+        {
+            return await userTransactionLogRepository.GetTotalRecordsCount(searchQuery);
+        }
+
+
         public async Task<UserTransactionLogVM> GetUserTransactioLogById(int id)
         {
             UserTransactionLog userTransactionLog = await userTransactionLogRepository.GetUserTransactionLogsById(id);
@@ -138,5 +151,6 @@ namespace Your_Ride.Services.UserTransactionLogServ
             return result;
         }
 
+     
     }
 }
